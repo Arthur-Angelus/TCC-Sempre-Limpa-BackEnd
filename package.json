@@ -9,6 +9,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "jest": "^30.3.0",
+    "knex": "^3.2.9",
+    "mysql2": "^3.22.3"
   }
 }
