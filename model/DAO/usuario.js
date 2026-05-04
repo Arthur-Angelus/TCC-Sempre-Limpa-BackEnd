@@ -10,109 +10,109 @@ const knex = require('../../db')
 const getSelectAllUsers = async function () {
     knex.select('*')
 
-    .from('usuario')
+        .from('usuario')
 
-    .then(rows => {
+        .then(rows => {
 
-        console.log(rows);
+            console.log(rows);
 
-    })
+        })
 
-    .catch(err => {
+        .catch(err => {
 
-        console.error(err);
+            console.error(err);
 
-    })
+        })
 
-    .finally(() => {
+        .finally(() => {
 
-        knex.destroy();
+            knex.destroy();
 
-    });
+        });
 }
 
 const getSelectUserById = async function (id) {
     knex.select('*')
 
-    .from('usuario')
+        .from('usuario')
 
-    .where({ id: id})
+        .where({ id: id })
 
-    .first()
+        .first()
 
-    .then(rows => {
+        .then(rows => {
 
-        console.log(rows);
+            console.log(rows);
 
-    })
+        })
 
-    .catch(err => {
+        .catch(err => {
 
-        console.error(err);
+            console.error(err);
 
-    })
+        })
 
-    .finally(() => {
+        .finally(() => {
 
-        knex.destroy();
+            knex.destroy();
 
-    });
+        });
 }
 
 const getSelectUserByEmail = async function (email, senha) {
     knex.select('*')
 
-    .from('usuario')
+        .from('usuario')
 
-    .where({ email: email, senha: senha})
+        .where({ email: email, senha: senha })
 
-    .first()
+        .first()
 
-    .then(rows => {
+        .then(rows => {
 
-        console.log(rows);
+            console.log(rows);
 
-    })
+        })
 
-    .catch(err => {
+        .catch(err => {
 
-        console.error(err);
+            console.error(err);
 
-    })
+        })
 
-    .finally(() => {
+        .finally(() => {
 
-        knex.destroy();
+            knex.destroy();
 
-    });
+        });
 }
 
 const getSelectUserByCpf = async function (cpf, senha) {
     knex.select('*')
 
-    .from('usuario')
+        .from('usuario')
 
-    .where({ cpf: cpf, senha: senha})
+        .where({ cpf: cpf, senha: senha })
 
-    .first()
+        .first()
 
-    .then(rows => {
+        .then(rows => {
 
-        console.log(rows);
+            console.log(rows);
 
-    })
+        })
 
-    .catch(err => {
+        .catch(err => {
 
-        console.error(err);
+            console.error(err);
 
-    })
+        })
 
-    .finally(() => {
+        .finally(() => {
 
-        knex.destroy();
+            knex.destroy();
 
-    });
+        });
 }
 
 const setInsertUsers = async function () {
@@ -126,57 +126,55 @@ const setInsertUsers = async function () {
     })
 }
 
-const setUpdateUsers = async function () {
+const setUpdateUsers = async function (id) {
     knex('usuario')
-    
-    .where({ id: 1})
-    
-    .update({
-        nome: 'joseph',
-        e_mail: 'josephReiDelas@gmail.com',
-        telefone: '11940583423',
-        cpf: '85747584754',
-        rne: '',
-        fk_endereco: 1
-    })
+
+        .where({ id: id })
+
+        .update({
+            nome: 'joseph',
+            e_mail: 'josephReiDelas@gmail.com',
+            telefone: '11940583423',
+            cpf: '85747584754',
+            rne: '',
+            fk_endereco: 1
+        })
 }
 
-const setDeleteUsers = async function () {
+const setDeleteUsers = async function (id) {
     knex('usuario')
-    
-    .where({ id: 1})
-    
-    .del()
+
+        .where({ id: id })
+
+        .del()
 }
 
-const getSelectLastID = async function (){
-    const getSelectUserById = async function (id) {
-        knex.select('*')
-    
+const getSelectLastID = async function () {
+    knex.select('*')
+
         .from('usuario')
-    
-        .where({ id: id})
-    
+
+        .where({ id: id })
+
         .last()
-    
+
         .then(rows => {
-    
+
             console.log(rows);
-    
+
         })
-    
+
         .catch(err => {
-    
+
             console.error(err);
-    
+
         })
-    
+
         .finally(() => {
-    
+
             knex.destroy();
-    
+
         });
-    }
 }
 
 module.exports = {
@@ -184,4 +182,8 @@ module.exports = {
     getSelectUserById,
     getSelectUserByEmail,
     getSelectUserByCpf,
+    setInsertUsers,
+    setUpdateUsers,
+    setDeleteUsers,
+    getSelectLastID
 }
