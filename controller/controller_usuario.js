@@ -257,6 +257,18 @@ const validarDadosUsuario = async function (Usuario) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Email incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
+    } else if (Usuario.telefone == '' || Usuario.telefone == undefined || Usuario.telefone == null || Usuario.telefone.length > 11) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Telefone incorreto]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Usuario.cpf == '' || Usuario.cpf == undefined || Usuario.cpf == null || Usuario.cpf.length > 11) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [CPF incorreto]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Usuario.rne == '' || Usuario.rne == undefined || Usuario.rne == null || Usuario.rne.length > 11) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [RNE incorreto]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
     } else {
         return false
     }
