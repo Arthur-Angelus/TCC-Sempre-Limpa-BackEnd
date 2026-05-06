@@ -2,179 +2,122 @@
  * Objetivo: Arquivo responsável pelas requisições CRUD do usuario
  * Data: 04/05/2026
  * Autor: Arthur Angelus
- * Versão: 1.0
+ * Versão: 2.0 (corrigido)
  *******************************************************************************************/
 
 const knex = require('../../db')
 
+// SELECT ALL
 const getSelectAllUsers = async function () {
-    knex.select('*')
-
-        .from('usuario')
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+    try {
+        const rows = await knex.select('*').from('usuario')
+        return rows
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
+// SELECT BY ID
 const getSelectUserById = async function (id) {
-    knex.select('*')
+    try {
+        const rows = await knex('usuario')
+            .select('*')
+            .where({ id: id })
 
-        .from('usuario')
-
-        .where({ id: id })
-
-        .first()
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+        return rows
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
+// SELECT BY EMAIL + SENHA
 const getSelectUserByEmail = async function (email, senha) {
-    knex.select('*')
+    try {
+        const rows = await knex('usuario')
+            .select('*')
+            .where({
+                e_mail: email,
+                senha: senha
+            })
 
-        .from('usuario')
-
-        .where({ email: email, senha: senha })
-
-        .first()
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+        return rows
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
+// SELECT BY CPF + SENHA
 const getSelectUserByCpf = async function (cpf, senha) {
-    knex.select('*')
+    try {
+        const rows = await knex('usuario')
+            .select('*')
+            .where({
+                cpf: cpf,
+                senha: senha
+            })
 
-        .from('usuario')
-
-        .where({ cpf: cpf, senha: senha })
-
-        .first()
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+        return rows
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
-const setInsertUsers = async function () {
-    knex('usuario').insert({
-        nome: 'joseph',
-        e_mail: 'josephReiDelas@gmail.com',
-        telefone: '11940583423',
-        cpf: '85747584754',
-        rne: '',
-        fk_endereco: 1
-    })
+// INSERT
+const setInsertUsers = async function (usuario) {
+    try {
+        const result = await knex('usuario').insert(usuario)
+        return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
-const setUpdateUsers = async function (id) {
-    knex('usuario')
+// UPDATE
+const setUpdateUsers = async function (usuario) {
+    try {
+        const result = await knex('usuario')
+            .where({ id: usuario.id })
+            .update(usuario)
 
-        .where({ id: id })
-
-        .update({
-            nome: 'joseph',
-            e_mail: 'josephReiDelas@gmail.com',
-            telefone: '11940583423',
-            cpf: '85747584754',
-            rne: '',
-            fk_endereco: 1
-        })
+        return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
+// DELETE
 const setDeleteUsers = async function (id) {
-    knex('usuario')
+    try {
+        const result = await knex('usuario')
+            .where({ id: id })
+            .del()
 
-        .where({ id: id })
-
-        .del()
+        return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
+// GET LAST ID
 const getSelectLastID = async function () {
-    knex.select('*')
+    try {
+        const result = await knex('usuario')
+            .select('id')
+            .orderBy('id', 'desc')
+            .first()
 
-        .from('usuario')
-
-        .where({ id: id })
-
-        .last()
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+        return result ? result.id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
 }
 
 module.exports = {

@@ -14,3 +14,5 @@ const knex = require('knex')({
         database: 'sempre_limpa_db'
     }
 });
+
+module.exports = knex

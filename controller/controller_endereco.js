@@ -7,7 +7,7 @@
 
 const enderecoDAO = require('../model/DAO/endereco.js')
 
-const DEFAULT_MESSAGES = require('./modulo/config_messages.js')
+const DEFAULT_MESSAGES = require('./module/config_messages.js')
 
 const listarEnderecos = async function () {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -17,20 +17,20 @@ const listarEnderecos = async function () {
 
         if (resultEnderecos) {
             if (resultEnderecos.length > 0) {
-                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCESS_REQUEST.status
-                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCESS_REQUEST.status_code
+                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
                 MESSAGES.DEFAULT_HEADER.items.Enderecos = resultEnderecos
 
                 return MESSAGES.DEFAULT_HEADER //200
             } else {
-                return MESSAGES.ERROR_NOT_FOUND //404
+                return MESSAGES.ERROR_NOT_FOUND + "controller listar enderecos"//404
             }
         } else {
-            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL + "controller listar enderecos"//500
         }
     } catch (error) {
         //console.log error
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER + "controller listar enderecos"//500
     }
 }
 
@@ -43,16 +43,16 @@ const buscarEnderecoID = async function (id) {
 
             if (resultEnderecos) {
                 if (resultEnderecos.length > 0) {
-                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCESS_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
                     MESSAGES.DEFAULT_HEADER.items.Endereco = resultEnderecos
 
                     return MESSAGES.DEFAULT_HEADER //200
                 } else {
-                    return MESSAGES.ERROR_NOT_FOUND //404
+                    return MESSAGES.ERROR_NOT_FOUND + "controller buscar endereco id"//404
                 }
             } else {
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL + "controller buscar endereco id"//500
             }
 
         } else {
@@ -61,7 +61,7 @@ const buscarEnderecoID = async function (id) {
         }
 
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER + "controller buscar endereco id"//500
     }
 }
 
@@ -87,20 +87,20 @@ const inserirEnderecos = async function (Endereco, contentType) {
 
                         return MESSAGES.DEFAULT_HEADER //201
                     } else {
-                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL + "controller inserir endereco"//500
                     }
 
                 } else {
-                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL + "controller inserir endereco"//500
                 }
             } else {
                 return validar //400
             }
         } else {
-            return MESSAGES.ERROR_CONTENT_TYPE //415
+            return MESSAGES.ERROR_CONTENT_TYPE + "controller inserir endereco"//415
         }
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER + "controller inserir endereco"//500
     }
 }
 
@@ -130,7 +130,7 @@ const atualizarEndereco = async function (Endereco, id, contentType) {
 
                         return MESSAGES.DEFAULT_HEADER //200
                     } else {
-                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL + "controller atualizar endereco"//500
                     }
                 } else {
                     return validarID 
@@ -139,10 +139,10 @@ const atualizarEndereco = async function (Endereco, id, contentType) {
                 return validar //400
             }
         } else {
-            return MESSAGES.ERROR_CONTENT_TYPE //415
+            return MESSAGES.ERROR_CONTENT_TYPE + "controller atualizar endereco"//415
         }
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER + "controller atualizar endereco"//500
     }
 }
 
@@ -169,10 +169,10 @@ const excluirEndereco = async function (id) {
                     return MESSAGES.DEFAULT_HEADER //200
 
                 } else {
-                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL + "controller atualizar endereco"//500
                 }
             } else {
-                return MESSAGES.ERROR_NOT_FOUND //404
+                return MESSAGES.ERROR_NOT_FOUND + "controller atualizar endereco"//404
             }
         } else {
             MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [ID incorreto]'
@@ -180,7 +180,7 @@ const excluirEndereco = async function (id) {
         }
 
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER + "controller atualizar endereco"//500
     }
 }
 

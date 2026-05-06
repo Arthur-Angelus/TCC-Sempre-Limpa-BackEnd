@@ -10,6 +10,14 @@
  */
 module.exports = {
 
+  test: {
+    client: 'sqlite3',
+    connection: { filename: ':memory:' },
+    useNullAsDefault: true,
+    migrations: { directory: './migrations' },
+    seeds: { directory: './seeds' }
+  },
+
   development: {
     development: {
       client: 'mysql2',
