@@ -5,6 +5,8 @@
  * Versão: 1.0
  *******************************************************************************************/
 
+const jwt = require('jsonwebtoken')
+
 const usuarioDAO = require('../model/DAO/usuario.js')
 
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
@@ -150,10 +152,16 @@ const inserirUsuarios = async function (Usuario, contentType) {
             if (!validar) {
                 let resultUsuarios = await usuarioDAO.setInsertUsers(Usuario)
 
+                console.log("DEBUG INSERT RESULT:", resultUsuarios)
+
+                if (!resultUsuarios) {
+                    throw new Error("Insert retornou falso")
+                }
+
                 if (resultUsuarios) {
                     let lastID = await usuarioDAO.getSelectLastID()
                     if (lastID) {
-                        Usuario.id = lastID
+                        Usuario.usuario_id = lastID
                         MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
@@ -196,9 +204,12 @@ const atualizarUsuario = async function (Usuario, id, contentType) {
 
                 if (validarID.status_code == 200) {
 
-                    Usuario.id = Number(id)
+                    let idUsuario = Number(id)
 
-                    let resultUsuarios = await usuarioDAO.setUpdateUsers(Usuario)
+                    let dados = Usuario
+                    delete dados.id
+
+                    let resultUsuarios = await usuarioDAO.setUpdateUsers(dados, idUsuario)
 
                     if (resultUsuarios) {
                         MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
@@ -212,7 +223,7 @@ const atualizarUsuario = async function (Usuario, id, contentType) {
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
                     }
                 } else {
-                    return validarID 
+                    return validarID
                 }
             } else {
                 return validar //400
@@ -287,12 +298,152 @@ const validarDadosUsuario = async function (Usuario) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [CPF incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (Usuario.rne == '' || Usuario.rne == undefined || Usuario.rne == null || Usuario.rne.length > 11) {
+    } else if (Usuario.rne && Usuario.rne.length > 11) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [RNE incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else {
         return false
+    }
+}
+
+const loginUsuarioEmail = async function (email, senha) {
+
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (email == '' || senha == '') {
+
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Email ou senha inválidos]'
+            return MESSAGES.ERROR_REQUIRED_FIELDS
+
+        } else {
+
+            let resultUsuario = await usuarioDAO.getSelectUserByEmail(email, senha)
+
+            if (resultUsuario) {
+
+                if (resultUsuario.length > 0) {
+
+                    let usuario = resultUsuario[0]
+
+                    // GERAR TOKEN
+                    const token = jwt.sign(
+                        {
+                            id: usuario.id,
+                            email: usuario.e_mail
+                        },
+                        process.env.JWT_SECRET,
+                        {
+                            expiresIn: '1h'
+                        }
+                    )
+
+                    return {
+                        status: true,
+                        status_code: 200,
+                        message: 'Login realizado com sucesso',
+                        token: token,
+                        usuario: {
+                            id: usuario.id,
+                            nome: usuario.nome,
+                            email: usuario.e_mail
+                        }
+                    }
+
+                } else {
+
+                    return {
+                        status: false,
+                        status_code: 401,
+                        message: 'Email ou senha incorretos'
+                    }
+                }
+
+            } else {
+
+                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += 'login usuario'
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+            }
+        }
+
+    } catch (error) {
+
+        console.log(error)
+
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login usuario'
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const loginUsuarioCpf = async function (cpf, senha) {
+
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (cpf == '' || senha == '') {
+
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Cpf ou senha inválidos]'
+            return MESSAGES.ERROR_REQUIRED_FIELDS
+
+        } else {
+
+            let resultUsuario = await usuarioDAO.getSelectUserByCpf(cpf, senha)
+
+            if (resultUsuario) {
+
+                if (resultUsuario.length > 0) {
+
+                    let usuario = resultUsuario[0]
+
+                    // GERAR TOKEN
+                    const token = jwt.sign(
+                        {
+                            id: usuario.id,
+                            email: usuario.cpf
+                        },
+                        process.env.JWT_SECRET,
+                        {
+                            expiresIn: '1h'
+                        }
+                    )
+
+                    return {
+                        status: true,
+                        status_code: 200,
+                        message: 'Login realizado com sucesso',
+                        token: token,
+                        usuario: {
+                            id: usuario.id,
+                            nome: usuario.nome,
+                            email: usuario.cpf
+                        }
+                    }
+
+                } else {
+
+                    return {
+                        status: false,
+                        status_code: 401,
+                        message: 'Cpf ou senha incorretos'
+                    }
+                }
+
+            } else {
+
+                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += 'login usuario'
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+            }
+        }
+
+    } catch (error) {
+
+        console.log(error)
+
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login usuario'
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
@@ -303,5 +454,7 @@ module.exports = {
     buscarUsuarioCpf,
     inserirUsuarios,
     atualizarUsuario,
-    excluirUsuario
+    excluirUsuario,
+    loginUsuarioEmail,
+    loginUsuarioCpf
 }

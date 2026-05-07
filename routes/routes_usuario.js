@@ -24,29 +24,9 @@ router.get('/v1/SempreLimpa/Usuarios', cors(), async function (request, response
 })
 
 router.get('/v1/SempreLimpa/Usuario/:id', cors(), async function (request, response) {
-    let idUsuario = request.params.id
+    let usuario_id = request.params.id
 
-    let Usuario = await controllerUsuario.buscarUsuarioID(idUsuario)
-
-    response.status(Usuario.status_code)
-    response.json(Usuario)
-})
-
-router.get('/v1/SempreLimpa/Usuario/:email, :senha', cors(), async function (request, response) {
-    let emailUsuario = request.params.email
-    let senhaUsuario = request.params.senha
-
-    let Usuario = await controllerUsuario.buscarUsuarioID(emailUsuario, senhaUsuario)
-
-    response.status(Usuario.status_code)
-    response.json(Usuario)
-})
-
-router.get('/v1/SempreLimpa/Usuario/:cpf, :senha', cors(), async function (request, response) {
-    let cpfUsuario = request.params.cpf
-    let senhaUsuario = request.params.senha
-
-    let Usuario = await controllerUsuario.buscarUsuarioID(cpfUsuario, senhaUsuario)
+    let Usuario = await controllerUsuario.buscarUsuarioID(usuario_id)
 
     response.status(Usuario.status_code)
     response.json(Usuario)
@@ -64,22 +44,44 @@ router.post('/v1/SempreLimpa/Usuario', cors(), bodyParserJSON, async function (r
 })
 
 router.put('/v1/SempreLimpa/Usuario/:id', cors(), bodyParserJSON, async function(request, response){
-    let idUsuario = request.params.id
+    let usuario_id = request.params.id
 
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
 
-    let Usuario = await controllerUsuario.atualizarUsuario(dadosBody, idUsuario, contentType)
+    let Usuario = await controllerUsuario.atualizarUsuario(dadosBody, usuario_id, contentType)
 
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
 
 router.delete('/v1/SempreLimpa/Usuario/:id', cors(), async function(request, response){
-    let idUsuario = request.params.id
+    let usuario_id = request.params.id
 
-    let Usuario = await controllerUsuario.excluirUsuario(idUsuario)
+    let Usuario = await controllerUsuario.excluirUsuario(usuario_id)
+
+    response.status(Usuario.status_code)
+    response.json(Usuario)
+})
+
+router.post('/v1/SempreLimpa/loginEmail', cors(), bodyParserJSON, async function (request, response) {
+
+    let email = request.body.email
+    let senha = request.body.senha
+
+    let Usuario = await controllerUsuario.loginUsuarioEmail(email, senha)
+
+    response.status(Usuario.status_code)
+    response.json(Usuario)
+})
+
+router.post('/v1/SempreLimpa/loginCpf', cors(), bodyParserJSON, async function (request, response) {
+
+    let cpf = request.body.cpf
+    let senha = request.body.senha
+
+    let Usuario = await controllerUsuario.loginUsuarioCpf(cpf, senha)
 
     response.status(Usuario.status_code)
     response.json(Usuario)

@@ -11,7 +11,10 @@ const knex = require('../../db')
 const getSelectAllUsers = async function () {
     try {
         const rows = await knex.select('*').from('usuario')
-        return rows
+        return rows.map(u => {
+            delete u.senha
+            return u
+        })
     } catch (error) {
         console.error(error)
         return false
@@ -19,13 +22,16 @@ const getSelectAllUsers = async function () {
 }
 
 // SELECT BY ID
-const getSelectUserById = async function (id) {
+const getSelectUserById = async function (usuario_id) {
     try {
         const rows = await knex('usuario')
             .select('*')
-            .where({ id: id })
+            .where({ usuario_id: usuario_id })
 
-        return rows
+        return rows.map(u => {
+            delete u.senha
+            return u
+        })
     } catch (error) {
         console.error(error)
         return false
@@ -42,7 +48,10 @@ const getSelectUserByEmail = async function (email, senha) {
                 senha: senha
             })
 
-        return rows
+        return rows.map(u => {
+            delete u.senha
+            return u
+        })
     } catch (error) {
         console.error(error)
         return false
@@ -59,7 +68,10 @@ const getSelectUserByCpf = async function (cpf, senha) {
                 senha: senha
             })
 
-        return rows
+        return rows.map(u => {
+            delete u.senha
+            return u
+        })
     } catch (error) {
         console.error(error)
         return false
@@ -69,22 +81,44 @@ const getSelectUserByCpf = async function (cpf, senha) {
 // INSERT
 const setInsertUsers = async function (usuario) {
     try {
-        const result = await knex('usuario').insert(usuario)
-        return result
+        const result = await knex('usuario').insert({
+            nome: usuario.nome,
+            e_mail: usuario.e_mail,
+            telefone: usuario.telefone,
+            cpf: usuario.cpf,
+            rne: usuario.rne,
+            fk_endereco: usuario.fk_endereco,
+            senha: usuario.senha
+        })
+        return result.map(u => {
+            delete u.senha
+            return u
+        })
     } catch (error) {
-        console.error(error)
-        return false
+        console.error("🔥 ERRO NO DAO INSERT:", error)
+        throw error
     }
 }
 
 // UPDATE
-const setUpdateUsers = async function (usuario) {
+const setUpdateUsers = async function (usuario, usuario_id) {
     try {
         const result = await knex('usuario')
-            .where({ id: usuario.id })
-            .update(usuario)
+            .where({ usuario_id: usuario_id })
+            .update({
+                nome: usuario.nome,
+                e_mail: usuario.e_mail,
+                telefone: usuario.telefone,
+                cpf: usuario.cpf,
+                rne: usuario.rne,
+                fk_endereco: usuario.fk_endereco,
+                senha: usuario.senha
+            })
 
-        return result
+        return result.map(u => {
+            delete u.senha
+            return u
+        })
     } catch (error) {
         console.error(error)
         return false
@@ -92,10 +126,10 @@ const setUpdateUsers = async function (usuario) {
 }
 
 // DELETE
-const setDeleteUsers = async function (id) {
+const setDeleteUsers = async function (usuario_id) {
     try {
         const result = await knex('usuario')
-            .where({ id: id })
+            .where({ usuario_id: usuario_id })
             .del()
 
         return result
@@ -106,14 +140,14 @@ const setDeleteUsers = async function (id) {
 }
 
 // GET LAST ID
-const getSelectLastID = async function () {
+const getSelectLastID = async function (usuario_id) {
     try {
         const result = await knex('usuario')
-            .select('id')
-            .orderBy('id', 'desc')
+            .select('usuario_id')
+            .orderBy('usuario_id', 'desc')
             .first()
 
-        return result ? result.id : null
+        return result ? result.usuario_id : null
     } catch (error) {
         console.error(error)
         return null
