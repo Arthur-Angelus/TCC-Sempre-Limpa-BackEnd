@@ -19,6 +19,8 @@ app.use(bodyParserJSON)
 
 const PORT = process.env.PORT || 5000
 
+require('dotenv').config()
+
 app.use((request, response, next) => {
     response.header('Access-Control-Allow-Origin', '*')
     response.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
