@@ -39,7 +39,14 @@ const listarCartoesPorUsuario = async (usuario_id) => {
 
         if (result) {
             MESSAGES.DEFAULT_HEADER = true
+            MESSAGES.DEFAULT_HEADER.status_code = 200
+            MESSAGES.DEFAULT_HEADER.items = { Cartoes: result} 
+
+            return MESSAGES.DEFAULT_HEADER
         }
+
+        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        
     } catch (error) {
         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
     }
