@@ -5,13 +5,13 @@
  * Versão: 1.0
  *******************************************************************************************/
 
-const enderecoLavanderiaDao = require('../model/DAO/endereco_lavanderia.js')
+const enderecoLavanderiaDAO = require('../model/DAO/endereco_lavanderia.js')
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 
 const listarTodosEnderecosLavanderias = async function (){
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     try {
-        let resultEnderecos = await enderecoLavanderiaDao.getSelectAllAddresLaundry()
+        let resultEnderecos = await enderecoLavanderiaDAO.getSelectAllAddresLaundry()
         if(resultEnderecos){
             if(resultEnderecos.length > 0){
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
@@ -26,7 +26,33 @@ const listarTodosEnderecosLavanderias = async function (){
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
         }
     } catch (error) {
-        console.log(error)
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const listarEnderecoLavanderiaPorId = async function(id){
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
+         if (!isNaN(id) && id != '' && id != null && id > 0) {
+            let resultEnderecosLavanderia = await enderecoLavanderiaDAO.getSelectAddresLaundryById(Number(id))
+            if(resultEnderecosLavanderia){
+                if(resultEnderecosLavanderia.length > 0) {
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia =resultEnderecos
+
+                    return MESSAGES.DEFAULT_HEADER
+                } else {
+                    return MESSAGES.ERROR_NOT_FOUND
+                }
+            } else {
+                return MESSAGES.ERROR_NOT_FOUND
+            }
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID incorreto]'
+            return MESSAGES.ERROR_REQUIRED_FIELDS
+        }
+    } catch (error) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
@@ -70,4 +96,5 @@ const validarDadosEnderecoLavanderia = async function (EnderecoLavanderia) {
 
 module.exports = {
     listarTodosEnderecosLavanderias,
+    listarEnderecoLavanderiaPorId
 }
