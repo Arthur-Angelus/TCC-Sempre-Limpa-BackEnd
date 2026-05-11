@@ -31,9 +31,11 @@ app.use((request, response, next) => {
 //import das rotas
 const usuarioRoutes = require('./routes/routes_usuario.js')
 const enderecoRoutes = require('./routes/routes_endereco.js')
+const enderecoLavanderiaRoutes = require('./routes/routes_enderecoLavanderia.js')
 
 app.use(usuarioRoutes)
 app.use(enderecoRoutes)
+app.use(enderecoLavanderiaRoutes)
 
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')
