@@ -24,5 +24,13 @@ router.get('/v1/semprelimpa/status', cors(), async function (request, response) 
     response.status(Status.status_code)
     response.json(Status)
 })
+// GET STATUS BY ID
+router.get('/v1/semprelimpa/status/:id', cors(), async function (request, response) {
+    let status_id = request.params.id
 
+    let Status = await controllerStatus.buscarStatusID(status_id)
+
+    response.status(Status.status_code)
+    response.json(Status)
+})
 module.exports = router

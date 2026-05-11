@@ -19,7 +19,23 @@ const getSelectAllStatus = async function () {
         return false
     }
 }
+// SELECT STATUS BY ID
+const getSelectStatusById = async function (status_id) {
+    try {
+        const rows = await knex('status')
+            .select('*')
+            .where({ status_id: status_id })
+
+        return rows.map(s => {
+            return s
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 
 module.exports = {
     getSelectAllStatus,
+    getSelectStatusById
 }
