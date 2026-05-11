@@ -34,8 +34,23 @@ const getSelectStatusById = async function (status_id) {
         return false
     }
 }
+// INSERT STATUS
+const setInsertStatus = async function (status) {
+    try {
+        const result = await knex('status').insert({
+            descricao: status.descricao
+        })
+        return result.map(status => {
+            return status
+        })
+    } catch (error) {
+        console.error("🔥 ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
 
 module.exports = {
     getSelectAllStatus,
-    getSelectStatusById
+    getSelectStatusById,
+    setInsertStatus
 }

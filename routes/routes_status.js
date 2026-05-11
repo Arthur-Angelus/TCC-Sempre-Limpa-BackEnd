@@ -33,4 +33,16 @@ router.get('/v1/semprelimpa/status/:id', cors(), async function (request, respon
     response.status(Status.status_code)
     response.json(Status)
 })
+// POST STATUS
+router.post('/v1/semprelimpa/status', cors(), bodyParserJSON, async function(request, response){
+    let Status_data = request.body
+
+    let contentType = request.headers['content-type']
+
+    let Status = await controllerStatus.inserirStatus(Status_data, contentType)
+
+    response.status(Status.status_code)
+    response.json(Status)
+})
+
 module.exports = router
