@@ -163,7 +163,7 @@ const deletarEnderecoLavanderia = async function(id_endereco_lavanderia){
 const validarDadosEnderecoLavanderia = async function (EnderecoLavanderia) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (EnderecoLavanderia.cep == '' || EnderecoLavanderia.cep == undefined || EnderecoLavanderia.cep == null || EnderecoLavanderia.cep.length > 8) {
+    if (EnderecoLavanderia.cep == '' || EnderecoLavanderia.cep == undefined || EnderecoLavanderia.cep == null || EnderecoLavanderia.cep.length != 8 || !isNaN(EnderecoLavanderia)) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[CEP incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
