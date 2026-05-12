@@ -23,4 +23,40 @@ router.get('/v1/semprelimpa/enderecolavanderia', cors(), async function(request,
         response.json(enderecoLavanderia)
 })
 
+router.get('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(request, response){
+    let id = request.params.id
+
+    let enderecoLavanderia = await controllerEnderecoLavanderia.listarEnderecoLavanderiaPorId(id)
+
+    response.status(enderecoLavanderia.status_code)
+    response.json(enderecoLavanderia)
+})
+
+router.post('/v1/semprelimpa/enderecolavanderia/', cors(), async function(request, response){
+    let dadosBody = request.body
+    let contentType = request.headers['content-type']
+
+    let enderecoLavanderia = await controllerEnderecoLavanderia.inserirEnderecoLavanderia(dadosBody, contentType)
+    response.status(enderecoLavanderia.status_code)
+    response.json(enderecoLavanderia)
+})
+
+router.put('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(request, response){
+    let idEnderecoLavanderia = request.params.id
+    let dadosBody = request.body
+    let contentType = request.headers['content-type']
+
+    let enderecoLavanderia = await controllerEnderecoLavanderia.atualizarEnderecoLavanderia(dadosBody, idEnderecoLavanderia ,contentType)
+    response.status(enderecoLavanderia.status_code)
+    response.json(enderecoLavanderia)
+})
+
+router.delete('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(request, response){
+    let idEnderecoLavanderia = request.params.id
+
+    let enderecoLavanderia = await controllerEnderecoLavanderia.deletarEnderecoLavanderia(idEnderecoLavanderia)
+    response.status(enderecoLavanderia.status_code)
+    response.json(enderecoLavanderia)
+})
+
 module.exports = router

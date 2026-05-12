@@ -11,7 +11,6 @@ const getSelectAllAddresLaundry= async function(){
     try {
        return await knex('endereco_lavanderia').select('*')
     } catch (error) {
-        console.log("Ocorreu um erro ao requisitar informações no Banco de dados", error)
         return error
     }
 }
@@ -23,7 +22,6 @@ const getSelectAddresLaundryById = async function(id_endereco_lavanderia){
         })
         .first()
     } catch (error) {
-        console.log("Erro ao buscar endereço referente a lavanderia", error)
         return false
     }
 }
@@ -42,7 +40,6 @@ const setInsertAddresLaundry = async function (dadosEndereco) {
 
         return idGerado
     } catch (error) {
-        console.log("Erro ao cadastrar endereço:", error)
         return false
     }
 }
@@ -55,7 +52,6 @@ const setUpdateAddresLaundry = async function(id_endereco_lavanderia, dadosEnder
 
         return linhasAlteradas
     } catch (error) {
-        console.log("Erro ao atualizar endereço:", error)
         return false
     }
 }
@@ -65,11 +61,13 @@ const setDeleteAdressLaundry = async function(id_endereco_lavanderia){
         const linhasAlteradas = await knex('endereco_lavanderia')
         .where({endereco_lavanderia_PK: id_endereco_lavanderia})
         .del()
+
+        return linhasAlteradas
     } catch (error) {
-        console.log ("erro ao deletar", error)
         return false
     }
 }
+
 
 module.exports = {
     getSelectAllAddresLaundry,

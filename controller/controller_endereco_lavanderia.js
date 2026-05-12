@@ -11,12 +11,12 @@ const DEFAULT_MESSAGES = require('./module/config_messages.js')
 const listarTodosEnderecosLavanderias = async function (){
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     try {
-        let resultEnderecos = await enderecoLavanderiaDAO.getSelectAllAddresLaundry()
-        if(resultEnderecos){
-            if(resultEnderecos.length > 0){
+        let resultEnderecosLavanderia = await enderecoLavanderiaDAO.getSelectAllAddresLaundry()
+        if(resultEnderecosLavanderia){
+            if(resultEnderecosLavanderia.length > 0){
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia =resultEnderecos
+                MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = resultEnderecosLavanderia
                 
                 return MESSAGES.DEFAULT_HEADER
             } else {
@@ -35,22 +35,124 @@ const listarEnderecoLavanderiaPorId = async function(id){
     try {
          if (!isNaN(id) && id != '' && id != null && id > 0) {
             let resultEnderecosLavanderia = await enderecoLavanderiaDAO.getSelectAddresLaundryById(Number(id))
-            if(resultEnderecosLavanderia){
-                if(resultEnderecosLavanderia.length > 0) {
+            
+            if(resultEnderecosLavanderia !== false){
+                
+                if(resultEnderecosLavanderia !== undefined) {
                     MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia =resultEnderecos
+                    MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = resultEnderecosLavanderia
 
                     return MESSAGES.DEFAULT_HEADER
                 } else {
                     return MESSAGES.ERROR_NOT_FOUND
                 }
+                
             } else {
-                return MESSAGES.ERROR_NOT_FOUND
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
             }
+            
         } else {
             MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID incorreto]'
             return MESSAGES.ERROR_REQUIRED_FIELDS
+        }
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const inserirEnderecoLavanderia = async function(dadosEndereco, contentType){
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON'){
+            let validar = await validarDadosEnderecoLavanderia(dadosEndereco)
+            if(!validar){
+                let resultEnderecosLavanderia = await enderecoLavanderiaDAO.setInsertAddresLaundry(dadosEndereco)
+                if (resultEnderecosLavanderia){
+                    dadosEndereco.id = resultEnderecosLavanderia
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = dadosEndereco
+
+                    return MESSAGES.DEFAULT_HEADER
+                } else { 
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+                }
+            } else{
+                return validar
+            }
+        } else {
+            return MESSAGES.ERROR_CONTENT_TYPE
+        }
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const atualizarEnderecoLavanderia = async function(enderecoLavanderia, id_endereco_lavanderia, contentType){
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON'){
+            let validar = await validarDadosEnderecoLavanderia(enderecoLavanderia)
+            if(!validar){
+                let validarID = await listarEnderecoLavanderiaPorId(id_endereco_lavanderia)
+                if (validarID.status_code == 200) {
+                    let idEnderecoLavanderia = Number(id_endereco_lavanderia)
+                    let dados = enderecoLavanderia
+
+                    let resultEnderecosLavanderia = await enderecoLavanderiaDAO.setUpdateAddresLaundry(idEnderecoLavanderia, dados)
+                    if (resultEnderecosLavanderia){
+                        dados.id = idEnderecoLavanderia
+
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = dados
+
+                        return MESSAGES.DEFAULT_HEADER
+                    } else {
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar
+            }
+        } else {
+            return MESSAGES.ERROR_CONTENT_TYPE
+        }
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const deletarEnderecoLavanderia = async function(id_endereco_lavanderia){
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
+     
+        let validarID = await listarEnderecoLavanderiaPorId(id_endereco_lavanderia)
+        
+        if (validarID.status_code == 200) {
+            let idEnderecoLavanderia = Number(id_endereco_lavanderia)
+
+ 
+            let resultDelete = await enderecoLavanderiaDAO.setDeleteAdressLaundry(idEnderecoLavanderia)
+            
+            if (resultDelete){
+              
+                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = { id: idEnderecoLavanderia }
+
+                return MESSAGES.DEFAULT_HEADER
+            } else {
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+            }
+        } else {
+            
+            return validarID 
         }
     } catch (error) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
@@ -96,5 +198,8 @@ const validarDadosEnderecoLavanderia = async function (EnderecoLavanderia) {
 
 module.exports = {
     listarTodosEnderecosLavanderias,
-    listarEnderecoLavanderiaPorId
+    listarEnderecoLavanderiaPorId,
+    inserirEnderecoLavanderia,
+    atualizarEnderecoLavanderia,
+    deletarEnderecoLavanderia
 }
