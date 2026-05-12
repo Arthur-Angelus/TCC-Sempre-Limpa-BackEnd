@@ -1,14 +1,16 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pela controller do usuario
- * Data: 04/05/2026
+ * Data: 12/05/2026
  * Autor: Arthur Angelus
- * Versão: 1.0
+ * Versão: 2.0
+ * implementado função esqueci minha senha e resetar senha
  *******************************************************************************************/
 
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
+const emailService = require('../services/email.js')
 const usuarioDAO = require('../model/DAO/usuario.js')
-
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 
 const listarUsuarios = async function () {
@@ -142,51 +144,58 @@ const buscarUsuarioCpf = async function (cpf, senha) {
 }
 
 const inserirUsuarios = async function (Usuario, contentType) {
+
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
-        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
-            let validar = await validarDadosUsuario(Usuario)
-
-            if (!validar) {
-                let resultUsuarios = await usuarioDAO.setInsertUsers(Usuario)
-
-                console.log("DEBUG INSERT RESULT:", resultUsuarios)
-
-                if (!resultUsuarios) {
-                    throw new Error("Insert retornou falso")
-                }
-
-                if (resultUsuarios) {
-                    let lastID = await usuarioDAO.getSelectLastID()
-                    if (lastID) {
-                        Usuario.usuario_id = lastID
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items = Usuario
-
-                        return MESSAGES.DEFAULT_HEADER //201
-                    } else {
-                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir usuario"
-                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-                    }
-
-                } else {
-                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir usuario"
-                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-                }
-            } else {
-                return validar //400
-            }
-        } else {
+        if (String(contentType).toUpperCase() != 'APPLICATION/JSON') {
             MESSAGES.ERROR_CONTENT_TYPE.message += "controller inserir usuario"
-            return MESSAGES.ERROR_CONTENT_TYPE //415
+            return MESSAGES.ERROR_CONTENT_TYPE
         }
+
+        // validação
+        let validar = await validarDadosUsuario(Usuario)
+
+        if (validar) {
+            return validar
+        }
+
+        // 🔐 HASH DA SENHA (AQUI ESTÁ A MUDANÇA PRINCIPAL)
+        const senhaHash = await bcrypt.hash(Usuario.senha, 10)
+        Usuario.senha = senhaHash
+
+        // chama DAO
+        let resultUsuarios = await usuarioDAO.setInsertUsers(Usuario)
+
+        if (!resultUsuarios) {
+            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir usuario"
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        let lastID = await usuarioDAO.getSelectLastID()
+
+        if (!lastID) {
+            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir usuario"
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        Usuario.usuario_id = lastID
+        delete Usuario.senha // não retorna senha no response
+
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+        MESSAGES.DEFAULT_HEADER.items = Usuario
+
+        return MESSAGES.DEFAULT_HEADER
+
     } catch (error) {
+
+        console.log(error)
+
         MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller inserir usuario"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
@@ -313,58 +322,51 @@ const loginUsuarioEmail = async function (email, senha) {
 
     try {
 
-        if (email == '' || senha == '') {
-
+        if (!email || !senha) {
             MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Email ou senha inválidos]'
             return MESSAGES.ERROR_REQUIRED_FIELDS
+        }
 
-        } else {
+        let usuario = await usuarioDAO.getSelectUserByEmail(email)
 
-            let resultUsuario = await usuarioDAO.getSelectUserByEmail(email, senha)
+        if (!usuario) {
+            return {
+                status: false,
+                status_code: 404,
+                message: 'Usuário não encontrado'
+            }
+        }
 
-            if (resultUsuario) {
+        // 🔐 COMPARAÇÃO SEGURA
+        const senhaValida = await bcrypt.compare(senha, usuario.senha)
 
-                if (resultUsuario.length > 0) {
+        if (!senhaValida) {
+            return {
+                status: false,
+                status_code: 401,
+                message: 'Email ou senha incorretos'
+            }
+        }
 
-                    let usuario = resultUsuario[0]
+        // 🎟️ gera token
+        const token = jwt.sign(
+            {
+                usuario_id: usuario.usuario_id,
+                email: usuario.e_mail
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        )
 
-                    // GERAR TOKEN
-                    const token = jwt.sign(
-                        {
-                            id: usuario.id,
-                            email: usuario.e_mail
-                        },
-                        process.env.JWT_SECRET,
-                        {
-                            expiresIn: '1h'
-                        }
-                    )
-
-                    return {
-                        status: true,
-                        status_code: 200,
-                        message: 'Login realizado com sucesso',
-                        token: token,
-                        usuario: {
-                            id: usuario.id,
-                            nome: usuario.nome,
-                            email: usuario.e_mail
-                        }
-                    }
-
-                } else {
-
-                    return {
-                        status: false,
-                        status_code: 401,
-                        message: 'Email ou senha incorretos'
-                    }
-                }
-
-            } else {
-
-                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += 'login usuario'
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        return {
+            status: true,
+            status_code: 200,
+            message: 'Login realizado com sucesso',
+            token,
+            usuario: {
+                usuario_id: usuario.usuario_id,
+                nome: usuario.nome,
+                email: usuario.e_mail
             }
         }
 
@@ -372,7 +374,7 @@ const loginUsuarioEmail = async function (email, senha) {
 
         console.log(error)
 
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login usuario'
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login email'
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
@@ -383,58 +385,49 @@ const loginUsuarioCpf = async function (cpf, senha) {
 
     try {
 
-        if (cpf == '' || senha == '') {
-
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Cpf ou senha inválidos]'
+        if (!cpf || !senha) {
             return MESSAGES.ERROR_REQUIRED_FIELDS
+        }
 
-        } else {
+        let usuario = await usuarioDAO.getSelectUserByCpf(cpf)
 
-            let resultUsuario = await usuarioDAO.getSelectUserByCpf(cpf, senha)
+        if (!usuario) {
+            return {
+                status: false,
+                status_code: 404,
+                message: 'Usuário não encontrado'
+            }
+        }
 
-            if (resultUsuario) {
+        // 🔐 compara hash
+        const senhaValida = await bcrypt.compare(senha, usuario.senha)
 
-                if (resultUsuario.length > 0) {
+        if (!senhaValida) {
+            return {
+                status: false,
+                status_code: 401,
+                message: 'CPF ou senha incorretos'
+            }
+        }
 
-                    let usuario = resultUsuario[0]
+        const token = jwt.sign(
+            {
+                usuario_id: usuario.usuario_id,
+                email: usuario.cpf
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        )
 
-                    // GERAR TOKEN
-                    const token = jwt.sign(
-                        {
-                            id: usuario.id,
-                            email: usuario.cpf
-                        },
-                        process.env.JWT_SECRET,
-                        {
-                            expiresIn: '1h'
-                        }
-                    )
-
-                    return {
-                        status: true,
-                        status_code: 200,
-                        message: 'Login realizado com sucesso',
-                        token: token,
-                        usuario: {
-                            id: usuario.id,
-                            nome: usuario.nome,
-                            email: usuario.cpf
-                        }
-                    }
-
-                } else {
-
-                    return {
-                        status: false,
-                        status_code: 401,
-                        message: 'Cpf ou senha incorretos'
-                    }
-                }
-
-            } else {
-
-                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += 'login usuario'
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        return {
+            status: true,
+            status_code: 200,
+            message: 'Login realizado com sucesso',
+            token,
+            usuario: {
+                usuario_id: usuario.usuario_id,
+                nome: usuario.nome,
+                cpf: usuario.cpf
             }
         }
 
@@ -442,8 +435,149 @@ const loginUsuarioCpf = async function (cpf, senha) {
 
         console.log(error)
 
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login usuario'
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login cpf'
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const esqueciMinhaSenha = async function (email) {
+
+    try {
+
+        let usuario = await usuarioDAO.getSelectUserOnlyEmail(email)
+
+        if (usuario) {
+
+            if (usuario.length > 0) {
+
+                usuario = usuario[0]
+
+                // TOKEN JWT
+                const token = jwt.sign(
+
+                    {
+                        usuario_id: usuario.usuario_id,
+                        email: usuario.e_mail
+                    },
+
+                    process.env.JWT_SECRET,
+
+                    {
+                        expiresIn: '15m'
+                    }
+                )
+
+                // HTML EMAIL
+                const mensagem = `
+                    <h1>Recuperação de senha</h1>
+
+                    <p>Use o token abaixo para redefinir sua senha:</p>
+
+                    <h2>${token}</h2>
+
+                    <p>Esse token expira em 15 minutos.</p>
+                `
+
+                // ENVIAR EMAIL
+                const resultEmail = await emailService.enviarEmail(
+                    usuario.e_mail,
+                    'Recuperação de senha',
+                    mensagem
+                )
+
+                if (resultEmail) {
+
+                    return {
+                        status: true,
+                        status_code: 200,
+                        message: 'Email enviado com sucesso'
+                    }
+
+                } else {
+
+                    return {
+                        status: false,
+                        status_code: 500,
+                        message: 'Erro ao enviar email'
+                    }
+                }
+
+            } else {
+
+                return {
+                    status: false,
+                    status_code: 404,
+                    message: 'Email não encontrado'
+                }
+            }
+
+        } else {
+
+            return {
+                status: false,
+                status_code: 500,
+                message: 'Erro interno no banco'
+            }
+        }
+
+    } catch (error) {
+
+        console.log(error)
+
+        return {
+            status: false,
+            status_code: 500,
+            message: 'Erro interno'
+        }
+    }
+}
+
+const resetarSenha = async function (token, novaSenha) {
+
+    try {
+
+        // VALIDAR TOKEN
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        )
+
+        // HASH NOVA SENHA
+        const senhaHash = await bcrypt.hash(novaSenha, 10)
+
+        // UPDATE SENHA
+        const result = await usuarioDAO.updateSenhaUsuario(
+            decoded.usuario_id,
+            senhaHash
+        )
+
+        if (result) {
+
+            return {
+                status: true,
+                status_code: 200,
+                message: 'Senha alterada com sucesso'
+            }
+
+        } else {
+
+            return {
+                status: false,
+                status_code: 500,
+                message: 'Erro ao atualizar senha'
+            }
+        }
+
+        
+    } catch (error) {
+
+        console.log(error)
+
+        return {
+            status: false,
+            status_code: 401,
+            message: 'Token inválido ou expirado'
+        }
     }
 }
 
@@ -456,5 +590,7 @@ module.exports = {
     atualizarUsuario,
     excluirUsuario,
     loginUsuarioEmail,
-    loginUsuarioCpf
+    loginUsuarioCpf,
+    esqueciMinhaSenha,
+    resetarSenha
 }

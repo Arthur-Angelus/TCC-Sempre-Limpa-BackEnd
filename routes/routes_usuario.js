@@ -1,8 +1,9 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelos endpoints do usuario
- * Data: 04/05/2026
+ * Data: 12/05/2026
  * Autor: Arthur Angelus
- * Versão: 1.0
+ * Versão: 2.0
+ * implementando router para esqueci minha senha e resetar senha
  *******************************************************************************************/
 
 const express = require('express')
@@ -66,7 +67,6 @@ router.delete('/v1/SempreLimpa/Usuario/:id', cors(), async function(request, res
 })
 
 router.post('/v1/SempreLimpa/loginEmail', cors(), bodyParserJSON, async function (request, response) {
-
     let email = request.body.email
     let senha = request.body.senha
 
@@ -77,7 +77,6 @@ router.post('/v1/SempreLimpa/loginEmail', cors(), bodyParserJSON, async function
 })
 
 router.post('/v1/SempreLimpa/loginCpf', cors(), bodyParserJSON, async function (request, response) {
-
     let cpf = request.body.cpf
     let senha = request.body.senha
 
@@ -86,5 +85,29 @@ router.post('/v1/SempreLimpa/loginCpf', cors(), bodyParserJSON, async function (
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
+
+router.post('/v1/SempreLimpa/esqueciSenha', cors(), bodyParserJSON, async function(request, response){
+        let email = request.body.email
+
+        let result = await controllerUsuario.esqueciMinhaSenha(email)
+
+        response.status(result.status_code)
+        response.json(result)
+    }
+)
+
+router.post('/v1/SempreLimpa/resetarSenha', cors(), bodyParserJSON, async function(request, response){
+        let token = request.body.token
+        let novaSenha = request.body.novaSenha
+
+        let result = await controllerUsuario.resetarSenha(
+            token,
+            novaSenha
+        )
+
+        response.status(result.status_code)
+        response.json(result)
+    }
+)
 
 module.exports = router
