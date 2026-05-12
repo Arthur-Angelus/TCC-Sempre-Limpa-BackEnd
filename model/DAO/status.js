@@ -48,6 +48,23 @@ const setInsertStatus = async function (status) {
         throw error
     }
 }
+// UPDATE
+const setUpdateStatus = async function (status, status_id) {
+    try {
+        const result = await knex('status')
+            .where({ status_id: status_id })
+            .update({
+                descricao: status.descricao
+            })
+
+        return result.map(status => {
+            return status
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (status_id) {
     try {
@@ -67,5 +84,6 @@ module.exports = {
     getSelectAllStatus,
     getSelectStatusById,
     setInsertStatus,
+    setUpdateStatus,
     getSelectLastID
 }
