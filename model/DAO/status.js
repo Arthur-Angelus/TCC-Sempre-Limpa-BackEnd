@@ -1,6 +1,6 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelas requisições CRUD da tabela status_pedido
- * Data: 11/05/2026
+ * Data de Criação: 11/05/2026
  * Autor: Kauan Lopes Pereira
  * Versão: 1.0
  *******************************************************************************************/
@@ -48,9 +48,24 @@ const setInsertStatus = async function (status) {
         throw error
     }
 }
+// GET LAST ID
+const getSelectLastID = async function (status_id) {
+    try {
+        const result = await knex('status')
+            .select('status_id')
+            .orderBy('status_id', 'desc')
+            .first()
+
+        return result ? result.status_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
 
 module.exports = {
     getSelectAllStatus,
     getSelectStatusById,
-    setInsertStatus
+    setInsertStatus,
+    getSelectLastID
 }
