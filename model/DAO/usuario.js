@@ -1,8 +1,9 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelas requisições CRUD do usuario
- * Data: 04/05/2026
+ * Data: 12/05/2026
  * Autor: Arthur Angelus
- * Versão: 2.0 (corrigido)
+ * Versão: 3.0
+ * implementado função para get usuario pelo email e update de senha do usuario
  *******************************************************************************************/
 
 const knex = require('../../db')
@@ -39,41 +40,37 @@ const getSelectUserById = async function (usuario_id) {
 }
 
 // SELECT BY EMAIL + SENHA
-const getSelectUserByEmail = async function (email, senha) {
-    try {
-        const rows = await knex('usuario')
-            .select('*')
-            .where({
-                e_mail: email,
-                senha: senha
-            })
+const getSelectUserByEmail = async function (email) {
 
-        return rows.map(u => {
-            delete u.senha
-            return u
-        })
+    try {
+
+        const result = await knex('usuario')
+            .select('*')
+            .where({ e_mail: email })
+            .first()
+
+        return result
+
     } catch (error) {
-        console.error(error)
+        console.log(error)
         return false
     }
 }
 
 // SELECT BY CPF + SENHA
-const getSelectUserByCpf = async function (cpf, senha) {
-    try {
-        const rows = await knex('usuario')
-            .select('*')
-            .where({
-                cpf: cpf,
-                senha: senha
-            })
+const getSelectUserByCpf = async function (cpf) {
 
-        return rows.map(u => {
-            delete u.senha
-            return u
-        })
+    try {
+
+        const result = await knex('usuario')
+            .select('*')
+            .where({ cpf: cpf })
+            .first()
+
+        return result
+
     } catch (error) {
-        console.error(error)
+        console.log(error)
         return false
     }
 }
@@ -154,6 +151,44 @@ const getSelectLastID = async function (usuario_id) {
     }
 }
 
+const getSelectUserOnlyEmail = async function(email){
+
+    try {
+
+        const result = await knex('usuario')
+            .select('*')
+            .where({
+                e_mail: email
+            })
+
+        return result
+
+    } catch(error){
+
+        console.log(error)
+        return false
+    }
+}
+
+const updateSenhaUsuario = async function(usuario_id, senha){
+
+    try {
+
+        const result = await knex('usuario')
+            .where({ usuario_id: usuario_id })
+            .update({
+                senha: senha
+            })
+
+        return result
+
+    } catch(error){
+
+        console.log(error)
+        return false
+    }
+}
+
 module.exports = {
     getSelectAllUsers,
     getSelectUserById,
@@ -162,5 +197,7 @@ module.exports = {
     setInsertUsers,
     setUpdateUsers,
     setDeleteUsers,
-    getSelectLastID
+    getSelectLastID,
+    getSelectUserOnlyEmail,
+    updateSenhaUsuario
 }
