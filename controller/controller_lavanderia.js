@@ -35,7 +35,7 @@ const selecionarLavanderiaPorId = async function (id_lavanderia){
     try {
         if (!isNaN(id_lavanderia) && id_lavanderia != '' && id_lavanderia != null && id_lavanderia > 0){
             let lavanderia = await lavanderiaDAO.getSelectLaundryById(Number(id_lavanderia))
-            if (lavanderia !== false){
+            if (lavanderia !== falsane){
                 if (lavanderia !== undefined){
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
@@ -56,6 +56,8 @@ const selecionarLavanderiaPorId = async function (id_lavanderia){
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
+
+const selecionarLavanderiaPorNome
 
 module.exports = {
     selecionarTodasLavanderia,
