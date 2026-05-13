@@ -62,6 +62,19 @@ const setUpdateStatus = async function (status, status_id) {
         return false
     }
 }
+// DELETE
+const setDeleteStatus = async function (status_id) {
+    try {
+        const result = await knex('status')
+            .where({ status_id: status_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO DELETE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (status_id) {
     try {
@@ -82,5 +95,6 @@ module.exports = {
     getSelectStatusById,
     setInsertStatus,
     setUpdateStatus,
+    setDeleteStatus,
     getSelectLastID
 }

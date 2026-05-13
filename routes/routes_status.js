@@ -57,4 +57,13 @@ router.put('/v1/SempreLimpa/Status/:id', cors(), bodyParserJSON, async function(
     response.status(Status.status_code)
     response.json(Status)
 })
+// DELETE STATUS
+router.delete('/v1/SempreLimpa/Status/:id', cors(), async function(request, response){
+    let status_id = request.params.id
+
+    let Status = await controllerStatus.excluirStatus(status_id)
+
+    response.status(Status.status_code)
+    response.json(Status)
+})
 module.exports = router
