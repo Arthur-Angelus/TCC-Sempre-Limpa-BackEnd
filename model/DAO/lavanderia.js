@@ -7,7 +7,7 @@
 
 const knex = require('../../db')
 
-const getSelectLaundry = async function(){
+const getSelectAllLaundry = async function(){
     try {
         const result = await knex('vw_lavanderia_endereco')
         .select('*')
@@ -19,8 +19,47 @@ const getSelectLaundry = async function(){
     }
 }
 
+const getSelectLaundryById = async function(id_lavanderia){
+    try {
+        return await knex('vw_lavanderia_endereco')
+        .where('lavanderia_id', id_lavanderia)
+        .first()
+    } catch (error) {
+        return false
+    }
+}
+
+const getSelectLaundryByFilterSelect = async function(filtros){
+    try {
+        let query = knex('vw_lavanderias_filtros').select('*')
+
+        if (filtros.cidade) {
+            query.where('cidade', 'like', `%${filtros.cidade}%`)
+        }
+        if (filtros.bairro){
+            query.where('bairro', 'like', `%${filtros.bairro}%`)
+        }
+        if (filtros.preco_max_lavagem) {
+            query.where('preco_lavagem', '<=', filtros.preco_max_lavagem)
+        }
+        if (filtros.preco_max_secagem) {
+            query.where('preco_secagem', '<=', filtros.preco_max_secagem)
+        }
+        if (filtros.avaliacao_minima) {
+            query.where('media_avaliacao', '>=', filtros.avaliacao_minima)
+        }
+
+        query.orderBy('media_avaliacao', 'desc')
+
+        return await query
+    } catch (error) {
+        return false
+    }
+}
 
 
 module.exports = {
-    getSelectLaundry
+    getSelectAllLaundry,
+    getSelectLaundryByFilterSelect,
+    getSelectLaundryById
 }
