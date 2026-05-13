@@ -5,11 +5,18 @@
  * Versão: 2.0 (corrigido)
  *******************************************************************************************/
 
-
 const knex = require('../../db')
 
 /* Buscar todos cartões */
-const getAllCards = async
+const getAllCards = async function () {
+    try {
+        const result = await knex('cartao');
+        return result;
+    } catch (error) {
+        console.log("🔥 ERRO NO DAO - GET ALL:", error);
+        return false;
+    }
+}
 
 /* Inserir um novo Cartão */
 const setinsertCard = async function (cartao) {
@@ -30,14 +37,15 @@ const setinsertCard = async function (cartao) {
 }
 
 /* Filtrar cartões por usuário */
-const getListarCartoesPorUsuario = async function (usuario_id) {
+const getSelectCardsByUser = async function (usuario_id) {
+
     try {
         const result = await knex('cartao')
-            .select('*')
             .where('usuario_id', usuario_id)
 
         return result
     } catch (error) {
+        console.log("ERRO NO DAO", error)
         return false
     }
 }
@@ -59,7 +67,8 @@ const setDeletCard = async (cartao_id, usuario_id) => {
 }
 
 module.exports = {
+    getAllCards,
     setinsertCard,
-    getListarCartoesPorUsuario,
+    getSelectCardsByUser,
     setDeletCard
 }
