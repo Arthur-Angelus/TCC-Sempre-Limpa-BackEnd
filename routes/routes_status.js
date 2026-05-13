@@ -44,5 +44,17 @@ router.post('/v1/semprelimpa/status', cors(), bodyParserJSON, async function(req
     response.status(Status.status_code)
     response.json(Status)
 })
+// PUT STATUS
+router.put('/v1/SempreLimpa/Status/:id', cors(), bodyParserJSON, async function(request, response){
+    let status_id = request.params.id
 
+    let dadosBody = request.body
+
+    let contentType = request.headers['content-type']
+
+    let Status = await controllerStatus.atualizarStatus(dadosBody, status_id, contentType)
+
+    response.status(Status.status_code)
+    response.json(Status)
+})
 module.exports = router

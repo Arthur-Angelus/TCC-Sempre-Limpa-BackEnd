@@ -96,28 +96,77 @@ const inserirStatus = async function (Status, contentType) {
 
                         return MESSAGES.DEFAULT_HEADER //201
                     } else {
-                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "Não foi possivel recuperar o ID do novo status"
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel recuperar o ID do novo status"
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
                     }
 
                 } else {
-                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "Não foi possivel inserir o status no banco de dados"
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel inserir o status no banco de dados"
                     return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
                 }
             } else {
                 return validar //400
             }
         } else {
-            MESSAGES.ERROR_CONTENT_TYPE.message += "Tipo de conteúdo não suportado. Use 'application/json'"
+            MESSAGES.ERROR_CONTENT_TYPE.message += " INSERT - Tipo de conteúdo não suportado. Use 'application/json'"
             return MESSAGES.ERROR_CONTENT_TYPE //415
         }
     } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "Erro Critico na controller, acionar suporte técnico"
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro Critico na controller, acionar suporte técnico"
         console.log("DEBUG VALIDAÇÃO:", error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// UPDATE
+const atualizarStatus = async function (Status, id, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosStatus(Status)
+
+            if (!validar) {
+                console.log("DEBUG FALHA NA VALIDAÇÃO:", validar)
+                let validarID = await buscarStatusID(id)
+
+                if (validarID.status_code == 200) {
+
+                    let idStatus = Number(id)
+
+                    let dados = Status
+                    delete dados.id
+
+                    let resultStatus = await statusDAO.setUpdateStatus(dados, idStatus)
+                    console.log("DEBUG UPDATE RESULT ID:", resultStatus)
+
+                    if (resultStatus) {
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.Status = Status
+
+                        return MESSAGES.DEFAULT_HEADER //200
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " UPDATE - Não foi possivel atualizar o status no banco de dados"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " UPDATE - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " UPDATE - Erro Critico na controller, acionar suporte técnico"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosStatus = async function (Status) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -135,5 +184,6 @@ const validarDadosStatus = async function (Status) {
 module.exports = {
     listarStatus,
     buscarStatusID,
-    inserirStatus
+    inserirStatus,
+    atualizarStatus
 }

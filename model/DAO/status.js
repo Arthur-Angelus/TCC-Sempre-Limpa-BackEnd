@@ -44,11 +44,11 @@ const setInsertStatus = async function (status) {
             return status
         })
     } catch (error) {
-        console.error("🔥 ERRO NO DAO INSERT:", error)
+        console.error("ERRO NO DAO INSERT:", error)
         throw error
     }
 }
-// UPDATE
+// UPDATE STATUS
 const setUpdateStatus = async function (status, status_id) {
     try {
         const result = await knex('status')
@@ -56,12 +56,9 @@ const setUpdateStatus = async function (status, status_id) {
             .update({
                 descricao: status.descricao
             })
-
-        return result.map(status => {
-            return status
-        })
+        return result
     } catch (error) {
-        console.error(error)
+        console.error("ERRO NO DAO UPDATE:",error)
         return false
     }
 }
