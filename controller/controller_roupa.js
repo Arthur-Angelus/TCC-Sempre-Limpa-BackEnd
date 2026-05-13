@@ -2,12 +2,14 @@
  * Objetivo: Arquivo responsável pela controller de Roupas
  * Data: 13/05/2026
  * Autor: Guilherme Viana de Souza
+ * Contributor: Kauan Lopes Pereira
  * Versão: 1.0
  *******************************************************************************************/
 
 const roupasDAO = require('../model/DAO/roupa.js')
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 
+// SELECT ALL
 const listarTodasRoupas = async function(){
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     try {
@@ -29,7 +31,7 @@ const listarTodasRoupas = async function(){
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-
+// SELECT BY ID
 const listarRoupaPorId = async function(id_roupa){
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     try {
@@ -58,7 +60,7 @@ const listarRoupaPorId = async function(id_roupa){
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-
+// SELECT BY NAME
 const listarRoupaPorNome = async function (nome_peca){
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     try {
@@ -84,14 +86,64 @@ const listarRoupaPorNome = async function (nome_peca){
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
+// INSERT
+const inserirRoupa = async function (Roupa, contentType) {
 
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
+    try {
+
+        if (String(contentType).toUpperCase() != 'APPLICATION/JSON') {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " INSERT - controller inserir roupa"
+            return MESSAGES.ERROR_CONTENT_TYPE // 415
+        }
+        // validação
+        let validar = await validarDadosRoupa(Roupa)
+        if (validar) {
+            return validar // 400
+        }
+        // chama DAO
+        let resultRoupas = await roupasDAO.setInsertClothes(Roupa)
+
+        if (!resultRoupas) {
+            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possível inserir a roupa no banco de dados"
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
+        }
+
+        let lastID = await roupasDAO.getSelectLastID()
+
+        if (!lastID) {
+            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possível recuperar o ID da roupa inserida"
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
+        }
+
+        Roupa.roupa_id = lastID
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+        MESSAGES.DEFAULT_HEADER.items = Roupa
+
+        return MESSAGES.DEFAULT_HEADER
+
+    } catch (error) {
+
+        console.log(error)
+
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro critico na controller de roupa, contatar o suporte " 
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
+    }
+}
+
+// Função para validar os dados da roupa
 const validarDadosRoupa = function (dadosRoupa) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (dadosRoupa.nome_peca == '' || dadosRoupa.nome_peca == undefined || dadosRoupa.nome_peca == null || dadosRoupa.nome_peca.length > 100) {
+    if (dadosRoupa.nome_peca == '' || dadosRoupa.nome_peca == undefined || 
+        dadosRoupa.nome_peca == null || dadosRoupa.nome_peca.length > 100 ||
+        !isNaN(dadosRoupa.nome_peca)) {
+
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Nome da peça incorreto ou vazio]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
+        return MESSAGES.ERROR_REQUIRED_FIELDS // 400
     } else {
         return false 
     }
@@ -100,5 +152,6 @@ const validarDadosRoupa = function (dadosRoupa) {
 module.exports = {
     listarTodasRoupas,
     listarRoupaPorId,
-    listarRoupaPorNome
+    listarRoupaPorNome,
+    inserirRoupa
 }
