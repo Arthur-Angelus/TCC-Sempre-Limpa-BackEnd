@@ -1,126 +1,104 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelas requisições CRUD do endereco
- * Data: 05/05/2026
+ * Data: 13/05/2026
  * Autor: Arthur Angelus
- * Versão: 1.0
+ * Versão: 2.0
  *******************************************************************************************/
 
 const knex = require('../../db')
 
+// SELECT ALL
 const getSelectAllAdress = async function () {
-    knex.select('*')
-
-        .from('endereco')
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+    try {
+        const result = await knex.select('*').from('endereco')
+        return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
-const getSelectAdressById = async function (id) {
-    knex.select('*')
+// SELECT BY ID
+const getSelectAdressById = async function (endereco_id) {
+    try {
+        const result = await knex('endereco')
+            .select('*')
+            .where({ endereco_id: endereco_id })
 
-        .from('usuario')
-
-        .where({ id: id })
-
-        .first()
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+            return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
-const setInsertAdress = async function () {
-    knex('endereco').insert({
-        cep: '02384-917',
-        uf: 'sp',
-        cidade: 'saquarema',
-        bairro: 'sao masquilhos',
-        logradouro: 'rua pablo pasqualhenquick',
-        numero: '3974',
-        complemento: 'do lado do bar do thomas turbando'
-    })
+// INSERT
+const setInsertAdress = async function (endereco) {
+    try {
+        const result = await knex('endereco').insert({
+            cep: endereco.cep,
+            uf: endereco.uf,
+            cidade: endereco.cidade,
+            bairro: endereco.bairro,
+            logradouro: endereco.logradouro,
+            numero: endereco.numero,
+            complemento: endereco.complemento
+        })
+        return result
+    } catch (error) {
+        console.error("🔥 ERRO NO DAO INSERT:", error)
+        throw error
+    }
 }
 
-const setUpdateAdress = async function (id) {
-    knex('endereco')
-
-        .where({ id: id })
-
-        .update({
-            cep: '02384-917',
-            uf: 'sp',
-            cidade: 'saquarema',
-            bairro: 'sao masquilhos',
-            logradouro: 'rua pablo pasqualhenquick',
-            numero: '3974',
-            complemento: 'do lado do bar do thomas turbando'
-        })
+// UPDATE
+const setUpdateAdress = async function (endereco, endereco_id) {
+    try {
+        const result = await knex('endereco')
+            .where({ endereco_id: endereco_id })
+            .update({
+                cep: endereco.cep,
+                uf: endereco.uf,
+                cidade: endereco.cidade,
+                bairro: endereco.bairro,
+                logradouro: endereco.logradouro,
+                numero: endereco.numero,
+                complemento: endereco.complemento
+            })
+            return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
-const setDeleteAdress = async function (id) {
-    knex('endereco')
+// DELETE
+const setDeleteAdress = async function (endereco_id) {
+    try {
+        const result = await knex('endereco')
+            .where({ endereco_id: endereco_id })
+            .del()
 
-        .where({ id: id })
-
-        .del()
+        return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
-const getSelectLastID = async function () {
-    knex.select('*')
+// GET LAST ID
+const getSelectLastID = async function (endereco_id) {
+    try {
+        const result = await knex('endereco')
+            .select('endereco_id')
+            .orderBy('endereco_id', 'desc')
+            .first()
 
-        .from('endereco')
-
-        .where({ id: id })
-
-        .last()
-
-        .then(rows => {
-
-            console.log(rows);
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-        })
-
-        .finally(() => {
-
-            knex.destroy();
-
-        });
+        return result ? result.endereco_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
 }
 
 module.exports = {
