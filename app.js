@@ -32,25 +32,14 @@ app.use((request, response, next) => {
 const usuarioRoutes = require('./routes/routes_usuario.js')
 const enderecoRoutes = require('./routes/routes_endereco.js')
 const enderecoLavanderiaRoutes = require('./routes/routes_enderecoLavanderia.js')
-const lavanderiaRoutes = require('./routes/routes_lavanderia.js')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const statusroutes = require('./routes/routes_status.js')
+const avaliacaoroutes = require('./routes/routes_avaliacao.js')
 
 app.use(usuarioRoutes)
 app.use(enderecoRoutes)
 app.use(enderecoLavanderiaRoutes)
+app.use(statusroutes)
+app.use(avaliacaoroutes)
 
 
 

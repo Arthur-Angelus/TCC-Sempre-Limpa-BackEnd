@@ -1,5 +1,5 @@
 /*******************************************************************************************
- * Objetivo: Arquivo responsável pelas requisições CRUD do endereco_Lavanderia
+ * Objetivo: Arquivo responsável pelas requisições CRUD do endereco
  * Data: 11/05/2026
  * Autor: Guilherme Viana de Souza
  * Versão: 1.0
