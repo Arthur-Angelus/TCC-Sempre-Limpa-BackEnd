@@ -182,6 +182,47 @@ const atualizarRoupa = async function (Roupa, id, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// DELETE
+const excluirRoupa = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+
+            let validarID = await listarRoupaPorId(id)
+
+            if (validarID.status_code == 200) {
+
+                let resultRoupas = await roupasDAO.setDeleteClothes(Number(id))
+
+                if (resultRoupas) {
+
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                    MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                    MESSAGES.DEFAULT_HEADER.items.Roupa = resultRoupas 
+                    delete MESSAGES.DEFAULT_HEADER.items
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " DELETE - Não foi possível excluir a roupa no banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                MESSAGES.ERROR_NOT_FOUND.message += " DELETE - Não foi possível encontrar a roupa com o ID informado para exclusão"
+                return MESSAGES.ERROR_NOT_FOUND //404
+            }
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += ' DELETE - [ID incorreto]'
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " DELETE - Erro critico na controller de roupa, contatar o suporte"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 
 // Função para validar os dados da roupa
 const validarDadosRoupa = function (dadosRoupa) {
@@ -201,5 +242,6 @@ module.exports = {
     listarRoupaPorId,
     listarRoupaPorNome,
     inserirRoupa,
-    atualizarRoupa  
+    atualizarRoupa,
+    excluirRoupa
 }
