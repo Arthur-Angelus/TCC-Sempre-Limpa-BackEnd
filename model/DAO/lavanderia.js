@@ -40,10 +40,10 @@ const getSelectLaundryByFilterSelect = async function(filtros){
             query.where('bairro', 'like', `%${filtros.bairro}%`)
         }
         if (filtros.preco_max_lavagem) {
-            query.where('preco_lavagem', '<=', filtros.preco_max_lavagem)
+            query.where('preco_padrao_lavagem', '<=', filtros.preco_max_lavagem)
         }
         if (filtros.preco_max_secagem) {
-            query.where('preco_secagem', '<=', filtros.preco_max_secagem)
+            query.where('preco_padrao_secagem', '<=', filtros.preco_max_secagem)
         }
         if (filtros.avaliacao_minima) {
             query.where('media_avaliacao', '>=', filtros.avaliacao_minima)
@@ -57,9 +57,70 @@ const getSelectLaundryByFilterSelect = async function(filtros){
     }
 }
 
+const setInsertLaundry = async function (dadosLavanderia, dadosEnderecoLavanderia) {
+    try {
+        return await knex.transaction(async (trx)=> {
+            let arrayIdEndereco = await trx('endereco_lavanderia').insert({
+                cep: dadosEnderecoLavanderia.cep,
+                uf: dadosEnderecoLavanderia.uf,
+                cidade: dadosEnderecoLavanderia.cidade,
+                bairro: dadosEnderecoLavanderia.bairro,
+                logradouro: dadosEnderecoLavanderia.logradouro,
+                numero: dadosEnderecoLavanderia.numero,
+                complemento: dadosEnderecoLavanderia.complemento
+            })
+
+            let idEnderecoGerado = arrayIdEndereco[0]
+
+            let arrayIdLavanderia = await trx('lavanderia').insert({
+                nome: dadosLavanderia.nome,
+                descricao: dadosLavanderia.descricao,
+                cnpj: dadosLavanderia.cnpj,
+                tempo_padrao_lavagem: dadosLavanderia.tempo_padrao_lavagem,
+                tempo_secagem: dadosLavanderia.tempo_secagem,
+                preco_padrao_lavagem: dadosLavanderia.preco_padrao_lavagem,
+                preco_padrao_secagem: dadosLavanderia.preco_padrao_secagem,
+                logo: dadosLavanderia.logo,
+                e_mail: dadosLavanderia.e_mail,
+                telefone: dadosLavanderia.telefone,
+                fk_endereco_lavanderia: idEnderecoGerado 
+            })
+
+            return arrayIdLavanderia[0]
+        })
+    } catch (error) {
+        return false
+    }
+}
+
+const setUpdateLaundry = async function (dadosLavanderia, idLavanderia){
+    try {
+        let atualizar = await knex('lavanderia')
+        .where('lavanderia_id', idLavanderia)
+        .update({
+                nome: dadosLavanderia.nome,
+                descricao: dadosLavanderia.descricao,
+                cnpj: dadosLavanderia.cnpj,
+                tempo_padrao_lavagem: dadosLavanderia.tempo_padrao_lavagem,
+                tempo_secagem: dadosLavanderia.tempo_secagem,
+                preco_padrao_lavagem: dadosLavanderia.preco_padrao_lavagem,
+                preco_padrao_secagem: dadosLavanderia.preco_padrao_secagem,
+                logo: dadosLavanderia.logo,
+                e_mail: dadosLavanderia.e_mail,
+                telefone: dadosLavanderia.telefone
+            })
+
+            return atualizar
+    } catch (error) {
+        return false
+    }
+}
+
 
 module.exports = {
     getSelectAllLaundry,
     getSelectLaundryByFilterSelect,
-    getSelectLaundryById
+    getSelectLaundryById,
+    setInsertLaundry,
+    setUpdateLaundry
 }
