@@ -187,7 +187,7 @@ const validarDadosEnderecoLavanderia = async function (EnderecoLavanderia) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Numero incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (EnderecoLavanderia.complemento == '' || EnderecoLavanderia.complemento == undefined || EnderecoLavanderia.complemento == null || EnderecoLavanderia.complemento.length > 100) {
+    } else if (EnderecoLavanderia.complemento.length > 100) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Complemento incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
@@ -201,5 +201,6 @@ module.exports = {
     listarEnderecoLavanderiaPorId,
     inserirEnderecoLavanderia,
     atualizarEnderecoLavanderia,
-    deletarEnderecoLavanderia
+    deletarEnderecoLavanderia,
+    validarDadosEnderecoLavanderia
 }

@@ -41,6 +41,19 @@ app.use(enderecoLavanderiaRoutes)
 app.use(statusroutes)
 app.use(avaliacaoroutes)
 
+
+
+
+
+
+
+
+
+
+
+
+app.use(lavanderiaRoutes)
+
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')
 })
