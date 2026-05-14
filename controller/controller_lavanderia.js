@@ -163,6 +163,70 @@ const inserirLavanderia = async function (dadosRequisicao, contentType){
     }
 }
 
+const atualizarLavanderia = async function(dadosRequisicao, id_lavanderia, contentType){
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON'){
+            let validar = await validarDadosLavanderia(dadosRequisicao)
+            if(!validar){
+                let validarID = await selecionarLavanderiaPorId(id_lavanderia)
+                if (validarID.status_code == 200){
+                    let idLavanderia = Number(id_lavanderia)
+                    let dados = dadosRequisicao
+
+                    let resultLavanderia = await lavanderiaDAO.setUpdateLaundry(dados, idLavanderia)
+                    if (resultLavanderia){
+                        dados.id = id_lavanderia
+
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = dados
+
+                        return MESSAGES.DEFAULT_HEADER
+                    } else {
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar
+            }
+        } else {
+            return MESSAGES.ERROR_CONTENT_TYPE
+        }
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const deletarLavanderia = async function(id_lavanderia){
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
+        let validarID = await selecionarLavanderiaPorId(id_lavanderia)
+        if(validarID.status_code == 200) {
+            let idEncontrado = Number(id_lavanderia)
+
+            let resultDelete = await lavanderiaDAO.setDeleteLaundry(idEncontrado)
+            if (resultDelete) {
+                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                MESSAGES.DEFAULT_HEADER.items.enderecoLavanderia = { id: idEnderecoLavanderia }
+
+                return MESSAGES.DEFAULT_HEADER
+            } else {
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+            }
+        } else {
+            return validarID
+        }
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
 const validarDadosLavanderia = async function (dados) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -200,5 +264,7 @@ module.exports = {
     selecionarTodasLavanderia,
     selecionarLavanderiaPorId,
     selecionarLavanderiaPorFiltro,
-    inserirLavanderia
+    inserirLavanderia,
+    atualizarLavanderia,
+    deletarLavanderia
 }

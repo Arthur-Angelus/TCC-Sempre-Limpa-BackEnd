@@ -116,11 +116,25 @@ const setUpdateLaundry = async function (dadosLavanderia, idLavanderia){
     }
 }
 
+const setDeleteLaundry = async function(idLavanderia){
+    try {
+        const linhasAlteradas = await knex('lavanderia')
+        .where('lavanderia_id', idLavanderia)
+        .del()
+
+        return linhasAlteradas
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 
 module.exports = {
     getSelectAllLaundry,
     getSelectLaundryByFilterSelect,
     getSelectLaundryById,
     setInsertLaundry,
-    setUpdateLaundry
+    setUpdateLaundry,
+    setDeleteLaundry
 }

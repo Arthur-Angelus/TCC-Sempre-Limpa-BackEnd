@@ -47,6 +47,27 @@ router.post('/v1/semprelimpa/lavanderia', cors(), async function (request, respo
     response.json(lavanderia)
 })
 
+router.put('/v1/semprelimpa/lavanderia/:id', cors(), bodyParserJSON, async function(request, response){
+    let contentType = request.headers['content-type']
+    
+    let idLavanderia = request.params.id
+    
+    let dadosBody = request.body
+
+    let dadosAtualizados = await controllerLavanderia.atualizarLavanderia(dadosBody, idLavanderia, contentType)
+
+    response.status(dadosAtualizados.status_code)
+    response.json(dadosAtualizados)
+})
+
+router.delete('/v1/semprelimpa/lavanderia/:id', cors(), async function(request, response){
+    let idLavanderia = request.params.id
+
+    let lavanderia = await controllerLavanderia.deletarLavanderia(idLavanderia)
+    response.status(lavanderia.status_code)
+    response.json(lavanderia)
+})
+
 
 
 module.exports = router
