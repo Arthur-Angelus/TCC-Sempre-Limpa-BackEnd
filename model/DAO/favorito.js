@@ -27,6 +27,14 @@ const getSelectFavoriteById = async function(idFavorito){
     }
 }
 
+const getSelectAllFavoriteByUsuaryId = async function (idUsuario) {
+    try {
+        
+    } catch (error) {
+        return false
+    }
+}
+
 module.exports = {
     getSelectAllFavorite
 }
