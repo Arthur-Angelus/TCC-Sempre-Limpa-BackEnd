@@ -135,6 +135,53 @@ const inserirRoupa = async function (Roupa, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
+// UPDATE
+const atualizarRoupa = async function (Roupa, id, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosRoupa(Roupa)
+
+            if (!validar) {
+
+                let validarID = await listarRoupaPorId(id)
+
+                if (validarID.status_code == 200) {
+
+                    let idRoupa = Number(id)
+
+                   let dados = Roupa
+                    let resultRoupas = await roupasDAO.setUpdateClothes(idRoupa, dados)
+                    console.log("DEBUG", resultRoupas)
+                    if (resultRoupas) {
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.Roupa = Roupa
+
+                        return MESSAGES.DEFAULT_HEADER //200
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " UPDATE - Não foi possível atualizar a roupa no banco de dados"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " UPDATE - Tipo de conteúdo enviado não é do tipo JSON"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " UPDATE - Erro critico na controller de roupa, contatar o suporte"
+        console.log("DEBUG",error)
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 
 // Função para validar os dados da roupa
 const validarDadosRoupa = function (dadosRoupa) {
@@ -153,5 +200,6 @@ module.exports = {
     listarTodasRoupas,
     listarRoupaPorId,
     listarRoupaPorNome,
-    inserirRoupa
+    inserirRoupa,
+    atualizarRoupa  
 }
