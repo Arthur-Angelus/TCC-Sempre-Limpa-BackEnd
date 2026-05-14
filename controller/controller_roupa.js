@@ -67,23 +67,25 @@ const listarRoupaPorNome = async function (nome_peca){
         let validarRoupa = validarDadosRoupa({nome_peca: nome_peca})
         if(!validarRoupa){
             let resultRoupas = await roupasDAO.getClothesByName(nome_peca)
-            if(resultRoupas !== false) {
-                if(resultRoupas.length > 0) {
+            if(resultRoupas) {
+                if(resultRoupas.length != 0) {
                     MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
                     MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_REQUEST.message
                     MESSAGES.DEFAULT_HEADER.items.roupas = resultRoupas
 
                     return MESSAGES.DEFAULT_HEADER
+                } else {
+                    return MESSAGES.ERROR_NOT_FOUND // 404
                 }
             } else {
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL += "GET BY NAME - Não foi possível buscar a roupa por nome no banco de dados"
             }
         } else {
-            return validarRoupa
+            return validarRoupa // 400
         }
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
 // INSERT
@@ -137,12 +139,10 @@ const inserirRoupa = async function (Roupa, contentType) {
 // Função para validar os dados da roupa
 const validarDadosRoupa = function (dadosRoupa) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
     if (dadosRoupa.nome_peca == '' || dadosRoupa.nome_peca == undefined || 
         dadosRoupa.nome_peca == null || dadosRoupa.nome_peca.length > 100 ||
-        !isNaN(dadosRoupa.nome_peca)) {
-
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Nome da peça incorreto ou vazio]'
+        dadosRoupa.nome_peca.length == 0 || !isNaN(dadosRoupa.nome_peca)) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message +=  " [Nome da peça incorreto ou vazio]"
         return MESSAGES.ERROR_REQUIRED_FIELDS // 400
     } else {
         return false 

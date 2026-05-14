@@ -28,8 +28,6 @@ router.get('/v1/semprelimpa/roupa', cors(), async function(request, response){
 router.get('/v1/semprelimpa/roupa/buscar', cors(), async function(request, response){
     let nomePeca= request.query.nome
     let dadosRoupas = await controllerRoupa.listarRoupaPorNome(nomePeca)
-    console.log("DEBUG", dadosRoupas)
-    console.log("DEBUG", nomePeca)
     response.status(dadosRoupas.status_code).json(dadosRoupas)
 })
 // GET BY ID
