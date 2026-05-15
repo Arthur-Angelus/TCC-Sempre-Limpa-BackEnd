@@ -35,6 +35,9 @@ const enderecoLavanderiaRoutes = require('./routes/routes_enderecoLavanderia.js'
 const statusroutes = require('./routes/routes_status.js')
 const avaliacaoroutes = require('./routes/routes_avaliacao.js')
 const cesto_rouparoutes = require('./routes/routes_cesto_roupa.js')
+const lavanderiaroutes = require('./routes/routes_lavanderia.js')
+const rouparoutes = require('./routes/routes_roupa.js')
+const cartao_usuarioroutes = require('./routes/routes_cartao_usuario.js')
 
 app.use(usuarioRoutes)
 app.use(enderecoRoutes)
@@ -42,19 +45,9 @@ app.use(enderecoLavanderiaRoutes)
 app.use(statusroutes)
 app.use(avaliacaoroutes)
 app.use(cesto_rouparoutes)
-
-
-
-
-
-
-
-
-
-
-
-
-app.use(lavanderiaRoutes)
+app.use(lavanderiaroutes)
+app.use(rouparoutes)
+app.use(cartao_usuarioroutes)
 
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')
