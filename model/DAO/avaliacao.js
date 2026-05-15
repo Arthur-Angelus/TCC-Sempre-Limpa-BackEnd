@@ -35,9 +35,6 @@ const getSelectReviewById = async function (avaliacao_id) {
 // INSERT
 const setInsertReview = async function (avaliacao) {
     try {
-        console.log('CHEGOU NO DAO INSERT')
-        console.log(avaliacao)
-
         const result = await knex('avaliacao').insert({
             nota: avaliacao.nota,
             comentario: avaliacao.comentario,

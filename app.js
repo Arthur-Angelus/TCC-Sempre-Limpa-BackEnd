@@ -34,12 +34,14 @@ const enderecoRoutes = require('./routes/routes_endereco.js')
 const enderecoLavanderiaRoutes = require('./routes/routes_enderecoLavanderia.js')
 const statusroutes = require('./routes/routes_status.js')
 const avaliacaoroutes = require('./routes/routes_avaliacao.js')
+const cesto_rouparoutes = require('./routes/routes_cesto_roupa.js')
 
 app.use(usuarioRoutes)
 app.use(enderecoRoutes)
 app.use(enderecoLavanderiaRoutes)
 app.use(statusroutes)
 app.use(avaliacaoroutes)
+app.use(cesto_rouparoutes)
 
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')
