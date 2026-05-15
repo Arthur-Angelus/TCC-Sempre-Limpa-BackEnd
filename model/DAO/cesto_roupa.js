@@ -90,6 +90,6 @@ module.exports = {
     getSelectAllReceive,
     getSelectReceiveById,
     setInsertReceive,
-    setUpdateReceive,
+    // setUpdateReceive,
     setDeleteReceive
 }
