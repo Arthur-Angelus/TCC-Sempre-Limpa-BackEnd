@@ -29,12 +29,31 @@ const getSelectFavoriteById = async function(idFavorito){
 
 const getSelectAllFavoriteByUsuaryId = async function (idUsuario) {
     try {
-        
+        let resultado = await knex('vw_favoritos_detalhados')
+        .where('usuario_id', idUsuario)
+        .orderBy('id_favorito', 'desc')
+
+        return resultado
+    } catch (error) {
+        return false
+    }
+}
+
+const getSelectFavoriteByLavanderiaId = async function (idlavanderia){
+    try {
+        let resultado = await knex('vw_favoritos_detalhados')
+        .where('lavanderia_id', idlavanderia)
+        .orderBy('id_favorito', 'desc')
+
+        return resultado
     } catch (error) {
         return false
     }
 }
 
 module.exports = {
-    getSelectAllFavorite
+    getSelectAllFavorite,
+    getSelectFavoriteById,
+    getSelectAllFavoriteByUsuaryId,
+    getSelectFavoriteByLavanderiaId
 }
