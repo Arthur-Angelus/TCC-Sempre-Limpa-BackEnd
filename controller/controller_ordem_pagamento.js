@@ -215,7 +215,7 @@ const validarDadosOrdemPagamento = async function (OrdemPagamento) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[tipo_pagamento incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (OrdemPagamento.valor == '' || OrdemPagamento.valor == undefined || OrdemPagamento.valor == null || isNaN(OrdemPagamento.valor) || OrdemPagamento.valor.length > 10.2) {
+    } else if (OrdemPagamento.valor == '' || OrdemPagamento.valor == undefined || OrdemPagamento.valor == null || isNaN(OrdemPagamento.valor) || OrdemPagamento.valor > 10.2) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [valor incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
