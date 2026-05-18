@@ -92,7 +92,7 @@ const deletarCartao = async (cartao_id, usuario_id) => {
     try {
         let result = await cartaoDAO.setDeletCard(cartao_id, usuario_id);
 
-        if (result && result.length > 0) {
+        if (result > 0) {
             MESSAGES.DEFAULT_HEADER.status = true
             MESSAGES.DEFAULT_HEADER.status_code = 200
             MESSAGES.DEFAULT_HEADER.message = "Cartão removido com sucesso!"
