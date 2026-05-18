@@ -1,8 +1,8 @@
 /*******************************************************************************************
- * Objetivo: Arquivo responsável pelos endpoints do endereco
- * Data: 13/05/2026
+ * Objetivo: Arquivo responsável pelos endpoints do ordem pagamento
+ * Data: 18/05/2026
  * Autor: Arthur Angelus
- * Versão: 2.0
+ * Versão: 1.0
  *******************************************************************************************/
 
 const express = require('express')

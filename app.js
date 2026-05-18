@@ -52,6 +52,10 @@ app.use(rouparoutes)
 app.use(cartao_usuarioroutes)
 app.use(ordem_pagamentoroutes)
 
+//rotas motorista
+const dados_bancariosroutes = require('./routes/motorista/routes_dados_bancarios.js')
+
+app.use(dados_bancariosroutes)
 
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')
