@@ -41,6 +41,7 @@ const cartao_usuarioroutes = require('./routes/routes_cartao_usuario.js')
 const ordem_pagamentoroutes = require('./routes/routes_ordem_pagamento.js')
 
 
+
 app.use(usuarioRoutes)
 app.use(enderecoRoutes)
 app.use(enderecoLavanderiaRoutes)
@@ -58,6 +59,7 @@ const dados_veiculoroutes = require('./routes/motorista/routes_dados_veiculo.js'
 
 app.use(dados_bancariosroutes)
 app.use(dados_veiculoroutes)
+
 
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')
