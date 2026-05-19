@@ -68,6 +68,19 @@ const setUpdateCesto = async function (cesto, cesto_id) {
         return false
     }
 }
+// DELETE
+const setDeleteCesto = async function (cesto_id) {
+    try {
+        const result = await knex('cesto')
+            .where({ cesto_id: cesto_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO DELETE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (cesto_id) {
     try {
@@ -88,6 +101,7 @@ module.exports = {
     getSelectCestoById,
     setInsertCesto,
     setUpdateCesto,
+    setDeleteCesto,
     getSelectLastID 
 }
     

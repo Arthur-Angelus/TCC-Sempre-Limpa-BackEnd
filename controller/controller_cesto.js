@@ -161,6 +161,47 @@ const atualizarCesto = async function (Cesto, id, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// DELETE
+const excluirCesto = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+
+            let validarID = await buscarCestoID(id)
+
+            if (validarID.status_code == 200) {
+
+                let resultCesto = await cestoDAO.setDeleteCesto(Number(id))
+
+                if (resultCesto) {
+
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                    MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                    MESSAGES.DEFAULT_HEADER.items.Cesto = resultCesto
+                    delete MESSAGES.DEFAULT_HEADER.items
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " DELETE - Não foi possível excluir o cesto"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                MESSAGES.ERROR_NOT_FOUND.message += " DELETE - cesto não encontrado"
+                return MESSAGES.ERROR_NOT_FOUND //404
+            }
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += " DELETE -[ID incorreto]" 
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " DELETE - controller excluir cesto"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosCesto = async function (Cesto) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -193,5 +234,6 @@ module.exports = {
   listarCesto,
   buscarCestoID,
   inserirCesto,
-  atualizarCesto
+  atualizarCesto,
+  excluirCesto
 }

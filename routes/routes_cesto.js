@@ -45,7 +45,7 @@ router.post('/v1/semprelimpa/cesto', cors(), bodyParserJSON, async function(requ
     response.json(Cesto)
 })
 // PUT CESTO
-router.put('/v1/SempreLimpa/cesto/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/v1/sempreLimpa/cesto/:id', cors(), bodyParserJSON, async function(request, response){
     let cesto_id = request.params.id
 
     let dadosBody = request.body
@@ -53,6 +53,15 @@ router.put('/v1/SempreLimpa/cesto/:id', cors(), bodyParserJSON, async function(r
     let contentType = request.headers['content-type']
 
     let Cesto = await controllerCesto.atualizarCesto(dadosBody, cesto_id, contentType)
+
+    response.status(Cesto.status_code)
+    response.json(Cesto)
+})
+// DELETE CESTO
+router.delete('/v1/sempreLimpa/cesto/:id', cors(), async function(request, response){
+    let cesto_id = request.params.id
+
+    let Cesto = await controllerCesto.excluirCesto(cesto_id)
 
     response.status(Cesto.status_code)
     response.json(Cesto)
