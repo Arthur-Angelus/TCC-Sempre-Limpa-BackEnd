@@ -44,5 +44,18 @@ router.post('/v1/semprelimpa/pix', cors(), bodyParserJSON, async function(reques
     response.status(Pix.status_code)
     response.json(Pix)
 })
+// PUT PIX
+router.put('/v1/sempreLimpa/pix/:id', cors(), bodyParserJSON, async function(request, response){
+    let pix_id = request.params.id
+
+    let dadosBody = request.body
+
+    let contentType = request.headers['content-type']
+
+    let Pix = await controllerPix.atualizarPix(dadosBody, pix_id, contentType)
+
+    response.status(Pix.status_code)
+    response.json(Pix)
+})
 
 module.exports = router

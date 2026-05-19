@@ -114,6 +114,53 @@ const inserirPix = async function (Pix, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// UPDATE
+const atualizarPix = async function (Pix, id, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosPix(Pix)
+
+            if (!validar) {
+                let validarID = await buscarPixID(id)
+
+                if (validarID.status_code == 200) {
+
+                    let idPix = Number(id)
+
+                    let dados = Pix
+                    delete dados.id
+
+                    let resultPix = await pixDAO.setUpdatePix(dados, idPix)
+
+                    if (resultPix) {
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.Pix = Pix
+
+                        return MESSAGES.DEFAULT_HEADER //200
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " UPDATE - Não foi possivel atualizar o pix no banco de dados"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " UPDATE - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " UPDATE - Erro Critico na controller, acionar suporte técnico"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosPix = async function (Pix) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -150,5 +197,6 @@ const validarDadosPix = async function (Pix) {
 module.exports = {
   listarPix,
   buscarPixID,
-  inserirPix
+  inserirPix,
+  atualizarPix
 }

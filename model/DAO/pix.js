@@ -52,6 +52,24 @@ const setInsertPix = async function (pix) {
         throw error
     }
 }
+// UPDATE PIX
+const setUpdatePix = async function (pix, pix_id) {
+    try {
+        const result = await knex('pix')
+            .where({ pix_id: pix_id })
+            .update({
+                chave_pix: pix.chave_pix,
+                data_expiracao: pix.data_expiracao,
+                qr_code: pix.qr_code,
+                status: pix.status,
+                fk_ordem_pagamento_id: pix.fk_ordem_pagamento_id
+            })
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO UPDATE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (pix_id) {
     try {
@@ -71,6 +89,7 @@ module.exports = {
     getSelectAllPix,
     getSelectPixById,
     setInsertPix,
+    setUpdatePix,
     getSelectLastID
 }
     
