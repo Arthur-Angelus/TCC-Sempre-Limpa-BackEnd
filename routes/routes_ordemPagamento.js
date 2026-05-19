@@ -44,5 +44,18 @@ router.post('/v1/semprelimpa/ordempagamento', cors(), bodyParserJSON, async func
     response.status(ordemPagamento.status_code)
     response.json(ordemPagamento)
 })
+// PUT ORDEM PAGAMENTO
+router.put('/v1/semprelimpa/ordempagamento/:id', cors(), bodyParserJSON, async function(request, response){
+    let ordem_pagamento_id = request.params.id
+
+    let dadosBody = request.body
+
+    let contentType = request.headers['content-type']
+
+    let ordemPagamento = await controllerOrdemPagamento.atualizarOrdemPagamento(dadosBody, ordem_pagamento_id, contentType)
+
+    response.status(ordemPagamento.status_code)
+    response.json(ordemPagamento)
+})
 
 module.exports = router

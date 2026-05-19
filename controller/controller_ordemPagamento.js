@@ -110,6 +110,53 @@ const inserirOrdemPagamento = async function (OrdemPagamento, contentType) {
         }
     } catch (error) {
         MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro Critico na controller, acionar suporte técnico"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// UPDATE
+const atualizarOrdemPagamento = async function (OrdemPagamento, id, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosOrdemPagamento(OrdemPagamento)
+
+            if (!validar) {
+                let validarID = await buscarOrdemPagamentoID(id)
+
+                if (validarID.status_code == 200) {
+
+                    let idOrdemPagamento = Number(id)
+
+                    let dados = OrdemPagamento
+                    delete dados.id
+
+                    let resultOrdemPagamento = await ordemPagamentoDAO.setUpdateOrdemPagamento(dados, idOrdemPagamento)
+
+                    if (resultOrdemPagamento) {
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.OrdemPagamento = OrdemPagamento
+
+                        return MESSAGES.DEFAULT_HEADER //200
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " UPDATE - Não foi possivel atualizar o ordem de pagamento no banco de dados"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " UPDATE - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " UPDATE - Erro Critico na controller, acionar suporte técnico"
         console.error(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
@@ -150,5 +197,6 @@ const validarDadosOrdemPagamento = async function (OrdemPagamento) {
 module.exports = {
   listarOrdemPagamento,
   buscarOrdemPagamentoID,
-  inserirOrdemPagamento
+  inserirOrdemPagamento,
+  atualizarOrdemPagamento
 }

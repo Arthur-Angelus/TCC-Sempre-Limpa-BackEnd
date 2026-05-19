@@ -5,6 +5,7 @@
  * Versão: 1.0
  *******************************************************************************************/
 
+const { set } = require('supertest/lib/cookies')
 const knex = require('../../db')
 
 // ORDEM PAGAMENTO ALL
@@ -67,10 +68,29 @@ const getSelectLastID = async function (ordem_pagamento_id) {
         return null
     }
 }
+// UPDATE ORDEM PAGAMENTO
+const setUpdateOrdemPagamento = async function (ordemPagamento, ordem_pagamento_id) {
+    try {
+        const result = await knex('ordem_pagamento')
+            .where({ ordem_pagamento_id: ordem_pagamento_id })
+            .update({
+                tipo_pagamento: ordemPagamento.tipo_pagamento,
+                valor: ordemPagamento.valor,
+                data_criacao: ordemPagamento.data_criacao,
+                status: ordemPagamento.status,
+                fk_pedido_id: ordemPagamento.fk_pedido_id
+            })
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO UPDATE:",error)
+        return false
+    }
+}
 module.exports = {
     getSelectAllOrdemPagamento,
     getSelectOrdemPagamentoById,
     setInsertOrdemPagamento,
+    setUpdateOrdemPagamento,
     getSelectLastID
 }
     
