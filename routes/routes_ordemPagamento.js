@@ -1,0 +1,28 @@
+/*******************************************************************************************
+ * Objetivo: Arquivo responsável pelos endpoints da tabela ordem pagamento
+ * Data de Criação: 18/05/2026
+ * Autor: Kauan Lopes Pereira
+ * Versão: 1.0
+ *******************************************************************************************/
+
+const express = require('express')
+const cors = require('cors')
+const bodyParser = require('body-parser')
+
+const router = express.Router()
+
+const bodyParserJSON = bodyParser.json()
+
+const controllerOrdemPagamento = require('../controller/controller_ordemPagamento.js')
+
+//ENDPOINT - ORDEM PAGAMENTO
+
+// GET ALL ORDEM PAGAMENTO
+router.get('/v1/semprelimpa/ordempagamento', cors(), async function (request, response) {
+    let ordemPagamento = await controllerOrdemPagamento.listarOrdemPagamento()
+
+    response.status(ordemPagamento.status_code)
+    response.json(ordemPagamento)
+})
+
+module.exports = router
