@@ -41,6 +41,7 @@ const cartao_usuarioroutes = require('./routes/routes_cartao_usuario.js')
 const ordem_pagamentoroutes = require('./routes/routes_ordem_pagamento.js')
 
 
+
 app.use(usuarioRoutes)
 app.use(enderecoRoutes)
 app.use(enderecoLavanderiaRoutes)
@@ -51,6 +52,7 @@ app.use(lavanderiaroutes)
 app.use(rouparoutes)
 app.use(cartao_usuarioroutes)
 app.use(ordem_pagamentoroutes)
+
 
 
 app.listen(PORT, function () {
