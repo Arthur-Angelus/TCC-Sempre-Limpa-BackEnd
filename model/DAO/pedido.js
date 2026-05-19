@@ -5,6 +5,7 @@
  * Versão: 1.0
  *******************************************************************************************/
 
+const { get } = require('express/lib/request')
 const knex = require('../../db')
 
 // PEDIDO ALL
@@ -19,9 +20,24 @@ const getSelectAllPedido = async function () {
         return false
     }
 }
+// SELECT PEDIDO BY ID
+const getSelectPedidoById = async function (pedido_id) {
+    try {
+        const rows = await knex('pedido')
+            .select('*')
+            .where({ pedido_id: pedido_id })
 
+        return rows.map(pedido => {
+            return pedido
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 
 module.exports = {
-    getSelectAllPedido 
+    getSelectAllPedido,
+    getSelectPedidoById
 }
     

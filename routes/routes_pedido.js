@@ -19,10 +19,19 @@ const controllerPedido = require('../controller/controller_pedido.js')
 
 // GET ALL PEDIDO
 router.get('/v1/semprelimpa/pedido', cors(), async function (request, response) {
-    let Pedido = await controllerPedido.listarPedido()
+    let pedido = await controllerPedido.listarPedido()
 
-    response.status(Pedido.status_code)
-    response.json(Pedido)
+    response.status(pedido.status_code)
+    response.json(pedido)
+})
+// GET PEDIDO BY ID
+router.get('/v1/semprelimpa/pedido/:id', cors(), async function (request, response) {
+    let pedido_id = request.params.id
+
+    let pedido = await controllerPedido.buscarPedidoID(pedido_id)
+
+    response.status(pedido.status_code)
+    response.json(pedido)
 })
 
 
