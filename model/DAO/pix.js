@@ -34,10 +34,43 @@ const getSelectPixById = async function (pix_id) {
         return false
     }
 }
+// INSERT PIX
+const setInsertPix = async function (pix) {
+    try {
+        const result = await knex('pix').insert({
+            chave_pix: pix.chave_pix,
+            data_expiracao: pix.data_expiracao,
+            qr_code: pix.qr_code,
+            status: pix.status,
+            fk_ordem_pagamento_id: pix.fk_ordem_pagamento_id
+        })
+        return result.map(pix => {
+            return pix
+        })
+    } catch (error) {
+        console.error("ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
+// GET LAST ID
+const getSelectLastID = async function (pix_id) {
+    try {
+        const result = await knex('pix')
+            .select('pix_id')
+            .orderBy('pix_id', 'desc')
+            .first()
 
+        return result ? result.pix_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
 
 module.exports = {
     getSelectAllPix,
-    getSelectPixById
+    getSelectPixById,
+    setInsertPix,
+    getSelectLastID
 }
     

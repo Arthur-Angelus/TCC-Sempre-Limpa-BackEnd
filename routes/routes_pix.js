@@ -33,5 +33,16 @@ router.get('/v1/semprelimpa/pix/:id', cors(), async function (request, response)
     response.status(pix.status_code)
     response.json(pix)
 })
+// POST PIX
+router.post('/v1/semprelimpa/pix', cors(), bodyParserJSON, async function(request, response){
+    let Pix_data = request.body
+
+    let contentType = request.headers['content-type']
+
+    let Pix = await controllerPix.inserirPix(Pix_data, contentType)
+
+    response.status(Pix.status_code)
+    response.json(Pix)
+})
 
 module.exports = router

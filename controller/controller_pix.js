@@ -70,7 +70,85 @@ const buscarPixID = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// INSERT
+const inserirPix = async function (Pix, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosPix(Pix)
+
+            if (!validar) {
+                let resultPix = await pixDAO.setInsertPix(Pix)
+
+                if (resultPix) {
+                    let lastID = await pixDAO.getSelectLastID()
+                    if (lastID) {
+                        Pix.pix_id = lastID
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items = Pix
+
+                        return MESSAGES.DEFAULT_HEADER //201
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel recuperar o ID do novo pix"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel inserir o pix no banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " INSERT - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro Critico na controller, acionar suporte técnico"
+        console.log("DEBUG VALIDAÇÃO:", error)
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// Validação dos dados INPUT - INSERT E UPDATE
+const validarDadosPix = async function (Pix) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    if (Pix.chave_pix == '' || Pix.chave_pix == undefined || 
+        Pix.chave_pix == null || typeof Pix.chave_pix !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Chave PIX Invalida]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Pix.data_expiracao == '' || Pix.data_expiracao == undefined || 
+        Pix.data_expiracao == null || typeof Pix.data_expiracao !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Data de Expiração Invalida]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Pix.qr_code == '' || Pix.qr_code == undefined || 
+        Pix.qr_code == null || typeof Pix.qr_code !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[QR Code Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Pix.status == '' || Pix.status == undefined || 
+        Pix.status == null || typeof Pix.status !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Status Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Pix.fk_ordem_pagamento_id == '' || Pix.fk_ordem_pagamento_id == undefined || 
+        Pix.fk_ordem_pagamento_id == null || typeof Pix.fk_ordem_pagamento_id !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID da Ordem de Pagamento Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+    } 
+    else {
+        return false
+    }
+}
 module.exports = {
   listarPix,
-  buscarPixID
+  buscarPixID,
+  inserirPix
 }
