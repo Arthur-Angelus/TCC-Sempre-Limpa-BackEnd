@@ -19,9 +19,25 @@ const getSelectAllPagamentoCartao = async function () {
         return false
     }
 }
+// SELECT PAGAMENTO CARTAO BY ID
+const getSelectPagamentoCartaoById = async function (pagamento_cartao_id) {
+    try {
+        const rows = await knex('pagamento_cartao')
+            .select('*')
+            .where({ pagamento_cartao_id: pagamento_cartao_id })
+
+        return rows.map(pagamento_cartao => {
+            return pagamento_cartao
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 
 
 module.exports = {
-    getSelectAllPagamentoCartao
+    getSelectAllPagamentoCartao,
+    getSelectPagamentoCartaoById
 }
     

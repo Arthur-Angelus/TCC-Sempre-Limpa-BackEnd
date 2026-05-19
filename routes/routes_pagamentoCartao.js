@@ -24,5 +24,14 @@ router.get('/v1/semprelimpa/pagamento-cartao', cors(), async function (request, 
     response.status(PagamentoCartao.status_code)
     response.json(PagamentoCartao)
 })
+// GET PAGAMENTO CARTAO BY ID
+router.get('/v1/semprelimpa/pagamento-cartao/:id', cors(), async function (request, response) {
+    let pagamento_cartao_id = request.params.id
+
+    let PagamentoCartao = await controllerPagamentoCartao.buscarPagamentoCartaoID(pagamento_cartao_id)
+
+    response.status(PagamentoCartao.status_code)
+    response.json(PagamentoCartao)
+})
 
 module.exports = router
