@@ -34,9 +34,43 @@ const getSelectOrdemPagamentoById = async function (ordem_pagamento_id) {
         return false
     }
 }
+// INSERT ORDEM PAGAMENTO
+const setInsertOrdemPagamento = async function (ordemPagamento) {
+    try {
+        const result = await knex('ordem_pagamento').insert({
+            tipo_pagamento: ordemPagamento.tipo_pagamento,
+            valor: ordemPagamento.valor,
+            data_criacao: ordemPagamento.data_criacao,
+            status: ordemPagamento.status,
+            fk_pedido_id: ordemPagamento.fk_pedido_id,
+           
+        })
+        return result.map(ordemPagamento => {
+            return ordemPagamento
+        })
+    } catch (error) {
+        console.error("ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
+// GET LAST ID
+const getSelectLastID = async function (ordem_pagamento_id) {
+    try {
+        const result = await knex('ordem_pagamento')
+            .select('ordem_pagamento_id')
+            .orderBy('ordem_pagamento_id', 'desc')
+            .first()
 
+        return result ? result.ordem_pagamento_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
 module.exports = {
     getSelectAllOrdemPagamento,
-    getSelectOrdemPagamentoById
+    getSelectOrdemPagamentoById,
+    setInsertOrdemPagamento,
+    getSelectLastID
 }
     

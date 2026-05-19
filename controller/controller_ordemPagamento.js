@@ -70,8 +70,85 @@ const buscarOrdemPagamentoID = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// INSERT
+const inserirOrdemPagamento = async function (OrdemPagamento, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosOrdemPagamento(OrdemPagamento)
+
+            if (!validar) {
+                let resultOrdemPagamento = await ordemPagamentoDAO.setInsertOrdemPagamento(OrdemPagamento)
+
+                if (resultOrdemPagamento) {
+                    let lastID = await ordemPagamentoDAO.getSelectLastID()
+                    if (lastID) {
+                        OrdemPagamento.ordem_pagamento_id = lastID
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items = OrdemPagamento
+
+                        return MESSAGES.DEFAULT_HEADER //201
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel recuperar o ID do novo ordem de pagamento"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel inserir o ordem de pagamento no banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " INSERT - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro Critico na controller, acionar suporte técnico"
+        console.error(error)
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// Validação dos dados INPUT - INSERT E UPDATE
+const validarDadosOrdemPagamento = async function (OrdemPagamento) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    if (OrdemPagamento.tipo_pagamento == '' || OrdemPagamento.tipo_pagamento == undefined || 
+        OrdemPagamento.tipo_pagamento == null || typeof OrdemPagamento.tipo_pagamento !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Tipo de Pagamento Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (OrdemPagamento.valor == '' || OrdemPagamento.valor == undefined || 
+        OrdemPagamento.valor == null || typeof OrdemPagamento.valor !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Valor Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (OrdemPagamento.data_criacao == '' || OrdemPagamento.data_criacao == undefined || 
+        OrdemPagamento.data_criacao == null || typeof OrdemPagamento.data_criacao !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Data de Criação Invalida]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (OrdemPagamento.status == '' || OrdemPagamento.status == undefined || 
+        OrdemPagamento.status == null || typeof OrdemPagamento.status !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Status Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (OrdemPagamento.fk_pedido_id == '' || OrdemPagamento.fk_pedido_id == undefined || 
+        OrdemPagamento.fk_pedido_id == null || typeof OrdemPagamento.fk_pedido_id !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Pedido Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+    } 
+    else {
+        return false
+    }
+}
 module.exports = {
   listarOrdemPagamento,
-  buscarOrdemPagamentoID
+  buscarOrdemPagamentoID,
+  inserirOrdemPagamento
 }
