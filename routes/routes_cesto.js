@@ -44,5 +44,18 @@ router.post('/v1/semprelimpa/cesto', cors(), bodyParserJSON, async function(requ
     response.status(Cesto.status_code)
     response.json(Cesto)
 })
+// PUT CESTO
+router.put('/v1/SempreLimpa/cesto/:id', cors(), bodyParserJSON, async function(request, response){
+    let cesto_id = request.params.id
+
+    let dadosBody = request.body
+
+    let contentType = request.headers['content-type']
+
+    let Cesto = await controllerCesto.atualizarCesto(dadosBody, cesto_id, contentType)
+
+    response.status(Cesto.status_code)
+    response.json(Cesto)
+})
 
 module.exports = router

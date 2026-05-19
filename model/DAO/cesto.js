@@ -51,6 +51,23 @@ const setInsertCesto = async function (cesto) {
         throw error
     }
 }
+// UPDATE CESTO
+const setUpdateCesto = async function (cesto, cesto_id) {
+    try {
+        const result = await knex('cesto')
+            .where({ cesto_id: cesto_id })
+            .update({
+                peso_estimado: cesto.peso_estimado,
+                secagem: cesto.secagem,
+                tipo_lavagem: cesto.tipo_lavagem,
+                fk_pedido_id: cesto.fk_pedido_id
+            })
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO UPDATE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (cesto_id) {
     try {
@@ -70,6 +87,7 @@ module.exports = {
     getSelectAllCesto,
     getSelectCestoById,
     setInsertCesto,
+    setUpdateCesto,
     getSelectLastID 
 }
     
