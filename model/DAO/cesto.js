@@ -19,8 +19,24 @@ const getSelectAllCesto = async function () {
         return false
     }
 }
+// SELECT CESTO BY ID
+const getSelectCestoById = async function (cesto_id) {
+    try {
+        const rows = await knex('cesto')
+            .select('*')
+            .where({ cesto_id: cesto_id })
+
+        return rows.map(cesto => {
+            return cesto
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 
 
 module.exports = {
     getSelectAllCesto,
+    getSelectCestoById
 }

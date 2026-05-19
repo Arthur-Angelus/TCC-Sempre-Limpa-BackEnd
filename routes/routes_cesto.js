@@ -24,6 +24,14 @@ router.get('/v1/semprelimpa/cesto', cors(), async function (request, response) {
     response.status(Cesto.status_code)
     response.json(Cesto)
 })
+// GET CESTO BY ID
+router.get('/v1/semprelimpa/cesto/:id', cors(), async function (request, response) {
+    let cesto_id = request.params.id
 
+    let Cesto = await controllerCesto.buscarCestoID(cesto_id)
+
+    response.status(Cesto.status_code)
+    response.json(Cesto)
+})
 
 module.exports = router
