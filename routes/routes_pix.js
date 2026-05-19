@@ -24,6 +24,14 @@ router.get('/v1/semprelimpa/pix', cors(), async function (request, response) {
     response.status(pix.status_code)
     response.json(pix)
 })
+// GET PIX BY ID
+router.get('/v1/semprelimpa/pix/:id', cors(), async function (request, response) {
+    let pix_id = request.params.id
 
+    let pix = await controllerPix.buscarPixID(pix_id)
+
+    response.status(pix.status_code)
+    response.json(pix)
+})
 
 module.exports = router

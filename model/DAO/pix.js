@@ -19,9 +19,25 @@ const getSelectAllPix = async function () {
         return false
     }
 }
+// SELECT PIX BY ID
+const getSelectPixById = async function (pix_id) {
+    try {
+        const rows = await knex('pix')
+            .select('*')
+            .where({ pix_id: pix_id })
+
+        return rows.map(pix => {
+            return pix
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 
 
 module.exports = {
-    getSelectAllPix
+    getSelectAllPix,
+    getSelectPixById
 }
     
