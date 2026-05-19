@@ -77,6 +77,19 @@ const setUpdatePedido = async function (pedido, pedido_id) {
         return false
     }
 }
+// DELETE
+const setDeletePedido = async function (pedido_id) {
+    try {
+        const result = await knex('pedido')
+            .where({ pedido_id: pedido_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO DELETE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (pedido_id) {
     try {
@@ -96,6 +109,7 @@ module.exports = {
     getSelectPedidoById,
     setInsertPedido,
     setUpdatePedido,
+    setDeletePedido,
     getSelectLastID
 }
     

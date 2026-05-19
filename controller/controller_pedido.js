@@ -161,6 +161,47 @@ const atualizarPedido = async function (Pedido, id, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// DELETE
+const excluirPedido = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+
+            let validarID = await buscarPedidoID(id)
+
+            if (validarID.status_code == 200) {
+
+                let resultPedido = await pedidoDAO.setDeletePedido(Number(id))
+
+                if (resultPedido) {
+
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                    MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                    MESSAGES.DEFAULT_HEADER.items.Pedido = resultPedido
+                    delete MESSAGES.DEFAULT_HEADER.items
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " DELETE - Não foi possível excluir o pedido do banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                MESSAGES.ERROR_NOT_FOUND.message += " DELETE - pedido não encontrado"
+                return MESSAGES.ERROR_NOT_FOUND //404
+            }
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += " DELETE -[ID incorreto]" 
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " DELETE - controller excluir pedido, acionar suporte técnico"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosPedido = async function (Pedido) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -199,9 +240,11 @@ const validarDadosPedido = async function (Pedido) {
         return false
     }
 }
+
 module.exports = {
   listarPedido,
   buscarPedidoID,
   inserirPedido,
-  atualizarPedido
+  atualizarPedido,
+  excluirPedido
 }
