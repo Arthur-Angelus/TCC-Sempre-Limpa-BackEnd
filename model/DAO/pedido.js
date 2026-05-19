@@ -56,6 +56,27 @@ const setInsertPedido = async function (pedido) {
         throw error
     }
 }
+// UPDATE PEDIDO
+const setUpdatePedido = async function (pedido, pedido_id) {
+    try {
+        const result = await knex('pedido')
+            .where({ pedido_id: pedido_id })
+            .update({
+                data: pedido.data,
+                valor_total: pedido.valor_total,
+                taxa_entrega: pedido.taxa_entrega,
+                taxa_entregador: pedido.taxa_entregador,
+                tempo_estimado: pedido.tempo_estimado,
+                fk_status_id: pedido.fk_status_id,
+                fk_lavanderia_id: pedido.fk_lavanderia_id,
+                fk_usuario_id: pedido.fk_usuario_id
+            })
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO UPDATE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (pedido_id) {
     try {
@@ -74,6 +95,7 @@ module.exports = {
     getSelectAllPedido,
     getSelectPedidoById,
     setInsertPedido,
+    setUpdatePedido,
     getSelectLastID
 }
     

@@ -44,6 +44,19 @@ router.post('/v1/semprelimpa/pedido', cors(), bodyParserJSON, async function(req
     response.status(pedido.status_code)
     response.json(pedido)
 })
+// PUT PEDIDO
+router.put('/v1/sempreLimpa/pedido/:id', cors(), bodyParserJSON, async function(request, response){
+    let pedido_id = request.params.id
+
+    let dadosBody = request.body
+
+    let contentType = request.headers['content-type']
+
+    let pedido = await controllerPedido.atualizarPedido(dadosBody, pedido_id, contentType)
+
+    response.status(pedido.status_code)
+    response.json(pedido)
+})
 
 
 module.exports = router
