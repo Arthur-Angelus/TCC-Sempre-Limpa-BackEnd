@@ -70,8 +70,84 @@ const buscarPagamentoCartaoID = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// INSERT
+const inserirPagamentoCartao = async function (PagamentoCartao, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosPagamentoCartao(PagamentoCartao)
+
+            if (!validar) {
+                let resultPagamentoCartao = await pagamentoCartaoDAO.setInsertPagamentoCartao(PagamentoCartao)
+
+                if (resultPagamentoCartao) {
+                    let lastID = await pagamentoCartaoDAO.getSelectLastID()
+                    if (lastID) {
+                        PagamentoCartao.pagamento_cartao_id = lastID
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items = PagamentoCartao
+
+                        return MESSAGES.DEFAULT_HEADER //201
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel recuperar o ID do novo pagamento cartão"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel inserir o pagamento cartão no banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " INSERT - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro Critico na controller, acionar suporte técnico"
+        console.log("DEBUG VALIDAÇÃO:", error)
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// Validação dos dados INPUT - INSERT E UPDATE
+const validarDadosPagamentoCartao = async function (PagamentoCartao) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    if (PagamentoCartao.token_utilizado == '' || PagamentoCartao.token_utilizado == undefined || 
+        PagamentoCartao.token_utilizado == null || typeof PagamentoCartao.token_utilizado !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Token Utilizado Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (PagamentoCartao.ultimos_digitos == '' || PagamentoCartao.ultimos_digitos == undefined || 
+        PagamentoCartao.ultimos_digitos == null || typeof PagamentoCartao.ultimos_digitos !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Ultimos Digitos Invalidos]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (PagamentoCartao.tipo == '' || PagamentoCartao.tipo == undefined || 
+        PagamentoCartao.tipo == null || typeof PagamentoCartao.tipo !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Tipo de Lavagem Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (PagamentoCartao.fk_cartao_id == '' || PagamentoCartao.fk_cartao_id == undefined || 
+        PagamentoCartao.fk_cartao_id == null || typeof PagamentoCartao.fk_cartao_id !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Cartao Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+    } else if (PagamentoCartao.fk_ordem_pagamento_id == '' || PagamentoCartao.fk_ordem_pagamento_id == undefined || 
+        PagamentoCartao.fk_ordem_pagamento_id == null || typeof PagamentoCartao.fk_ordem_pagamento_id !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID da Ordem de Pagamento Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+    } 
+    else {
+        return false
+    }
+}
 module.exports = {
   listarPagamentoCartao,
-  buscarPagamentoCartaoID
+  buscarPagamentoCartaoID,
+  inserirPagamentoCartao
 }

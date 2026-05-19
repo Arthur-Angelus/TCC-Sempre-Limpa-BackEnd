@@ -33,5 +33,16 @@ router.get('/v1/semprelimpa/pagamento-cartao/:id', cors(), async function (reque
     response.status(PagamentoCartao.status_code)
     response.json(PagamentoCartao)
 })
+// POST PAGAMENTO CARTAO
+router.post('/v1/semprelimpa/pagamento-cartao', cors(), bodyParserJSON, async function(request, response){
+    let PagamentoCartao_data = request.body
+
+    let contentType = request.headers['content-type']
+
+    let PagamentoCartao = await controllerPagamentoCartao.inserirPagamentoCartao(PagamentoCartao_data, contentType)
+
+    response.status(PagamentoCartao.status_code)
+    response.json(PagamentoCartao)
+})
 
 module.exports = router
