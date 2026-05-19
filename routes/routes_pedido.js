@@ -33,6 +33,17 @@ router.get('/v1/semprelimpa/pedido/:id', cors(), async function (request, respon
     response.status(pedido.status_code)
     response.json(pedido)
 })
+// POST PEDIDO
+router.post('/v1/semprelimpa/pedido', cors(), bodyParserJSON, async function(request, response){
+    let pedido_data = request.body
+
+    let contentType = request.headers['content-type']
+
+    let pedido = await controllerPedido.inserirPedido(pedido_data, contentType)
+
+    response.status(pedido.status_code)
+    response.json(pedido)
+})
 
 
 module.exports = router

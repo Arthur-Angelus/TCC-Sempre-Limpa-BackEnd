@@ -35,9 +35,45 @@ const getSelectPedidoById = async function (pedido_id) {
         return false
     }
 }
+// INSERT PEDIDO
+const setInsertPedido = async function (pedido) {
+    try {
+        const result = await knex('pedido').insert({
+            data: pedido.data,
+            valor_total: pedido.valor_total,
+            taxa_entrega: pedido.taxa_entrega,
+            taxa_entregador: pedido.taxa_entregador,
+            tempo_estimado: pedido.tempo_estimado,
+            fk_status_id: pedido.fk_status_id,
+            fk_lavanderia_id: pedido.fk_lavanderia_id,
+            fk_usuario_id: pedido.fk_usuario_id
+        })
+        return result.map(pedido => {
+            return pedido
+        })
+    } catch (error) {
+        console.error("ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
+// GET LAST ID
+const getSelectLastID = async function (pedido_id) {
+    try {
+        const result = await knex('pedido')
+            .select('pedido_id')
+            .orderBy('pedido_id', 'desc')
+            .first()
 
+        return result ? result.pedido_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
 module.exports = {
     getSelectAllPedido,
-    getSelectPedidoById
+    getSelectPedidoById,
+    setInsertPedido,
+    getSelectLastID
 }
     
