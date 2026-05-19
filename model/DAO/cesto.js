@@ -22,5 +22,5 @@ const getSelectAllCesto = async function () {
 
 
 module.exports = {
-    getSelectAllStatus,
+    getSelectAllCesto,
 }

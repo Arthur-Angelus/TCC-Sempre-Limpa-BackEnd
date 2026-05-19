@@ -5,7 +5,7 @@
  * Versão: 1.0
  *******************************************************************************************/
 
-const cestoDAO = require('../model/DAO/status.js')
+const cestoDAO = require('../model/DAO/cesto.js')
 
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 // GET ALL
