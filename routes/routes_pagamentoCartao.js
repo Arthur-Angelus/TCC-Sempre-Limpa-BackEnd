@@ -57,4 +57,14 @@ router.put('/v1/sempreLimpa/pagamento-cartao/:id', cors(), bodyParserJSON, async
     response.status(PagamentoCartao.status_code)
     response.json(PagamentoCartao)
 })
+// DELETE PAGAMENTO CARTAO
+router.delete('/v1/sempreLimpa/pagamento-cartao/:id', cors(), async function(request, response){
+    let pagamento_cartao_id = request.params.id
+
+    let PagamentoCartao = await controllerPagamentoCartao.excluirPagamentoCartao(pagamento_cartao_id)
+
+    response.status(PagamentoCartao.status_code)
+    response.json(PagamentoCartao)
+})
+
 module.exports = router

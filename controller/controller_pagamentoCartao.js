@@ -161,6 +161,47 @@ const atualizarPagamentoCartao = async function (PagamentoCartao, id, contentTyp
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// DELETE
+const excluirPagamentoCartao = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+
+            let validarID = await buscarPagamentoCartaoID(id)
+
+            if (validarID.status_code == 200) {
+
+                let resultPagamentoCartao = await pagamentoCartaoDAO.setDeletePagamentoCartao(Number(id))
+
+                if (resultPagamentoCartao) {
+
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                    MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                    MESSAGES.DEFAULT_HEADER.items.PagamentoCartao = resultPagamentoCartao
+                    delete MESSAGES.DEFAULT_HEADER.items
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " DELETE - Não foi possível excluir o pagamento cartão"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                MESSAGES.ERROR_NOT_FOUND.message += " DELETE - pagamento cartão não encontrado"
+                return MESSAGES.ERROR_NOT_FOUND //404
+            }
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += " DELETE -[ID incorreto]" 
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " DELETE - controller excluir pagamento cartão id"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosPagamentoCartao = async function (PagamentoCartao) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -197,5 +238,6 @@ module.exports = {
   listarPagamentoCartao,
   buscarPagamentoCartaoID,
   inserirPagamentoCartao,
-  atualizarPagamentoCartao
+  atualizarPagamentoCartao,
+  excluirPagamentoCartao
 }

@@ -70,6 +70,19 @@ const setUpdatePagamentoCartao = async function (pagamento_cartao, pagamento_car
         return false
     }
 }
+// DELETE
+const setDeletePagamentoCartao = async function (pagamento_cartao_id) {
+    try {
+        const result = await knex('pagamento_cartao')
+            .where({ pagamento_cartao_id: pagamento_cartao_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO DELETE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (pagamento_cartao_id) {
     try {
@@ -90,6 +103,7 @@ module.exports = {
     getSelectPagamentoCartaoById,
     setInsertPagamentoCartao,
     setUpdatePagamentoCartao,
+    setDeletePagamentoCartao,
     getSelectLastID
 }
     
