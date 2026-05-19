@@ -57,5 +57,14 @@ router.put('/v1/semprelimpa/ordempagamento/:id', cors(), bodyParserJSON, async f
     response.status(ordemPagamento.status_code)
     response.json(ordemPagamento)
 })
+// DELETE ORDEM PAGAMENTO
+router.delete('/v1/semprelimpa/ordempagamento/:id', cors(), async function(request, response){
+    let ordem_pagamento_id = request.params.id
+
+    let ordemPagamento = await controllerOrdemPagamento.excluirOrdemPagamento(ordem_pagamento_id)
+
+    response.status(ordemPagamento.status_code)
+    response.json(ordemPagamento)
+})
 
 module.exports = router

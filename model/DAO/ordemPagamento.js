@@ -54,20 +54,6 @@ const setInsertOrdemPagamento = async function (ordemPagamento) {
         throw error
     }
 }
-// GET LAST ID
-const getSelectLastID = async function (ordem_pagamento_id) {
-    try {
-        const result = await knex('ordem_pagamento')
-            .select('ordem_pagamento_id')
-            .orderBy('ordem_pagamento_id', 'desc')
-            .first()
-
-        return result ? result.ordem_pagamento_id : null
-    } catch (error) {
-        console.error(error)
-        return null
-    }
-}
 // UPDATE ORDEM PAGAMENTO
 const setUpdateOrdemPagamento = async function (ordemPagamento, ordem_pagamento_id) {
     try {
@@ -86,11 +72,40 @@ const setUpdateOrdemPagamento = async function (ordemPagamento, ordem_pagamento_
         return false
     }
 }
+// DELETE
+const setDeleteOrdemPagamento = async function (ordem_pagamento_id) {
+    try {
+        const result = await knex('ordem_pagamento')
+            .where({ ordem_pagamento_id: ordem_pagamento_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO DELETE:",error)
+        return false
+    }
+}
+// GET LAST ID
+const getSelectLastID = async function (ordem_pagamento_id) {
+    try {
+        const result = await knex('ordem_pagamento')
+            .select('ordem_pagamento_id')
+            .orderBy('ordem_pagamento_id', 'desc')
+            .first()
+
+        return result ? result.ordem_pagamento_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
+
 module.exports = {
     getSelectAllOrdemPagamento,
     getSelectOrdemPagamentoById,
     setInsertOrdemPagamento,
     setUpdateOrdemPagamento,
+    setDeleteOrdemPagamento,
     getSelectLastID
 }
     
