@@ -70,6 +70,19 @@ const setUpdatePix = async function (pix, pix_id) {
         return false
     }
 }
+// DELETE
+const setDeletePix = async function (pix_id) {
+    try {
+        const result = await knex('pix')
+            .where({ pix_id: pix_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO DELETE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (pix_id) {
     try {
@@ -90,6 +103,7 @@ module.exports = {
     getSelectPixById,
     setInsertPix,
     setUpdatePix,
+    setDeletePix,
     getSelectLastID
 }
     

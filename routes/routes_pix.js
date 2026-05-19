@@ -57,5 +57,14 @@ router.put('/v1/sempreLimpa/pix/:id', cors(), bodyParserJSON, async function(req
     response.status(Pix.status_code)
     response.json(Pix)
 })
+// DELETE PIX
+router.delete('/v1/sempreLimpa/pix/:id', cors(), async function(request, response){
+    let pix_id = request.params.id
+
+    let Pix = await controllerPix.excluirPix(pix_id)
+
+    response.status(Pix.status_code)
+    response.json(Pix)
+})
 
 module.exports = router

@@ -161,6 +161,47 @@ const atualizarPix = async function (Pix, id, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// DELETE
+const excluirPix = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+
+            let validarID = await buscarPixID(id)
+
+            if (validarID.status_code == 200) {
+
+                let resultPix = await pixDAO.setDeletePix(Number(id))
+
+                if (resultPix) {
+
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
+                    MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
+                    MESSAGES.DEFAULT_HEADER.items.Pix = resultPix
+                    delete MESSAGES.DEFAULT_HEADER.items
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " DELETE - Não foi possível excluir o pix do banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                MESSAGES.ERROR_NOT_FOUND.message += " DELETE - pix não encontrado"
+                return MESSAGES.ERROR_NOT_FOUND //404
+            }
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += " DELETE -[ID incorreto]" 
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " DELETE - controller excluir pix id"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosPix = async function (Pix) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -198,5 +239,6 @@ module.exports = {
   listarPix,
   buscarPixID,
   inserirPix,
-  atualizarPix
+  atualizarPix,
+  excluirPix
 }
