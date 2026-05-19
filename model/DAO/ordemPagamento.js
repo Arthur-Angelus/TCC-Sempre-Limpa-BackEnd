@@ -19,8 +19,24 @@ const getSelectAllOrdemPagamento = async function () {
         return false
     }
 }
+// SELECT ORDEM PAGAMENTO BY ID
+const getSelectOrdemPagamentoById = async function (ordem_pagamento_id) {
+    try {
+        const rows = await knex('ordem_pagamento')
+            .select('*')
+            .where({ ordem_pagamento_id: ordem_pagamento_id })
+
+        return rows.map(ordemPagamento => {
+            return ordemPagamento
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
 
 module.exports = {
-    getSelectAllOrdemPagamento
+    getSelectAllOrdemPagamento,
+    getSelectOrdemPagamentoById
 }
     

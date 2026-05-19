@@ -24,5 +24,14 @@ router.get('/v1/semprelimpa/ordempagamento', cors(), async function (request, re
     response.status(ordemPagamento.status_code)
     response.json(ordemPagamento)
 })
+// GET ORDEM PAGAMENTO BY ID
+router.get('/v1/semprelimpa/ordempagamento/:id', cors(), async function (request, response) {
+    let ordem_pagamento_id = request.params.id
+
+    let ordemPagamento = await controllerOrdemPagamento.buscarOrdemPagamentoID(ordem_pagamento_id)
+
+    response.status(ordemPagamento.status_code)
+    response.json(ordemPagamento)
+})
 
 module.exports = router
