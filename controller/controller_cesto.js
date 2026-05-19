@@ -70,8 +70,80 @@ const buscarCestoID = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// INSERT
+const inserirCesto = async function (Cesto, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosCesto(Cesto)
+
+            if (!validar) {
+                let resultCesto = await cestoDAO.setInsertCesto(Cesto)
+
+                if (resultCesto) {
+                    let lastID = await cestoDAO.getSelectLastID()
+                    if (lastID) {
+                        Cesto.cesto_id = lastID
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items = Cesto
+
+                        return MESSAGES.DEFAULT_HEADER //201
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel recuperar o ID do novo cesto"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+
+                } else {
+                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " INSERT - Não foi possivel inserir o cesto no banco de dados"
+                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " INSERT - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " INSERT - Erro Critico na controller, acionar suporte técnico"
+        console.log("DEBUG VALIDAÇÃO:", error)
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// Validação dos dados INPUT - INSERT E UPDATE
+const validarDadosCesto = async function (Cesto) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    if (Cesto.peso_estimado == '' || Cesto.peso_estimado == undefined || 
+        Cesto.peso_estimado == null || typeof Cesto.peso_estimado !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Peso Estimado Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Cesto.secagem == '' || Cesto.secagem == undefined || 
+        Cesto.secagem == null || typeof Cesto.secagem !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Secagem Invalida]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Cesto.tipo_lavagem == '' || Cesto.tipo_lavagem == undefined || 
+        Cesto.tipo_lavagem == null || typeof Cesto.tipo_lavagem !== 'string') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Tipo de Lavagem Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Cesto.fk_pedido_id == '' || Cesto.fk_pedido_id == undefined || 
+        Cesto.fk_pedido_id == null || typeof Cesto.fk_pedido_id !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Pedido Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+    } 
+    else {
+        return false
+    }
+}
 module.exports = {
   listarCesto,
-  buscarCestoID
+  buscarCestoID,
+  inserirCesto
 }

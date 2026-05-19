@@ -34,9 +34,42 @@ const getSelectCestoById = async function (cesto_id) {
         return false
     }
 }
+// INSERT CESTO
+const setInsertCesto = async function (cesto) {
+    try {
+        const result = await knex('cesto').insert({
+            peso_estimado: cesto.peso_estimado,
+            secagem: cesto.secagem,
+            tipo_lavagem: cesto.tipo_lavagem,
+            fk_pedido_id: cesto.fk_pedido_id
+        })
+        return result.map(cesto => {
+            return cesto
+        })
+    } catch (error) {
+        console.error("ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
+// GET LAST ID
+const getSelectLastID = async function (cesto_id) {
+    try {
+        const result = await knex('cesto')
+            .select('cesto_id')
+            .orderBy('cesto_id', 'desc')
+            .first()
 
+        return result ? result.cesto_id : null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
 
 module.exports = {
     getSelectAllCesto,
-    getSelectCestoById
+    getSelectCestoById,
+    setInsertCesto,
+    getSelectLastID 
 }
+    
