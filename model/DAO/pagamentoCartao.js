@@ -52,6 +52,24 @@ const setInsertPagamentoCartao = async function (pagamento_cartao) {
         throw error
     }
 }
+// UPDATE PAGAMENTO CARTAO
+const setUpdatePagamentoCartao = async function (pagamento_cartao, pagamento_cartao_id) {
+    try {
+        const result = await knex('pagamento_cartao')
+            .where({ pagamento_cartao_id: pagamento_cartao_id })
+            .update({
+                token_utilizado: pagamento_cartao.token_utilizado,
+                ultimos_digitos: pagamento_cartao.ultimos_digitos,
+                tipo: pagamento_cartao.tipo,
+                fk_cartao_id: pagamento_cartao.fk_cartao_id,
+                fk_ordem_pagamento_id: pagamento_cartao.fk_ordem_pagamento_id
+            })
+        return result
+    } catch (error) {
+        console.error("ERRO NO DAO UPDATE:",error)
+        return false
+    }
+}
 // GET LAST ID
 const getSelectLastID = async function (pagamento_cartao_id) {
     try {
@@ -71,6 +89,7 @@ module.exports = {
     getSelectAllPagamentoCartao,
     getSelectPagamentoCartaoById,
     setInsertPagamentoCartao,
+    setUpdatePagamentoCartao,
     getSelectLastID
 }
     

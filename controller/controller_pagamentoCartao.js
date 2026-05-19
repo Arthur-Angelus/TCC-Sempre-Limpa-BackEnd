@@ -42,21 +42,21 @@ const buscarPagamentoCartaoID = async function (id) {
 
     try {
         if (!isNaN(id) && id != '' && id != null && id > 0) {
-            let resultCesto = await cestoDAO.getSelectCestoById(Number(id))
+            let resultPagamentoCartao = await pagamentoCartaoDAO.getSelectPagamentoCartaoById(Number(id))
 
-            if (resultCesto) {
-                if (resultCesto.length > 0) {
+            if (resultPagamentoCartao) {
+                if (resultPagamentoCartao.length > 0) {
                     MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.Cesto = resultCesto
+                    MESSAGES.DEFAULT_HEADER.items.PagamentoCartao = resultPagamentoCartao
 
                     return MESSAGES.DEFAULT_HEADER //200
                 } else {
-                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar cesto id"
+                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar pagamento cartão id"
                     return MESSAGES.ERROR_NOT_FOUND //404
                 }
             } else {
-                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar cesto id"
+                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar pagamento cartão id"
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
             }
 
@@ -66,7 +66,7 @@ const buscarPagamentoCartaoID = async function (id) {
         }
 
     } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar cesto id"
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar pagamento cartão id"
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
@@ -114,6 +114,53 @@ const inserirPagamentoCartao = async function (PagamentoCartao, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+// UPDATE
+const atualizarPagamentoCartao = async function (PagamentoCartao, id, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosPagamentoCartao(PagamentoCartao)
+
+            if (!validar) {
+                let validarID = await buscarPagamentoCartaoID(id)
+
+                if (validarID.status_code == 200) {
+
+                    let idPagamentoCartao = Number(id)
+
+                    let dados = PagamentoCartao
+                    delete dados.id
+
+                    let resultPagamentoCartao = await pagamentoCartaoDAO.setUpdatePagamentoCartao(dados, idPagamentoCartao)
+
+                    if (resultPagamentoCartao) {
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.PagamentoCartao = PagamentoCartao
+
+                        return MESSAGES.DEFAULT_HEADER //200
+                    } else {
+                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " UPDATE - Não foi possivel atualizar o pagamento cartão no banco de dados"
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " UPDATE - Tipo de conteúdo não suportado. Use 'application/json'"
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " UPDATE - Erro Critico na controller, acionar suporte técnico"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosPagamentoCartao = async function (PagamentoCartao) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -149,5 +196,6 @@ const validarDadosPagamentoCartao = async function (PagamentoCartao) {
 module.exports = {
   listarPagamentoCartao,
   buscarPagamentoCartaoID,
-  inserirPagamentoCartao
+  inserirPagamentoCartao,
+  atualizarPagamentoCartao
 }
