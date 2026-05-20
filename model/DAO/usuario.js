@@ -85,7 +85,8 @@ const setInsertUsers = async function (usuario) {
             cpf: usuario.cpf,
             rne: usuario.rne,
             fk_endereco: usuario.fk_endereco,
-            senha: usuario.senha
+            senha: usuario.senha,
+            data_nascimento: usuario.data_nascimento
         })
         return result.map(u => {
             delete u.senha

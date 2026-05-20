@@ -13,6 +13,7 @@ const emailService = require('../services/email.js')
 const usuarioDAO = require('../model/DAO/usuario.js')
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 
+// GET ALL
 const listarUsuarios = async function () {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -40,7 +41,7 @@ const listarUsuarios = async function () {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
+// GET BY ID
 const buscarUsuarioID = async function (id) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -74,7 +75,7 @@ const buscarUsuarioID = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
+// GET BY EMAIL
 const buscarUsuarioEmail = async function (email, senha) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -108,7 +109,7 @@ const buscarUsuarioEmail = async function (email, senha) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
+// GET BY CPF
 const buscarUsuarioCpf = async function (cpf, senha) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -142,7 +143,7 @@ const buscarUsuarioCpf = async function (cpf, senha) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
+// INSERT
 const inserirUsuarios = async function (Usuario, contentType) {
 
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -198,7 +199,7 @@ const inserirUsuarios = async function (Usuario, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-
+// UPDATE
 const atualizarUsuario = async function (Usuario, id, contentType) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -246,7 +247,7 @@ const atualizarUsuario = async function (Usuario, id, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
+// DELETE
 const excluirUsuario = async function (id) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -287,7 +288,7 @@ const excluirUsuario = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
+// VALIDAR DADOS
 const validarDadosUsuario = async function (Usuario) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -315,7 +316,7 @@ const validarDadosUsuario = async function (Usuario) {
         return false
     }
 }
-
+// LOGIN USUARIOS BY EMAIL
 const loginUsuarioEmail = async function (email, senha) {
 
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -378,7 +379,7 @@ const loginUsuarioEmail = async function (email, senha) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-
+// LOGIN USUARIOS BY CPF
 const loginUsuarioCpf = async function (cpf, senha) {
 
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -439,7 +440,7 @@ const loginUsuarioCpf = async function (cpf, senha) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-
+// ESQUECI MINHA SENHA
 const esqueciMinhaSenha = async function (email) {
 
     try {
@@ -531,7 +532,7 @@ const esqueciMinhaSenha = async function (email) {
         }
     }
 }
-
+// RESETAR SENHA
 const resetarSenha = async function (token, novaSenha) {
 
     try {
