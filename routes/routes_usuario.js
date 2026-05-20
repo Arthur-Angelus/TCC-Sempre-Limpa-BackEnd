@@ -17,13 +17,14 @@ const bodyParserJSON = bodyParser.json()
 const controllerUsuario = require('../controller/controller_usuario.js')
 
 //endpoints para a rota de genero
+// GET ALL USUARIOS
 router.get('/v1/semprelimpa/usuarios', cors(), async function (request, response) {
     let Usuario = await controllerUsuario.listarUsuarios()
 
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// GET USUARIOS BY ID USUARIO
 router.get('/v1/semprelimpa/usuario/:id', cors(), async function (request, response) {
     let usuario_id = request.params.id
 
@@ -32,7 +33,7 @@ router.get('/v1/semprelimpa/usuario/:id', cors(), async function (request, respo
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// INSERT USUARIOS
 router.post('/v1/semprelimpa/usuario', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
 
@@ -43,7 +44,7 @@ router.post('/v1/semprelimpa/usuario', cors(), bodyParserJSON, async function (r
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// UPDATE USUARIOS
 router.put('/v1/semprelimpa/usuario/:id', cors(), bodyParserJSON, async function(request, response){
     let usuario_id = request.params.id
 
@@ -56,7 +57,7 @@ router.put('/v1/semprelimpa/usuario/:id', cors(), bodyParserJSON, async function
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// DELETE USUARIOS
 router.delete('/v1/semprelimpa/usuario/:id', cors(), async function(request, response){
     let usuario_id = request.params.id
 
@@ -65,7 +66,7 @@ router.delete('/v1/semprelimpa/usuario/:id', cors(), async function(request, res
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// LOGIN USUARIOS BY EMAIL
 router.post('/v1/semprelimpa/loginemail', cors(), bodyParserJSON, async function (request, response) {
     let email = request.body.email
     let senha = request.body.senha
@@ -75,7 +76,7 @@ router.post('/v1/semprelimpa/loginemail', cors(), bodyParserJSON, async function
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// LOGIN USUARIOS BY CPF
 router.post('/v1/semprelimpa/logincpf', cors(), bodyParserJSON, async function (request, response) {
     let cpf = request.body.cpf
     let senha = request.body.senha
@@ -85,7 +86,7 @@ router.post('/v1/semprelimpa/logincpf', cors(), bodyParserJSON, async function (
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
-
+// ESQUECI MINHA SENHA
 router.post('/v1/semprelimpa/esquecisenha', cors(), bodyParserJSON, async function(request, response){
         let email = request.body.email
 
@@ -95,7 +96,7 @@ router.post('/v1/semprelimpa/esquecisenha', cors(), bodyParserJSON, async functi
         response.json(result)
     }
 )
-
+// RESETAR SENHA
 router.post('/v1/semprelimpa/resetarsenha', cors(), bodyParserJSON, async function(request, response){
         let token = request.body.token
         let novaSenha = request.body.novaSenha
