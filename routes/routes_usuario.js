@@ -14,6 +14,7 @@ const router = express.Router()
 
 const bodyParserJSON = bodyParser.json()
 
+const controllerEndereco = require('../controller/controller_endereco.js')
 const controllerUsuario = require('../controller/controller_usuario.js')
 
 //endpoints para a rota de genero
@@ -36,10 +37,24 @@ router.get('/v1/semprelimpa/usuario/:id', cors(), async function (request, respo
 // INSERT USUARIOS
 router.post('/v1/semprelimpa/usuario', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
-
     let contentType = request.headers['content-type']
 
-    let Usuario = await controllerUsuario.inserirUsuarios(dadosBody, contentType)
+    let dadosEndereco = dadosBody.endereco
+    let dadosUsuario = {...dadosBody}
+    delete dadosUsuario.endereco
+
+    let resultEndereco = await controllerEndereco.inserirEnderecos(dadosEndereco, contentType)
+
+    if (resultEndereco.status_code !== 201) {
+        response.status(resultEndereco.status_code);
+        return response.json(resultEndereco);
+    }
+
+    let idEnderecoCriado = resultEndereco.items.Endereco_id;
+
+    dadosUsuario.fk_endereco = idEnderecoCriado;
+
+    let Usuario = await controllerUsuario.inserirUsuarios(dadosUsuario, contentType)
 
     response.status(Usuario.status_code)
     response.json(Usuario)
