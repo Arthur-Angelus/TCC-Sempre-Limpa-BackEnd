@@ -43,7 +43,18 @@ router.post('/v1/semprelimpa/usuario', cors(), bodyParserJSON, async function (r
     let dadosUsuario = {...dadosBody}
     delete dadosUsuario.endereco
 
-    let Usuario = await controllerUsuario.inserirUsuarios(dadosBody, contentType)
+    let resultEndereco = await controllerEndereco.inserirEnderecos(dadosEndereco, contentType)
+
+    if (resultEndereco.status_code !== 201) {
+        response.status(resultEndereco.status_code);
+        return response.json(resultEndereco);
+    }
+
+    let idEnderecoCriado = resultEndereco.items.Endereco_id;
+
+    dadosUsuario.fk_endereco = idEnderecoCriado;
+
+    let Usuario = await controllerUsuario.inserirUsuarios(dadosUsuario, contentType)
 
     response.status(Usuario.status_code)
     response.json(Usuario)
