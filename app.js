@@ -55,9 +55,11 @@ app.use(ordem_pagamentoroutes)
 //rotas motorista
 const dados_bancariosroutes = require('./routes/motorista/routes_dados_bancarios.js')
 const dados_veiculoroutes = require('./routes/motorista/routes_dados_veiculo.js')
+const veiculoroutes = require('./routes/motorista/routes_veiculo.js')
 
 app.use(dados_bancariosroutes)
 app.use(dados_veiculoroutes)
+app.use(veiculoroutes)
 
 app.listen(PORT, function () {
     console.log('API aguardando requisições....')

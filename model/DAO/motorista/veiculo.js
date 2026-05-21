@@ -38,7 +38,7 @@ const setInsertVehicle = async function (veiculo) {
         const result = await knex('veiculo').insert({
             modalidade: veiculo.modalidade,
             fk_motorista_id: veiculo.fk_motorista_id,
-            fk_dados_veiculo: veiculo.fk_dados_veiculo
+            fk_dados_veiculo_id: veiculo.fk_dados_veiculo_id
         })
         return result
     } catch (error) {
