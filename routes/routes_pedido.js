@@ -1,8 +1,9 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelos endpoints da tabela pedido
  * Data de Criação: 18/05/2026
- * Autor: Kauan Lopes Pereira
- * Versão: 1.0
+ * Autores: Kauan Lopes Pereira, Arthur Angelus
+ * Versão: 2.0
+ * implementando buscar pedido pelo id do usuario
  *******************************************************************************************/
 
 const express = require('express')
@@ -32,6 +33,15 @@ router.get('/v1/semprelimpa/pedido/:id', cors(), async function (request, respon
 
     response.status(pedido.status_code)
     response.json(pedido)
+})
+// GET PEDIDO BY USER ID
+router.get('/v1/semprelimpa/pedidousuario/:id', cors(), async function (request, response) {
+    let usuario_id = request.params.id
+
+    let pedidoUsuario = await controllerPedido.buscarPedidoUsuarioID(usuario_id)
+
+    response.status(pedidoUsuario.status_code)
+    response.json(pedidoUsuario)
 })
 // POST PEDIDO
 router.post('/v1/semprelimpa/pedido', cors(), bodyParserJSON, async function(request, response){

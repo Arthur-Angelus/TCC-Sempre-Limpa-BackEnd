@@ -1,8 +1,9 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelas requisições CRUD da tabela pedido
  * Data de Criação: 18/05/2026
- * Autor: Kauan Lopes Pereira
- * Versão: 1.0
+ * Autor: Kauan Lopes Pereira, Arthur Angelus
+ * Versão: 2.0
+ * implementando buscar pedido pelo id do usuario
  *******************************************************************************************/
 
 const { get } = require('express/lib/request')
@@ -26,6 +27,21 @@ const getSelectPedidoById = async function (pedido_id) {
         const rows = await knex('pedido')
             .select('*')
             .where({ pedido_id: pedido_id })
+
+        return rows.map(pedido => {
+            return pedido
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
+// SELECT PEDIDO BY USER ID
+const getSelectPedidoByUserId = async function (usuario_id) {
+    try {
+        const rows = await knex('pedido')
+            .select('*')
+            .where({ usuario_id: usuario_id })
 
         return rows.map(pedido => {
             return pedido
@@ -107,6 +123,7 @@ const getSelectLastID = async function (pedido_id) {
 module.exports = {
     getSelectAllPedido,
     getSelectPedidoById,
+    getSelectPedidoByUserId,
     setInsertPedido,
     setUpdatePedido,
     setDeletePedido,
