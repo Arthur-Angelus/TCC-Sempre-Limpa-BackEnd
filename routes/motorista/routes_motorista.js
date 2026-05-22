@@ -19,14 +19,14 @@ const controllerMotorista = require('../../controller/motorista/controller_motor
 
 //endpoints para a rota de genero
 // GET ALL motorista
-router.get('/v1/semprelimpa/motorista', cors(), async function (request, response) {
+router.get('/motorista', cors(), async function (request, response) {
     let motorista = await controllerMotorista.listarMotoristas()
 
     response.status(motorista.status_code)
     response.json(motorista)
 })
 // GET motorista BY ID motorista
-router.get('/v1/semprelimpa/motorista/:id', cors(), async function (request, response) {
+router.get('/motorista/:id', cors(), async function (request, response) {
     let motorista_id = request.params.id
 
     let motorista = await controllerMotorista.buscarMotoristaID(motorista_id)
@@ -35,7 +35,7 @@ router.get('/v1/semprelimpa/motorista/:id', cors(), async function (request, res
     response.json(motorista)
 })
 // INSERT motorista
-router.post('/v1/semprelimpa/motorista', cors(), bodyParserJSON, async function (request, response) {
+router.post('/motorista', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
@@ -60,7 +60,7 @@ router.post('/v1/semprelimpa/motorista', cors(), bodyParserJSON, async function 
     response.json(motorista)
 })
 // UPDATE motorista
-router.put('/v1/semprelimpa/motorista/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/motorista/:id', cors(), bodyParserJSON, async function(request, response){
     let motorista_id = request.params.id
 
     let dadosBody = request.body
@@ -73,7 +73,7 @@ router.put('/v1/semprelimpa/motorista/:id', cors(), bodyParserJSON, async functi
     response.json(motorista)
 })
 // DELETE motorista
-router.delete('/v1/semprelimpa/motorista/:id', cors(), async function(request, response){
+router.delete('/motorista/:id', cors(), async function(request, response){
     let motorista_id = request.params.id
 
     let motorista = await controllerMotorista.excluirMotorista(motorista_id)
@@ -82,7 +82,7 @@ router.delete('/v1/semprelimpa/motorista/:id', cors(), async function(request, r
     response.json(motorista)
 })
 // LOGIN motorista BY EMAIL
-router.post('/v1/semprelimpa/loginemail', cors(), bodyParserJSON, async function (request, response) {
+router.post('/loginemailmotorista', cors(), bodyParserJSON, async function (request, response) {
     let email = request.body.email
     let senha = request.body.senha
 
@@ -92,7 +92,7 @@ router.post('/v1/semprelimpa/loginemail', cors(), bodyParserJSON, async function
     response.json(motorista)
 })
 // LOGIN motorista BY CPF
-router.post('/v1/semprelimpa/logincpf', cors(), bodyParserJSON, async function (request, response) {
+router.post('/logincpfmotorista', cors(), bodyParserJSON, async function (request, response) {
     let cpf = request.body.cpf
     let senha = request.body.senha
 
@@ -102,7 +102,7 @@ router.post('/v1/semprelimpa/logincpf', cors(), bodyParserJSON, async function (
     response.json(motorista)
 })
 // ESQUECI MINHA SENHA
-router.post('/v1/semprelimpa/esquecisenha', cors(), bodyParserJSON, async function(request, response){
+router.post('/esquecisenhamotorista', cors(), bodyParserJSON, async function(request, response){
         let email = request.body.email
 
         let result = await controllerMotorista.esqueciMinhaSenha(email)
@@ -112,7 +112,7 @@ router.post('/v1/semprelimpa/esquecisenha', cors(), bodyParserJSON, async functi
     }
 )
 // RESETAR SENHA
-router.post('/v1/semprelimpa/resetarsenha', cors(), bodyParserJSON, async function(request, response){
+router.post('/resetarsenhamotorista', cors(), bodyParserJSON, async function(request, response){
         let token = request.body.token
         let novaSenha = request.body.novaSenha
 

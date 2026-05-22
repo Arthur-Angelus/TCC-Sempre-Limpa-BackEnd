@@ -19,14 +19,14 @@ const controllerPedido = require('../controller/controller_pedido.js')
 //ENDPOINT - PEDIDO
 
 // GET ALL PEDIDO
-router.get('/v1/semprelimpa/pedido', cors(), async function (request, response) {
+router.get('/pedido', cors(), async function (request, response) {
     let pedido = await controllerPedido.listarPedido()
 
     response.status(pedido.status_code)
     response.json(pedido)
 })
 // GET PEDIDO BY ID
-router.get('/v1/semprelimpa/pedido/:id', cors(), async function (request, response) {
+router.get('/pedido/:id', cors(), async function (request, response) {
     let pedido_id = request.params.id
 
     let pedido = await controllerPedido.buscarPedidoID(pedido_id)
@@ -35,7 +35,7 @@ router.get('/v1/semprelimpa/pedido/:id', cors(), async function (request, respon
     response.json(pedido)
 })
 // GET PEDIDO BY USER ID
-router.get('/v1/semprelimpa/pedidousuario/:id', cors(), async function (request, response) {
+router.get('/pedidousuario/:id', cors(), async function (request, response) {
     let usuario_id = request.params.id
 
     let pedidoUsuario = await controllerPedido.buscarPedidoUsuarioID(usuario_id)
@@ -44,7 +44,7 @@ router.get('/v1/semprelimpa/pedidousuario/:id', cors(), async function (request,
     response.json(pedidoUsuario)
 })
 // POST PEDIDO
-router.post('/v1/semprelimpa/pedido', cors(), bodyParserJSON, async function(request, response){
+router.post('/pedido', cors(), bodyParserJSON, async function(request, response){
     let pedido_data = request.body
 
     let contentType = request.headers['content-type']
@@ -55,7 +55,7 @@ router.post('/v1/semprelimpa/pedido', cors(), bodyParserJSON, async function(req
     response.json(pedido)
 })
 // PUT PEDIDO
-router.put('/v1/sempreLimpa/pedido/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/pedido/:id', cors(), bodyParserJSON, async function(request, response){
     let pedido_id = request.params.id
 
     let dadosBody = request.body
@@ -68,7 +68,7 @@ router.put('/v1/sempreLimpa/pedido/:id', cors(), bodyParserJSON, async function(
     response.json(pedido)
 })
 // DELETE PEDIDO
-router.delete('/v1/sempreLimpa/pedido/:id', cors(), async function(request, response){
+router.delete('/pedido/:id', cors(), async function(request, response){
     let pedido_id = request.params.id
 
     let pedido = await controllerPedido.excluirPedido(pedido_id)

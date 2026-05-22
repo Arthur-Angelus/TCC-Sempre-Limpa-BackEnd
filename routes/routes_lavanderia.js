@@ -16,21 +16,21 @@ const bodyParserJSON = bodyParser.json()
 
 const controllerLavanderia = require('../controller/controller_lavanderia.js')
 
-router.get('/v1/semprelimpa/lavanderia', cors(), async function(request, response){
+router.get('/lavanderia', cors(), async function(request, response){
     let lavanderia = await controllerLavanderia.selecionarTodasLavanderia()
     
         response.status(lavanderia.status_code)
         response.json(lavanderia)
 })
 
-router.get('/v1/semprelimpa/lavanderia/filtro', cors(), async function (request, response){
+router.get('/lavanderia/filtro', cors(), async function (request, response){
     let dadosLavanderia = await controllerLavanderia.selecionarLavanderiaPorFiltro(request.query)
 
     response.status(dadosLavanderia.status_code)
     response.json(dadosLavanderia)
 })
 
-router.get('/v1/semprelimpa/lavanderia/:id', cors(), async function(request, response){
+router.get('/lavanderia/:id', cors(), async function(request, response){
     let idLavanderia = request.params.id
     let lavanderia = await controllerLavanderia.selecionarLavanderiaPorId(idLavanderia)
 
@@ -38,7 +38,7 @@ router.get('/v1/semprelimpa/lavanderia/:id', cors(), async function(request, res
     response.json(lavanderia)
 })
 
-router.post('/v1/semprelimpa/lavanderia', cors(), async function (request, response){
+router.post('/lavanderia', cors(), async function (request, response){
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
@@ -47,7 +47,7 @@ router.post('/v1/semprelimpa/lavanderia', cors(), async function (request, respo
     response.json(lavanderia)
 })
 
-router.put('/v1/semprelimpa/lavanderia/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/lavanderia/:id', cors(), bodyParserJSON, async function(request, response){
     let contentType = request.headers['content-type']
     
     let idLavanderia = request.params.id
@@ -60,7 +60,7 @@ router.put('/v1/semprelimpa/lavanderia/:id', cors(), bodyParserJSON, async funct
     response.json(dadosAtualizados)
 })
 
-router.delete('/v1/semprelimpa/lavanderia/:id', cors(), async function(request, response){
+router.delete('/lavanderia/:id', cors(), async function(request, response){
     let idLavanderia = request.params.id
 
     let lavanderia = await controllerLavanderia.deletarLavanderia(idLavanderia)

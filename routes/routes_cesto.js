@@ -18,14 +18,14 @@ const controllerCesto = require('../controller/controller_cesto.js')
 //ENDPOINT - CESTO
 
 // GET ALL CESTO
-router.get('/v1/semprelimpa/cesto', cors(), async function (request, response) {
+router.get('/cesto', cors(), async function (request, response) {
     let Cesto = await controllerCesto.listarCesto()
 
     response.status(Cesto.status_code)
     response.json(Cesto)
 })
 // GET CESTO BY ID
-router.get('/v1/semprelimpa/cesto/:id', cors(), async function (request, response) {
+router.get('/cesto/:id', cors(), async function (request, response) {
     let cesto_id = request.params.id
 
     let Cesto = await controllerCesto.buscarCestoID(cesto_id)
@@ -34,7 +34,7 @@ router.get('/v1/semprelimpa/cesto/:id', cors(), async function (request, respons
     response.json(Cesto)
 })
 // POST CESTO
-router.post('/v1/semprelimpa/cesto', cors(), bodyParserJSON, async function(request, response){
+router.post('/cesto', cors(), bodyParserJSON, async function(request, response){
     let Cesto_data = request.body
 
     let contentType = request.headers['content-type']
@@ -45,7 +45,7 @@ router.post('/v1/semprelimpa/cesto', cors(), bodyParserJSON, async function(requ
     response.json(Cesto)
 })
 // PUT CESTO
-router.put('/v1/sempreLimpa/cesto/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/cesto/:id', cors(), bodyParserJSON, async function(request, response){
     let cesto_id = request.params.id
 
     let dadosBody = request.body
@@ -58,7 +58,7 @@ router.put('/v1/sempreLimpa/cesto/:id', cors(), bodyParserJSON, async function(r
     response.json(Cesto)
 })
 // DELETE CESTO
-router.delete('/v1/sempreLimpa/cesto/:id', cors(), async function(request, response){
+router.delete('/cesto/:id', cors(), async function(request, response){
     let cesto_id = request.params.id
 
     let Cesto = await controllerCesto.excluirCesto(cesto_id)

@@ -18,14 +18,14 @@ const controllerPix = require('../controller/controller_pix.js')
 //ENDPOINT - PIX
 
 // GET ALL PIX
-router.get('/v1/semprelimpa/pix', cors(), async function (request, response) {
+router.get('/pix', cors(), async function (request, response) {
     let pix = await controllerPix.listarPix()
 
     response.status(pix.status_code)
     response.json(pix)
 })
 // GET PIX BY ID
-router.get('/v1/semprelimpa/pix/:id', cors(), async function (request, response) {
+router.get('/pix/:id', cors(), async function (request, response) {
     let pix_id = request.params.id
 
     let pix = await controllerPix.buscarPixID(pix_id)
@@ -34,7 +34,7 @@ router.get('/v1/semprelimpa/pix/:id', cors(), async function (request, response)
     response.json(pix)
 })
 // POST PIX
-router.post('/v1/semprelimpa/pix', cors(), bodyParserJSON, async function(request, response){
+router.post('/pix', cors(), bodyParserJSON, async function(request, response){
     let Pix_data = request.body
 
     let contentType = request.headers['content-type']
@@ -45,7 +45,7 @@ router.post('/v1/semprelimpa/pix', cors(), bodyParserJSON, async function(reques
     response.json(Pix)
 })
 // PUT PIX
-router.put('/v1/sempreLimpa/pix/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/pix/:id', cors(), bodyParserJSON, async function(request, response){
     let pix_id = request.params.id
 
     let dadosBody = request.body
@@ -58,7 +58,7 @@ router.put('/v1/sempreLimpa/pix/:id', cors(), bodyParserJSON, async function(req
     response.json(Pix)
 })
 // DELETE PIX
-router.delete('/v1/sempreLimpa/pix/:id', cors(), async function(request, response){
+router.delete('/pix/:id', cors(), async function(request, response){
     let pix_id = request.params.id
 
     let Pix = await controllerPix.excluirPix(pix_id)

@@ -16,14 +16,14 @@ const bodyParserJSON = bodyParser.json()
 const controllerAvaliacao = require('../controller/controller_avaliacao.js')
 
 //endpoints para a rota de genero
-router.get('/v1/semprelimpa/avaliacoes', cors(), async function (request, response) {
+router.get('/avaliacoes', cors(), async function (request, response) {
     let Avaliacao = await controllerAvaliacao.listarAvaliacoes()
 
     response.status(Avaliacao.status_code)
     response.json(Avaliacao)
 })
 
-router.get('/v1/semprelimpa/avaliacao/:id', cors(), async function (request, response) {
+router.get('/avaliacao/:id', cors(), async function (request, response) {
     let avaliacao_id = request.params.id
 
     let Avaliacao = await controllerAvaliacao.buscarAvaliacaoID(avaliacao_id)
@@ -32,7 +32,7 @@ router.get('/v1/semprelimpa/avaliacao/:id', cors(), async function (request, res
     response.json(Avaliacao)
 })
 
-router.post('/v1/semprelimpa/avaliacao', cors(), bodyParserJSON, async function (request, response) {
+router.post('/avaliacao', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
@@ -43,7 +43,7 @@ router.post('/v1/semprelimpa/avaliacao', cors(), bodyParserJSON, async function 
     response.json(Avaliacao)
 })
 
-router.put('/v1/semprelimpa/avaliacao/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/avaliacao/:id', cors(), bodyParserJSON, async function(request, response){
     let avaliacao_id = request.params.id
 
     let dadosBody = request.body
@@ -56,7 +56,7 @@ router.put('/v1/semprelimpa/avaliacao/:id', cors(), bodyParserJSON, async functi
     response.json(Avaliacao)
 })
 
-router.delete('/v1/semprelimpa/avaliacao/:id', cors(), async function(request, response){
+router.delete('/avaliacao/:id', cors(), async function(request, response){
     let avaliacao_id = request.params.id
 
     let Avaliacao = await controllerAvaliacao.excluirAvaliacao(avaliacao_id)

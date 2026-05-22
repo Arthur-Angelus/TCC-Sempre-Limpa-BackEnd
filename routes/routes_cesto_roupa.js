@@ -16,14 +16,14 @@ const bodyParserJSON = bodyParser.json()
 const controllerRecebe = require('../controller/controller_cesto_roupa.js')
 
 //endpoints para a rota de genero
-router.get('/v1/semprelimpa/cesto_roupas', cors(), async function (request, response) {
+router.get('/cesto_roupas', cors(), async function (request, response) {
     let recebe = await controllerRecebe.listarCesto_roupas()
 
     response.status(recebe.status_code)
     response.json(recebe)
 })
 
-router.get('/v1/semprelimpa/cesto_roupa/:fk_cesto_id', cors(), async function (request, response) {
+router.get('/cesto_roupa/:fk_cesto_id', cors(), async function (request, response) {
     let fk_cesto_id = request.params.fk_cesto_id
 
     let recebe = await controllerRecebe.buscarCesto_roupaFK(fk_cesto_id)
@@ -32,7 +32,7 @@ router.get('/v1/semprelimpa/cesto_roupa/:fk_cesto_id', cors(), async function (r
     response.json(recebe)
 })
 
-router.post('/v1/semprelimpa/cesto_roupa', cors(), bodyParserJSON, async function (request, response) {
+router.post('/cesto_roupa', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
@@ -43,7 +43,7 @@ router.post('/v1/semprelimpa/cesto_roupa', cors(), bodyParserJSON, async functio
     response.json(recebe)
 })
 
-// router.put('/v1/semprelimpa/cesto_roupa/:fk_cesto_id/:fk_roupa_id', cors(), bodyParserJSON, async function(request, response){
+// router.put('/cesto_roupa/:fk_cesto_id/:fk_roupa_id', cors(), bodyParserJSON, async function(request, response){
 //     let fk_cesto_id = request.params.fk_cesto_id
 //     let fk_roupa_id_antiga = request.params.fk_roupa_id
 
@@ -57,7 +57,7 @@ router.post('/v1/semprelimpa/cesto_roupa', cors(), bodyParserJSON, async functio
 //     response.json(recebe)
 // })
 
-router.delete('/v1/semprelimpa/cesto_roupa/:fk_cesto_id/:fk_roupa_id', cors(), async function(request, response){
+router.delete('/cesto_roupa/:fk_cesto_id/:fk_roupa_id', cors(), async function(request, response){
     let fk_cesto_id = request.params.fk_cesto_id
     let fk_roupa_id = request.params.fk_roupa_id
 

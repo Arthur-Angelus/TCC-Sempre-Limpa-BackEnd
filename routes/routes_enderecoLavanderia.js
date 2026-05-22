@@ -16,14 +16,14 @@ const bodyParserJSON = bodyParser.json()
 
 const controllerEnderecoLavanderia = require('../controller/controller_endereco_lavanderia.js')
 
-router.get('/v1/semprelimpa/enderecolavanderia', cors(), async function(request, response){
+router.get('/enderecolavanderia', cors(), async function(request, response){
     let enderecoLavanderia = await controllerEnderecoLavanderia.listarTodosEnderecosLavanderias()
     
         response.status(enderecoLavanderia.status_code)
         response.json(enderecoLavanderia)
 })
 
-router.get('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(request, response){
+router.get('/enderecolavanderia/:id', cors(), async function(request, response){
     let id = request.params.id
 
     let enderecoLavanderia = await controllerEnderecoLavanderia.listarEnderecoLavanderiaPorId(id)
@@ -32,7 +32,7 @@ router.get('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(requ
     response.json(enderecoLavanderia)
 })
 
-router.post('/v1/semprelimpa/enderecolavanderia/', cors(), async function(request, response){
+router.post('/enderecolavanderia/', cors(), async function(request, response){
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
@@ -41,7 +41,7 @@ router.post('/v1/semprelimpa/enderecolavanderia/', cors(), async function(reques
     response.json(enderecoLavanderia)
 })
 
-router.put('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(request, response){
+router.put('/enderecolavanderia/:id', cors(), async function(request, response){
     let idEnderecoLavanderia = request.params.id
     let dadosBody = request.body
     let contentType = request.headers['content-type']
@@ -51,7 +51,7 @@ router.put('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(requ
     response.json(enderecoLavanderia)
 })
 
-router.delete('/v1/semprelimpa/enderecolavanderia/:id', cors(), async function(request, response){
+router.delete('/enderecolavanderia/:id', cors(), async function(request, response){
     let idEnderecoLavanderia = request.params.id
 
     let enderecoLavanderia = await controllerEnderecoLavanderia.deletarEnderecoLavanderia(idEnderecoLavanderia)
