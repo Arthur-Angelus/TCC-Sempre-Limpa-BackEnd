@@ -19,14 +19,14 @@ const controllerUsuario = require('../controller/controller_usuario.js')
 
 //endpoints para a rota de genero
 // GET ALL USUARIOS
-router.get('/v1/semprelimpa/usuarios', cors(), async function (request, response) {
+router.get('/usuarios', cors(), async function (request, response) {
     let Usuario = await controllerUsuario.listarUsuarios()
 
     response.status(Usuario.status_code)
     response.json(Usuario)
 })
 // GET USUARIOS BY ID USUARIO
-router.get('/v1/semprelimpa/usuario/:id', cors(), async function (request, response) {
+router.get('/usuario/:id', cors(), async function (request, response) {
     let usuario_id = request.params.id
 
     let Usuario = await controllerUsuario.buscarUsuarioID(usuario_id)
@@ -35,7 +35,7 @@ router.get('/v1/semprelimpa/usuario/:id', cors(), async function (request, respo
     response.json(Usuario)
 })
 // INSERT USUARIOS
-router.post('/v1/semprelimpa/usuario', cors(), bodyParserJSON, async function (request, response) {
+router.post('/usuario', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
@@ -60,7 +60,7 @@ router.post('/v1/semprelimpa/usuario', cors(), bodyParserJSON, async function (r
     response.json(Usuario)
 })
 // UPDATE USUARIOS
-router.put('/v1/semprelimpa/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/usuario/:id', cors(), bodyParserJSON, async function(request, response){
     let usuario_id = request.params.id
 
     let dadosBody = request.body
@@ -73,7 +73,7 @@ router.put('/v1/semprelimpa/usuario/:id', cors(), bodyParserJSON, async function
     response.json(Usuario)
 })
 // DELETE USUARIOS
-router.delete('/v1/semprelimpa/usuario/:id', cors(), async function(request, response){
+router.delete('/usuario/:id', cors(), async function(request, response){
     let usuario_id = request.params.id
 
     let Usuario = await controllerUsuario.excluirUsuario(usuario_id)
@@ -82,7 +82,7 @@ router.delete('/v1/semprelimpa/usuario/:id', cors(), async function(request, res
     response.json(Usuario)
 })
 // LOGIN USUARIOS BY EMAIL
-router.post('/v1/semprelimpa/loginemail', cors(), bodyParserJSON, async function (request, response) {
+router.post('/loginemail', cors(), bodyParserJSON, async function (request, response) {
     let email = request.body.email
     let senha = request.body.senha
 
@@ -92,7 +92,7 @@ router.post('/v1/semprelimpa/loginemail', cors(), bodyParserJSON, async function
     response.json(Usuario)
 })
 // LOGIN USUARIOS BY CPF
-router.post('/v1/semprelimpa/logincpf', cors(), bodyParserJSON, async function (request, response) {
+router.post('/logincpf', cors(), bodyParserJSON, async function (request, response) {
     let cpf = request.body.cpf
     let senha = request.body.senha
 
@@ -102,7 +102,7 @@ router.post('/v1/semprelimpa/logincpf', cors(), bodyParserJSON, async function (
     response.json(Usuario)
 })
 // ESQUECI MINHA SENHA
-router.post('/v1/semprelimpa/esquecisenha', cors(), bodyParserJSON, async function(request, response){
+router.post('/esquecisenha', cors(), bodyParserJSON, async function(request, response){
         let email = request.body.email
 
         let result = await controllerUsuario.esqueciMinhaSenha(email)
@@ -112,7 +112,7 @@ router.post('/v1/semprelimpa/esquecisenha', cors(), bodyParserJSON, async functi
     }
 )
 // RESETAR SENHA
-router.post('/v1/semprelimpa/resetarsenha', cors(), bodyParserJSON, async function(request, response){
+router.post('/resetarsenha', cors(), bodyParserJSON, async function(request, response){
         let token = request.body.token
         let novaSenha = request.body.novaSenha
 

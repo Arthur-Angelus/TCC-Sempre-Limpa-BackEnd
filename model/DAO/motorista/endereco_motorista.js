@@ -5,7 +5,7 @@
  * Versão: 1.0
  *******************************************************************************************/
 
-const knex = require('../../db')
+const knex = require('../../../db')
 
 const getSelectAllEnderecoMotorista = async function(){
     try {

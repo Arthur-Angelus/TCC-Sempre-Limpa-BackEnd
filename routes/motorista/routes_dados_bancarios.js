@@ -16,14 +16,14 @@ const bodyParserJSON = bodyParser.json()
 const controllerDadosBancarios = require('../../controller/motorista/controller_dados_bancarios.js')
 
 //endpoints para a rota de genero
-router.get('/v1/semprelimpa/dados_bancarios', cors(), async function (request, response) {
+router.get('/dados_bancarios', cors(), async function (request, response) {
     let dados_bancarios = await controllerDadosBancarios.listarDadosBancarios()
 
     response.status(dados_bancarios.status_code)
     response.json(dados_bancarios)
 })
 
-router.get('/v1/semprelimpa/dados_bancarios/:id', cors(), async function (request, response) {
+router.get('/dados_bancarios/:id', cors(), async function (request, response) {
     let dados_bancarios_id = request.params.id
 
     let dados_bancarios = await controllerDadosBancarios.buscarDadosBancariosID(dados_bancarios_id)
@@ -32,7 +32,7 @@ router.get('/v1/semprelimpa/dados_bancarios/:id', cors(), async function (reques
     response.json(dados_bancarios)
 })
 
-router.post('/v1/semprelimpa/dados_bancarios', cors(), bodyParserJSON, async function (request, response) {
+router.post('/dados_bancarios', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
@@ -43,7 +43,7 @@ router.post('/v1/semprelimpa/dados_bancarios', cors(), bodyParserJSON, async fun
     response.json(dados_bancarios)
 })
 
-router.put('/v1/semprelimpa/dados_bancarios/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/dados_bancarios/:id', cors(), bodyParserJSON, async function(request, response){
     let dados_bancarios_id = request.params.id
 
     let dadosBody = request.body
@@ -56,7 +56,7 @@ router.put('/v1/semprelimpa/dados_bancarios/:id', cors(), bodyParserJSON, async 
     response.json(dados_bancarios)
 })
 
-router.delete('/v1/semprelimpa/dados_bancarios/:id', cors(), async function(request, response){
+router.delete('/dados_bancarios/:id', cors(), async function(request, response){
     let dados_bancarios_id = request.params.id
 
     let dados_bancarios = await controllerDadosBancarios.excluirDadosBancarios(dados_bancarios_id)

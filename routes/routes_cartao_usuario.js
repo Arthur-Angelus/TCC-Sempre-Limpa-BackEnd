@@ -16,14 +16,14 @@ const bodyParserJSON = bodyParser.json()
 const controllerCartao_usuario = require('../controller/controller_cartao_usuario.js')
 
 //endpoints para a rota de genero
-router.get('/v1/semprelimpa/cartao_usuarios', cors(), async function (request, response) {
+router.get('/cartao_usuarios', cors(), async function (request, response) {
     let cartao_usuario = await controllerCartao_usuario.listarCartao_usuarios()
 
     response.status(cartao_usuario.status_code)
     response.json(cartao_usuario)
 })
 
-router.get('/v1/semprelimpa/cartao_usuario/:fk_usuario_id', cors(), async function (request, response) {
+router.get('/cartao_usuario/:fk_usuario_id', cors(), async function (request, response) {
     let fk_usuario_id = request.params.fk_usuario_id
 
     let cartao_usuario = await controllerCartao_usuario.buscarCartao_usuarioFK(fk_usuario_id)
@@ -32,7 +32,7 @@ router.get('/v1/semprelimpa/cartao_usuario/:fk_usuario_id', cors(), async functi
     response.json(cartao_usuario)
 })
 
-router.post('/v1/semprelimpa/cartao_usuario', cors(), bodyParserJSON, async function (request, response) {
+router.post('/cartao_usuario', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
@@ -43,7 +43,7 @@ router.post('/v1/semprelimpa/cartao_usuario', cors(), bodyParserJSON, async func
     response.json(cartao_usuario)
 })
 
-// router.put('/v1/semprelimpa/cartao_usuario/:fk_usuario_id/:fk_cartao_id', cors(), bodyParserJSON, async function(request, response){
+// router.put('/cartao_usuario/:fk_usuario_id/:fk_cartao_id', cors(), bodyParserJSON, async function(request, response){
 //     let fk_usuario_id = request.params.fk_usuario_id
 //     let fk_cartao_id_antiga = request.params.fk_cartao_id
 
@@ -57,7 +57,7 @@ router.post('/v1/semprelimpa/cartao_usuario', cors(), bodyParserJSON, async func
 //     response.json(cartao_usuario)
 // })
 
-router.delete('/v1/semprelimpa/cartao_usuario/:fk_usuario_id/:fk_cartao_id', cors(), async function (request, response) {
+router.delete('/cartao_usuario/:fk_usuario_id/:fk_cartao_id', cors(), async function (request, response) {
     let fk_usuario_id = request.params.fk_usuario_id
     let fk_cartao_id = request.params.fk_cartao_id
 

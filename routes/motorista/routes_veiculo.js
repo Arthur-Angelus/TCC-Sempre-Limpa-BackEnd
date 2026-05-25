@@ -16,14 +16,14 @@ const bodyParserJSON = bodyParser.json()
 const controllerVeiculo = require('../../controller/motorista/controller_veiculo.js')
 
 //endpoints para a rota de genero
-router.get('/v1/semprelimpa/veiculo', cors(), async function (request, response) {
+router.get('/veiculo', cors(), async function (request, response) {
     let veiculo = await controllerVeiculo.listarVeiculo()
 
     response.status(veiculo.status_code)
     response.json(veiculo)
 })
 
-router.get('/v1/semprelimpa/veiculo/:id', cors(), async function (request, response) {
+router.get('/veiculo/:id', cors(), async function (request, response) {
     let veiculo_id = request.params.id
 
     let veiculo = await controllerVeiculo.buscarVeiculoID(veiculo_id)
@@ -32,7 +32,7 @@ router.get('/v1/semprelimpa/veiculo/:id', cors(), async function (request, respo
     response.json(veiculo)
 })
 
-router.post('/v1/semprelimpa/veiculo', cors(), bodyParserJSON, async function (request, response) {
+router.post('/veiculo', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
@@ -43,7 +43,7 @@ router.post('/v1/semprelimpa/veiculo', cors(), bodyParserJSON, async function (r
     response.json(veiculo)
 })
 
-router.put('/v1/semprelimpa/veiculo/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/veiculo/:id', cors(), bodyParserJSON, async function(request, response){
     let veiculo_id = request.params.id
 
     let dadosBody = request.body
@@ -56,7 +56,7 @@ router.put('/v1/semprelimpa/veiculo/:id', cors(), bodyParserJSON, async function
     response.json(veiculo)
 })
 
-router.delete('/v1/semprelimpa/veiculo/:id', cors(), async function(request, response){
+router.delete('/veiculo/:id', cors(), async function(request, response){
     let veiculo_id = request.params.id
 
     let veiculo = await controllerVeiculo.excluirVeiculo(veiculo_id)

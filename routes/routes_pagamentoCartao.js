@@ -18,14 +18,14 @@ const controllerPagamentoCartao = require('../controller/controller_pagamentoCar
 //ENDPOINT - PAGAMENTO CARTAO
 
 // GET ALL PAGAMENTO CARTAO
-router.get('/v1/semprelimpa/pagamento-cartao', cors(), async function (request, response) {
+router.get('/pagamento-cartao', cors(), async function (request, response) {
     let PagamentoCartao = await controllerPagamentoCartao.listarPagamentoCartao()
 
     response.status(PagamentoCartao.status_code)
     response.json(PagamentoCartao)
 })
 // GET PAGAMENTO CARTAO BY ID
-router.get('/v1/semprelimpa/pagamento-cartao/:id', cors(), async function (request, response) {
+router.get('/pagamento-cartao/:id', cors(), async function (request, response) {
     let pagamento_cartao_id = request.params.id
 
     let PagamentoCartao = await controllerPagamentoCartao.buscarPagamentoCartaoID(pagamento_cartao_id)
@@ -34,7 +34,7 @@ router.get('/v1/semprelimpa/pagamento-cartao/:id', cors(), async function (reque
     response.json(PagamentoCartao)
 })
 // POST PAGAMENTO CARTAO
-router.post('/v1/semprelimpa/pagamento-cartao', cors(), bodyParserJSON, async function(request, response){
+router.post('/pagamento-cartao', cors(), bodyParserJSON, async function(request, response){
     let PagamentoCartao_data = request.body
 
     let contentType = request.headers['content-type']
@@ -45,7 +45,7 @@ router.post('/v1/semprelimpa/pagamento-cartao', cors(), bodyParserJSON, async fu
     response.json(PagamentoCartao)
 })
 // PUT PAGAMENTO CARTAO
-router.put('/v1/sempreLimpa/pagamento-cartao/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/pagamento-cartao/:id', cors(), bodyParserJSON, async function(request, response){
     let pagamento_cartao_id = request.params.id
 
     let dadosBody = request.body
@@ -58,7 +58,7 @@ router.put('/v1/sempreLimpa/pagamento-cartao/:id', cors(), bodyParserJSON, async
     response.json(PagamentoCartao)
 })
 // DELETE PAGAMENTO CARTAO
-router.delete('/v1/sempreLimpa/pagamento-cartao/:id', cors(), async function(request, response){
+router.delete('/pagamento-cartao/:id', cors(), async function(request, response){
     let pagamento_cartao_id = request.params.id
 
     let PagamentoCartao = await controllerPagamentoCartao.excluirPagamentoCartao(pagamento_cartao_id)

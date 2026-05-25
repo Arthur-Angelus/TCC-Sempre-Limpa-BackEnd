@@ -11,7 +11,7 @@ const cors = require('cors')
 const controllerCartao = require('../controller/controller_cartao')
 
 /* Get All Cards */
-router.get('/v1/semprelimpa/cartao', cors(), async (req, res) => {
+router.get('/cartao', cors(), async (req, res) => {
 
     let result = await controllerCartao.listarTodosCartoes();
 
@@ -19,7 +19,7 @@ router.get('/v1/semprelimpa/cartao', cors(), async (req, res) => {
 });
 
 /* Get Card por User */
-router.get('/v1/semprelimpa/cartao/:usuario_id', async (req, res) => {
+router.get('/cartao/:usuario_id', async (req, res) => {
     let usuario_id = req.params.usuario_id
     let result = await controllerCartao.listarCartoesPorUsuario(usuario_id)
 
@@ -35,7 +35,7 @@ router.get('/v1/semprelimpa/cartao/:usuario_id', async (req, res) => {
 })
 
 /* Post Card */
-router.post('/v1/semprelimpa/cartao', async (req, res) => {
+router.post('/cartao', async (req, res) => {
 
     let cartao = req.body
 
@@ -46,7 +46,7 @@ router.post('/v1/semprelimpa/cartao', async (req, res) => {
 })
 
 /* Del Card */
-router.delete('/v1/semprelimpa/cartao/:cartao_id/usuario/:usuario_id', cors(), async (req, res) => {
+router.delete('/cartao/:cartao_id/usuario/:usuario_id', cors(), async (req, res) => {
 
     let { cartao_id, usuario_id } = req.params;
     let result = await controllerCartao.deletarCartao(cartao_id, usuario_id)

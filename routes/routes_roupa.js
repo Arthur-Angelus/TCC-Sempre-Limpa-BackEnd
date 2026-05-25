@@ -17,7 +17,7 @@ const bodyParserJSON = bodyParser.json()
 
 const controllerRoupa = require('../controller/controller_roupa.js')
 // GET ALL
-router.get('/v1/semprelimpa/roupa', cors(), async function(request, response){
+router.get('/roupa', cors(), async function(request, response){
     let roupa = await controllerRoupa.listarTodasRoupas()
     
         response.status(roupa.status_code)
@@ -25,13 +25,13 @@ router.get('/v1/semprelimpa/roupa', cors(), async function(request, response){
 })
 
 // GET BY NAME
-router.get('/v1/semprelimpa/roupa/buscar', cors(), async function(request, response){
+router.get('/roupa/buscar', cors(), async function(request, response){
     let nomePeca= request.query.nome
     let dadosRoupas = await controllerRoupa.listarRoupaPorNome(nomePeca)
     response.status(dadosRoupas.status_code).json(dadosRoupas)
 })
 // GET BY ID
-router.get('/v1/semprelimpa/roupa/:id', cors(), async function(request, response){
+router.get('/roupa/:id', cors(), async function(request, response){
     let id = request.params.id
 
     let roupa = await controllerRoupa.listarRoupaPorId(id)
@@ -40,7 +40,7 @@ router.get('/v1/semprelimpa/roupa/:id', cors(), async function(request, response
     response.json(roupa)
 })
 // POST
-router.post('/v1/semprelimpa/roupa', cors(), bodyParserJSON, async function(request, response){
+router.post('/roupa', cors(), bodyParserJSON, async function(request, response){
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
@@ -51,7 +51,7 @@ router.post('/v1/semprelimpa/roupa', cors(), bodyParserJSON, async function(requ
     response.json(roupa)
 })
 // PUT
-router.put('/v1/SempreLimpa/roupa/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/roupa/:id', cors(), bodyParserJSON, async function(request, response){
     let roupa_id = request.params.id
 
     let dadosBody = request.body
@@ -64,7 +64,7 @@ router.put('/v1/SempreLimpa/roupa/:id', cors(), bodyParserJSON, async function(r
     response.json(Roupa)
 })
 // DELETE
-router.delete('/v1/SempreLimpa/roupa/:id', cors(), async function(request, response){
+router.delete('/roupa/:id', cors(), async function(request, response){
     let roupa_id = request.params.id
 
     let Roupa = await controllerRoupa.excluirRoupa(roupa_id)

@@ -110,7 +110,8 @@ const setUpdateUsers = async function (usuario, usuario_id) {
                 cpf: usuario.cpf,
                 rne: usuario.rne,
                 fk_endereco: usuario.fk_endereco,
-                senha: usuario.senha
+                senha: usuario.senha,
+                data_nascimento: usuario.data_nascimento
             })
 
         return result.map(u => {

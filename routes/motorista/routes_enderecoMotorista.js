@@ -14,18 +14,18 @@ const router = express.Router()
 
 const bodyParserJSON = bodyParser.json()
 
-const controllerEnderecoMotorista = require('../controller/controller_endereco_motorista')
+const controllerEnderecoMotorista = require('../../controller/motorista/controller_endereco_motorista')
 
 
 /* GET Todos Endereços */
-router.get('/v1/semprelimpa/enderecoMotorista', cors(), async function (request, response) {
+router.get('/enderecoMotorista', cors(), async function (request, response) {
     let enderecoMotorista = await controllerEnderecoMotorista.listarTodosEnderecosMotorista()
 
     response.status(enderecoMotorista.status_code)
     response.json(enderecoMotorista)
 })
 
-router.get('/v1/semprelimpa/enderecoMotorista/:id', cors(), async function (request, response) {
+router.get('/enderecoMotorista/:id', cors(), async function (request, response) {
     let id = request.params.id
 
     let enderecoMotorista = await controllerEnderecoMotorista.listarEnderecoMotoristaPorId(id)
@@ -34,7 +34,7 @@ router.get('/v1/semprelimpa/enderecoMotorista/:id', cors(), async function (requ
     response.json(enderecoMotorista)
 })
 
-router.post('/v1/semprelimpa/enderecoMotorista/', cors(), async function (request, response) {
+router.post('/enderecoMotorista/', cors(), async function (request, response) {
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
@@ -47,7 +47,7 @@ router.post('/v1/semprelimpa/enderecoMotorista/', cors(), async function (reques
     )
 })
 
-router.put('/v1/semprelimpa/enderecoMotorista/:id', cors(), async function (request, response) {
+router.put('/enderecoMotorista/:id', cors(), async function (request, response) {
     let idEnderecoMotorista
         = request.params.id
     let dadosBody = request.body
@@ -63,7 +63,7 @@ router.put('/v1/semprelimpa/enderecoMotorista/:id', cors(), async function (requ
     )
 })
 
-router.delete('/v1/semprelimpa/enderecoMotorista/:id', cors(), async function (request, response) {
+router.delete('/enderecoMotorista/:id', cors(), async function (request, response) {
     let idEnderecoMotorista
         = request.params.id
 

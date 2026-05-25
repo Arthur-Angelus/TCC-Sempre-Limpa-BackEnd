@@ -5,8 +5,8 @@
  * Versão: 1.0
  *******************************************************************************************/
 
-const enderecoMotoristaDAO = require('../model/DAO/endereco_motorista')
-const DEFAULT_MESSAGES = require('./module/config_messages.js')
+const enderecoMotoristaDAO = require('../../model/DAO/motorista/endereco_motorista')
+const DEFAULT_MESSAGES = require('../module/config_messages.js')
 
 /* LISTAR TODOS */
 const listarTodosEnderecosMotorista = async function () {
