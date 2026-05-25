@@ -85,7 +85,9 @@ const setInsertDriver = async function (motorista) {
             email: motorista.email,
             cnh: motorista.cnh,
             foto: motorista.foto,
-            fk_endereco: motorista.fk_endereco
+            senha: motorista.senha,
+            fk_dados_bancarios_id: motorista.fk_dados_bancarios_id,
+            fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
 
         })
         return result.map(u => {
@@ -111,7 +113,9 @@ const setUpdateDriver = async function (motorista, motorista_id) {
                 email: motorista.email,
                 cnh: motorista.cnh,
                 foto: motorista.foto,
-                fk_endereco: motorista.fk_endereco
+                senha: motorista.senha,
+                fk_dados_bancarios_id: motorista.fk_dados_bancarios_id,
+                fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
             })
 
         return result.map(u => {
