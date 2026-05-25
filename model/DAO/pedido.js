@@ -62,7 +62,8 @@ const setInsertPedido = async function (pedido) {
             tempo_estimado: pedido.tempo_estimado,
             fk_status_id: pedido.fk_status_id,
             fk_lavanderia_id: pedido.fk_lavanderia_id,
-            fk_usuario_id: pedido.fk_usuario_id
+            fk_usuario_id: pedido.fk_usuario_id,
+            fk_motorista_id: pedido.fk_motorista_id
         })
         return result.map(pedido => {
             return pedido
@@ -85,7 +86,8 @@ const setUpdatePedido = async function (pedido, pedido_id) {
                 tempo_estimado: pedido.tempo_estimado,
                 fk_status_id: pedido.fk_status_id,
                 fk_lavanderia_id: pedido.fk_lavanderia_id,
-                fk_usuario_id: pedido.fk_usuario_id
+                fk_usuario_id: pedido.fk_usuario_id,
+                fk_motorista_id: pedido.fk_motorista_id
             })
         return result
     } catch (error) {

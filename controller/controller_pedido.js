@@ -270,6 +270,12 @@ const validarDadosPedido = async function (Pedido) {
         Pedido.fk_usuario_id == null || typeof Pedido.fk_usuario_id !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Usuario Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } 
+    else if (Pedido.fk_motorista_id == '' || Pedido.fk_motorista_id == undefined || 
+        Pedido.fk_motorista_id == null || typeof Pedido.fk_motorista_id !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do motorista Invalido]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
     }  
     else {
         return false

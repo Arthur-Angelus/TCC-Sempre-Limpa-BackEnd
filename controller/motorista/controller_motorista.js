@@ -297,7 +297,7 @@ const validarDadosMotorista = async function (Motorista) {
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else if (Motorista.data_nascimento == '' || Motorista.data_nascimento == undefined || Motorista.data_nascimento == null || Motorista.data_nascimento.length > 10) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Email incorreto]'
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Data nascimento incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else if (Motorista.cpf == '' || Motorista.cpf == undefined || Motorista.cpf == null || Motorista.cpf.length > 11) {
@@ -308,20 +308,20 @@ const validarDadosMotorista = async function (Motorista) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Telefone incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (Motorista.cnh == '' || Motorista.cnh == undefined || Motorista.cnh == null || Motorista.cnh.length > 11) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [CPF incorreto]'
+    } else if (Motorista.email == '' || Motorista.email == undefined || Motorista.email == null || Motorista.email.length > 100) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Email incorreto]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Motorista.cnh != null && Motorista.cnh > 11) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Cnh incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else if (Motorista.foto == '' || Motorista.foto == undefined || Motorista.foto == null || Motorista.foto.length > 255) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [CPF incorreto]'
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [foto incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else if (Motorista.fk_dados_bancarios_id == null || isNaN(Motorista.fk_dados_bancarios_id) || Motorista.fk_dados_bancarios_id <= 0) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message = "[fk_dados_bancarios_id inválido]";
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.fk_endereco_id == null || isNaN(Motorista.fk_endereco_id) || Motorista.fk_endereco_id <= 0) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message = "[fk_endereco_id inválido]";
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else {

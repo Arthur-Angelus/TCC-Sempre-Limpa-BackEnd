@@ -14,7 +14,7 @@ const router = express.Router()
 
 const bodyParserJSON = bodyParser.json()
 
-const controllerEndereco = require('../../controller/controller_endereco.js')
+const controllerEnderecoMotorista = require('../../controller/motorista/controller_endereco_motorista')
 const controllerMotorista = require('../../controller/motorista/controller_motorista.js')
 
 //endpoints para a rota de genero
@@ -40,24 +40,24 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
     let contentType = request.headers['content-type']
 
     let dadosEndereco = dadosBody.endereco
-    let dadosmotorista = {...dadosBody}
-    delete dadosmotorista.endereco
+    let dadosUsuario = {...dadosBody}
+    delete dadosUsuario.endereco
 
-    let resultEndereco = await controllerEndereco.inserirEnderecos(dadosEndereco, contentType)
+    let resultEndereco = await controllerEnderecoMotorista.inserirEnderecoMotorista(dadosEndereco, contentType)
 
     if (resultEndereco.status_code !== 201) {
         response.status(resultEndereco.status_code);
         return response.json(resultEndereco);
     }
 
-    let idEnderecoCriado = resultEndereco.items.Endereco_id;
+    let idEnderecoCriado = resultEndereco.items.endereco_motorista_id;
 
-    dadosmotorista.fk_endereco = idEnderecoCriado;
+    dadosUsuario.endereco_motorista_id = idEnderecoCriado;
 
-    let motorista = await controllerMotorista.inserirMotoristas(dadosmotorista, contentType)
+    let Usuario = await controllerUsuario.inserirUsuarios(dadosUsuario, contentType)
 
-    response.status(motorista.status_code)
-    response.json(motorista)
+    response.status(Usuario.status_code)
+    response.json(Usuario)
 })
 // UPDATE motorista
 router.put('/motorista/:id', cors(), bodyParserJSON, async function(request, response){
