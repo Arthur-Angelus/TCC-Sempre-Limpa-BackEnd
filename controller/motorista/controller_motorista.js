@@ -259,7 +259,7 @@ const excluirMotorista = async function (id) {
 
             if (validarID.status_code == 200) {
 
-                let resultMotoristas = await motoristaDAO.setDeleteDriverE(Number(id))
+                let resultMotoristas = await motoristaDAO.setDeleteDriver(Number(id))
 
                 if (resultMotoristas) {
 
