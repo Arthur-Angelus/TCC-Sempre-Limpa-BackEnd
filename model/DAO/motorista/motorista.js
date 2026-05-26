@@ -90,10 +90,8 @@ const setInsertDriver = async function (motorista) {
             fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
 
         })
-        return result.map(u => {
-            delete u.senha
-            return u
-        })
+        return result
+        
     } catch (error) {
         console.error("🔥 ERRO NO DAO INSERT:", error)
         throw error
@@ -118,10 +116,8 @@ const setUpdateDriver = async function (motorista, motorista_id) {
                 fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
             })
 
-        return result.map(u => {
-            delete u.senha
-            return u
-        })
+        return result
+
     } catch (error) {
         console.error(error)
         return false

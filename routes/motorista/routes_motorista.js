@@ -25,23 +25,24 @@ router.get('/motorista', cors(), async function (request, response) {
     response.status(motorista.status_code)
     response.json(motorista)
 })
-// GET motorista BY ID motorista
+
 router.get('/motorista/:id', cors(), async function (request, response) {
     let motorista_id = request.params.id
 
     let motorista = await controllerMotorista.buscarMotoristaID(motorista_id)
 
     response.status(motorista.status_code)
-    response.json(motorista)
+    response.json(extrato)
 })
-// INSERT motorista
+
+// GET motorista BY ID motorista
 router.post('/motorista', cors(), bodyParserJSON, async function (request, response) {
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
     let dadosEndereco = dadosBody.endereco
-    let dadosUsuario = {...dadosBody}
-    delete dadosUsuario.endereco
+    let dadosMotorista = {...dadosBody}
+    delete dadosMotorista.endereco
 
     let resultEndereco = await controllerEnderecoMotorista.inserirEnderecoMotorista(dadosEndereco, contentType)
 
@@ -50,14 +51,14 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
         return response.json(resultEndereco);
     }
 
-    let idEnderecoCriado = resultEndereco.items.endereco_motorista_id;
+    let idEnderecoCriado = resultEndereco.items.Endereco_id;
 
-    dadosUsuario.endereco_motorista_id = idEnderecoCriado;
+    dadosMotorista.fk_endereco = idEnderecoCriado;
 
-    let Usuario = await controllerUsuario.inserirUsuarios(dadosUsuario, contentType)
+    let Motorista = await controllerMotorista.inserirMotoristas(dadosMotorista, contentType)
 
-    response.status(Usuario.status_code)
-    response.json(Usuario)
+    response.status(Motorista.status_code)
+    response.json(Motorista)
 })
 // UPDATE motorista
 router.put('/motorista/:id', cors(), bodyParserJSON, async function(request, response){
