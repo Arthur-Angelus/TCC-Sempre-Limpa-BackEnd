@@ -25,7 +25,7 @@ const getSelectAllUsers = async function () {
 // SELECT BY ID
 const getSelectUserById = async function (usuario_id) {
     try {
-        const rows = await knex('usuario')
+        const rows = await knex('vw_usuario_endereco_detalhado')
             .select('*')
             .where({ usuario_id: usuario_id })
 
