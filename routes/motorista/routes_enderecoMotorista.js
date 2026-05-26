@@ -18,14 +18,14 @@ const controllerEnderecoMotorista = require('../../controller/motorista/controll
 
 
 /* GET Todos Endereços */
-router.get('/enderecoMotorista', cors(), async function (request, response) {
+router.get('/enderecomotorista', cors(), async function (request, response) {
     let enderecoMotorista = await controllerEnderecoMotorista.listarTodosEnderecosMotorista()
 
     response.status(enderecoMotorista.status_code)
     response.json(enderecoMotorista)
 })
 
-router.get('/enderecoMotorista/:id', cors(), async function (request, response) {
+router.get('/enderecomotorista/:id', cors(), async function (request, response) {
     let id = request.params.id
 
     let enderecoMotorista = await controllerEnderecoMotorista.listarEnderecoMotoristaPorId(id)
@@ -34,7 +34,7 @@ router.get('/enderecoMotorista/:id', cors(), async function (request, response) 
     response.json(enderecoMotorista)
 })
 
-router.post('/enderecoMotorista/', cors(), async function (request, response) {
+router.post('/enderecomotorista/', cors(), async function (request, response) {
     let dadosBody = request.body
     let contentType = request.headers['content-type']
 
@@ -47,7 +47,7 @@ router.post('/enderecoMotorista/', cors(), async function (request, response) {
     )
 })
 
-router.put('/enderecoMotorista/:id', cors(), async function (request, response) {
+router.put('/enderecomotorista/:id', cors(), async function (request, response) {
     let idEnderecoMotorista
         = request.params.id
     let dadosBody = request.body
@@ -63,7 +63,7 @@ router.put('/enderecoMotorista/:id', cors(), async function (request, response) 
     )
 })
 
-router.delete('/enderecoMotorista/:id', cors(), async function (request, response) {
+router.delete('/enderecomotorista/:id', cors(), async function (request, response) {
     let idEnderecoMotorista
         = request.params.id
 

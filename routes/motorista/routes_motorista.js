@@ -32,7 +32,7 @@ router.get('/motorista/:id', cors(), async function (request, response) {
     let motorista = await controllerMotorista.buscarMotoristaID(motorista_id)
 
     response.status(motorista.status_code)
-    response.json(extrato)
+    response.json(motorista)
 })
 
 // GET motorista BY ID motorista
@@ -51,9 +51,9 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
         return response.json(resultEndereco);
     }
 
-    let idEnderecoCriado = resultEndereco.items.Endereco_id;
+    let idEnderecoCriado = resultEndereco.items.enderecoMotorista.id;
 
-    dadosMotorista.fk_endereco = idEnderecoCriado;
+    dadosMotorista.fk_endereco_motorista_id = idEnderecoCriado;
 
     let Motorista = await controllerMotorista.inserirMotoristas(dadosMotorista, contentType)
 

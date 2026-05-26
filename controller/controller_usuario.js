@@ -356,7 +356,7 @@ const loginUsuarioEmail = async function (email, senha) {
                 email: usuario.e_mail
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '1y' }
         )
 
         return {
@@ -417,7 +417,7 @@ const loginUsuarioCpf = async function (cpf, senha) {
                 email: usuario.cpf
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '1y' }
         )
 
         return {

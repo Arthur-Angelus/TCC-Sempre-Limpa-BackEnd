@@ -124,10 +124,10 @@ const inserirEnderecoMotorista = async function (
                     dadosEndereco.id = resultEnderecosMotorista
 
                     MESSAGES.DEFAULT_HEADER.status =
-                        MESSAGES.SUCCESS_REQUEST.status
+                        MESSAGES.SUCCESS_CREATED_ITEM.status
 
                     MESSAGES.DEFAULT_HEADER.status_code =
-                        MESSAGES.SUCCESS_REQUEST.status_code
+                        MESSAGES.SUCCESS_CREATED_ITEM.status_code
 
                     MESSAGES.DEFAULT_HEADER.items.enderecoMotorista =
                         dadosEndereco
