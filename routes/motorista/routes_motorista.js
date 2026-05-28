@@ -16,6 +16,7 @@ const bodyParserJSON = bodyParser.json()
 
 const controllerEnderecoMotorista = require('../../controller/motorista/controller_endereco_motorista')
 const controllerMotorista = require('../../controller/motorista/controller_motorista.js')
+const controllerDadosBancarios = require('../../controller/motorista/controller_dados_bancarios')
 
 //endpoints para a rota de genero
 // GET ALL motorista
@@ -41,8 +42,21 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
     let contentType = request.headers['content-type']
 
     let dadosEndereco = dadosBody.endereco
+    let dadosBancarios = dadosBody.dadosBancarios
     let dadosMotorista = {...dadosBody}
     delete dadosMotorista.endereco
+    delete dadosMotorista.dadosBancarios
+
+    let resultDadosBancarios = await controllerDadosBancarios.inserirDadosBancarios(dadosBancarios, contentType)
+    
+    if (resultDadosBancarios.status_code !== 201){
+        response.status(resultDadosBancarios.status_code);
+        return response.json(resultDadosBancarios);
+    }
+
+    let idDadosBancariosCriado = resultDadosBancarios.items.dadosBancarios.id
+
+    dadosMotorista.fk_dados_bancarios_id = idDadosBancariosCriado
 
     let resultEndereco = await controllerEnderecoMotorista.inserirEnderecoMotorista(dadosEndereco, contentType)
 

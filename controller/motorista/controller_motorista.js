@@ -312,7 +312,7 @@ const validarDadosMotorista = async function (Motorista) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Email incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (Motorista.cnh != null && Motorista.cnh > 11) {
+    } else if (Motorista.cnh != null && Motorista.cnh.length > 11) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Cnh incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 

@@ -91,9 +91,66 @@ const setInsertDriver = async function (motorista) {
 
         })
         return result
-        
+
     } catch (error) {
         console.error("🔥 ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
+
+const setInsertMotoristaCompleto = async function (motorista, dadosBancarios, enderecoMotorista, dadosVeiculo, veiculo) {
+    try {
+        return await knex.transaction(async (trx) => {
+            const bancoId = await knex('dados_bancarios').insert({
+                digito: dadosBancarios.digito,
+                agencia: dadosBancarios.agencia,
+                banco: dadosBancarios.banco,
+                tipo_conta: dadosBancarios.tipo_conta,
+                conta: dadosBancarios.conta
+            }).returning('dados_bancarios_id')
+
+            const enderecoId = await knex('endereco_motorista').insert({
+                cep: enderecoMotorista.cep,
+                uf: enderecoMotorista.uf,
+                cidade: enderecoMotorista.cidade,
+                bairro: enderecoMotorista.bairro,
+                logradouro: enderecoMotorista.logradouro,
+                numero: enderecoMotorista.numero,
+                complemento: enderecoMotorista.complemento
+            }).returning('endereco_motorista_id')
+
+            const motoristaId = await knex('motorista').insert({
+                nome: motorista.nome,
+                data_nascimento: motorista.data_nascimento,
+                cpf: motorista.cpf,
+                telefone: motorista.telefone,
+                email: motorista.email,
+                cnh: motorista.cnh,
+                foto: motorista.foto,
+                senha: motorista.senha,
+                fk_dados_bancarios_id: bancoId[0],
+                fk_endereco_motorista_id: enderecoId
+
+            }).returning('motorista_id')
+
+            const dadosVeiculoId = await knex('dados_veiculo').insert({
+                placa: dadosVeiculo.placa,
+                modelo: dadosVeiculo.modelo,
+                marca: dadosVeiculo.marca,
+                ano_modelo: dadosVeiculo.ano_modelo,
+                ano_fabricacao: dadosVeiculo.ano_fabricacao,
+                cor: dadosVeiculo.cor
+            }).returning('dados_veiculo_id')
+
+            return {
+                bancoId: bancoId[0],
+                enderecoId: enderecoId[0],
+                motoristaId: motoristaId[0]
+            }
+        })
+
+    } catch (error) {
+        console.error("🔥 ERRO NO DAO INSERT COMPLETO:", error)
         throw error
     }
 }
