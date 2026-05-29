@@ -81,7 +81,7 @@ const inserirDadosVeiculo = async function (DadosVeiculo, contentType) {
         }
 
         // validação
-        let validar = await validarDadosDadosVeiculo(DadosVeiculo)
+        let validar = await validarDadosVeiculo(DadosVeiculo)
 
         if (validar) {
             return validar
@@ -125,7 +125,7 @@ const atualizarDadosVeiculo = async function (DadosVeiculo, id, contentType) {
     try {
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
-            let validar = await validarDadosDadosVeiculo(DadosVeiculo)
+            let validar = await validarDadosVeiculo(DadosVeiculo)
 
             if (!validar) {
 
@@ -208,7 +208,7 @@ const excluirDadosVeiculo = async function (id) {
     }
 }
 
-const validarDadosDadosVeiculo = async function (DadosVeiculo) {
+const validarDadosVeiculo = async function (DadosVeiculo) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     if (DadosVeiculo.placa == '' || DadosVeiculo.placa == undefined || DadosVeiculo.placa == null ||DadosVeiculo.placa.length > 7) {
@@ -245,5 +245,6 @@ module.exports = {
     buscarDadosVeiculoID,
     inserirDadosVeiculo,
     atualizarDadosVeiculo,
-    excluirDadosVeiculo
+    excluirDadosVeiculo,
+    validarDadosVeiculo
 }

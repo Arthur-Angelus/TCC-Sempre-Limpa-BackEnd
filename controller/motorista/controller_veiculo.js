@@ -233,5 +233,6 @@ module.exports = {
     buscarVeiculoID,
     inserirVeiculo,
     atualizarVeiculo,
-    excluirVeiculo
+    excluirVeiculo,
+    validarDadosVeiculo
 }

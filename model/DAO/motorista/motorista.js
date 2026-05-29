@@ -1,8 +1,10 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelas requisições CRUD do motorista
- * Data: 22/05/2026
+ * Data: 29/05/2026
  * Autor: Arthur Angelus
- * Versão: 1.0
+ * Versão: 3.0
+ * implementado função esqueci minha senha e resetar senha
+ * implementado função cadastro completo de motorista
  *******************************************************************************************/
 
 const knex = require('../../../db')
@@ -91,9 +93,91 @@ const setInsertDriver = async function (motorista) {
 
         })
         return result
-        
+
     } catch (error) {
         console.error("🔥 ERRO NO DAO INSERT:", error)
+        throw error
+    }
+}
+
+const setInsertMotoristaCompleto = async function (
+    motorista,
+    dadosBancarios,
+    enderecoMotorista,
+    dadosVeiculo
+) {
+    try {
+        return await knex.transaction(async (trx) => {
+
+            // 1. DADOS BANCÁRIOS
+            const bancoId = await trx('dados_bancarios').insert({
+                digito: dadosBancarios.digito,
+                agencia: dadosBancarios.agencia,
+                banco: dadosBancarios.banco,
+                tipo_conta: dadosBancarios.tipo_conta,
+                conta: dadosBancarios.conta
+            })
+
+            const idBanco = bancoId[0]
+
+            // 2. ENDEREÇO
+            const enderecoId = await trx('endereco_motorista').insert({
+                cep: enderecoMotorista.cep,
+                uf: enderecoMotorista.uf,
+                cidade: enderecoMotorista.cidade,
+                bairro: enderecoMotorista.bairro,
+                logradouro: enderecoMotorista.logradouro,
+                numero: enderecoMotorista.numero,
+                complemento: enderecoMotorista.complemento
+            })
+
+            const idEndereco = enderecoId[0]
+
+            // 3. MOTORISTA
+            const motoristaId = await trx('motorista').insert({
+                nome: motorista.nome,
+                data_nascimento: motorista.data_nascimento,
+                cpf: motorista.cpf,
+                telefone: motorista.telefone,
+                email: motorista.email,
+                cnh: motorista.cnh,
+                foto: motorista.foto,
+                senha: motorista.senha,
+                fk_dados_bancarios_id: idBanco,
+                fk_endereco_motorista_id: idEndereco
+            })
+
+            const idMotorista = motoristaId[0]
+
+            // 4. VEÍCULO (se existir depois)
+            const dadosVeiculoId = await trx('dados_veiculo').insert({
+                placa: dadosVeiculo.placa,
+                modelo: dadosVeiculo.modelo,
+                marca: dadosVeiculo.marca,
+                ano_modelo: dadosVeiculo.ano_modelo,
+                ano_fabricacao: dadosVeiculo.ano_fabricacao,
+                cor: dadosVeiculo.cor
+            })
+
+            const idDadosVeiculo = dadosVeiculoId[0]
+
+            const veiculoId = await trx('veiculo').insert({
+                modalidade: dadosVeiculo.modalidade,
+                fk_motorista_id: idMotorista,
+                fk_dados_veiculo_id: idDadosVeiculo
+            })
+
+            return {
+                bancoId: idBanco,
+                enderecoId: idEndereco,
+                motoristaId: idMotorista,
+                dadosVeiculoId: idDadosVeiculo,
+                veiculoId: veiculoId[0]
+            }
+        })
+
+    } catch (error) {
+        console.error("🔥 ERRO NO DAO INSERT COMPLETO:", error)
         throw error
     }
 }
@@ -197,6 +281,7 @@ module.exports = {
     getSelectDriverByEmail,
     getSelectDriverByCpf,
     setInsertDriver,
+    setInsertMotoristaCompleto,
     setUpdateDriver,
     setDeleteDriver,
     getSelectLastID,
