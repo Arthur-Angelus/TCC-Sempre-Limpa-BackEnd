@@ -81,7 +81,7 @@ const inserirDadosBancarios = async function (DadosBancarios, contentType) {
         }
 
         // validação
-        let validar = await validarDadosDadosBancarios(DadosBancarios)
+        let validar = await validarDadosBancarios(DadosBancarios)
 
         if (validar) {
             return validar
@@ -130,7 +130,7 @@ const atualizarDadosBancarios = async function (DadosBancarios, id, contentType)
     try {
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
-            let validar = await validarDadosDadosBancarios(DadosBancarios)
+            let validar = await validarDadosBancarios(DadosBancarios)
 
             if (!validar) {
 
@@ -213,7 +213,7 @@ const excluirDadosBancarios = async function (id) {
     }
 }
 
-const validarDadosDadosBancarios = async function (DadosBancarios) {
+const validarDadosBancarios = async function (DadosBancarios) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     if (DadosBancarios.digito == '' || DadosBancarios.digito == undefined || DadosBancarios.digito == null || isNaN(DadosBancarios.digito) ||DadosBancarios.digito.length > 1) {
@@ -246,5 +246,6 @@ module.exports = {
     buscarDadosBancariosID,
     inserirDadosBancarios,
     atualizarDadosBancarios,
-    excluirDadosBancarios
+    excluirDadosBancarios,
+    validarDadosBancarios
 }

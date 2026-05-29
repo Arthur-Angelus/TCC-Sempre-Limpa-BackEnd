@@ -1,8 +1,10 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelas requisições CRUD do motorista
- * Data: 22/05/2026
+ * Data: 29/05/2026
  * Autor: Arthur Angelus
- * Versão: 1.0
+ * Versão: 3.0
+ * implementado função esqueci minha senha e resetar senha
+ * implementado função cadastro completo de motorista
  *******************************************************************************************/
 
 const knex = require('../../../db')
@@ -98,18 +100,28 @@ const setInsertDriver = async function (motorista) {
     }
 }
 
-const setInsertMotoristaCompleto = async function (motorista, dadosBancarios, enderecoMotorista, dadosVeiculo, veiculo) {
+const setInsertMotoristaCompleto = async function (
+    motorista,
+    dadosBancarios,
+    enderecoMotorista,
+    dadosVeiculo
+) {
     try {
         return await knex.transaction(async (trx) => {
-            const bancoId = await knex('dados_bancarios').insert({
+
+            // 1. DADOS BANCÁRIOS
+            const bancoId = await trx('dados_bancarios').insert({
                 digito: dadosBancarios.digito,
                 agencia: dadosBancarios.agencia,
                 banco: dadosBancarios.banco,
                 tipo_conta: dadosBancarios.tipo_conta,
                 conta: dadosBancarios.conta
-            }).returning('dados_bancarios_id')
+            })
 
-            const enderecoId = await knex('endereco_motorista').insert({
+            const idBanco = bancoId[0]
+
+            // 2. ENDEREÇO
+            const enderecoId = await trx('endereco_motorista').insert({
                 cep: enderecoMotorista.cep,
                 uf: enderecoMotorista.uf,
                 cidade: enderecoMotorista.cidade,
@@ -117,9 +129,12 @@ const setInsertMotoristaCompleto = async function (motorista, dadosBancarios, en
                 logradouro: enderecoMotorista.logradouro,
                 numero: enderecoMotorista.numero,
                 complemento: enderecoMotorista.complemento
-            }).returning('endereco_motorista_id')
+            })
 
-            const motoristaId = await knex('motorista').insert({
+            const idEndereco = enderecoId[0]
+
+            // 3. MOTORISTA
+            const motoristaId = await trx('motorista').insert({
                 nome: motorista.nome,
                 data_nascimento: motorista.data_nascimento,
                 cpf: motorista.cpf,
@@ -128,24 +143,36 @@ const setInsertMotoristaCompleto = async function (motorista, dadosBancarios, en
                 cnh: motorista.cnh,
                 foto: motorista.foto,
                 senha: motorista.senha,
-                fk_dados_bancarios_id: bancoId[0],
-                fk_endereco_motorista_id: enderecoId
+                fk_dados_bancarios_id: idBanco,
+                fk_endereco_motorista_id: idEndereco
+            })
 
-            }).returning('motorista_id')
+            const idMotorista = motoristaId[0]
 
-            const dadosVeiculoId = await knex('dados_veiculo').insert({
+            // 4. VEÍCULO (se existir depois)
+            const dadosVeiculoId = await trx('dados_veiculo').insert({
                 placa: dadosVeiculo.placa,
                 modelo: dadosVeiculo.modelo,
                 marca: dadosVeiculo.marca,
                 ano_modelo: dadosVeiculo.ano_modelo,
                 ano_fabricacao: dadosVeiculo.ano_fabricacao,
                 cor: dadosVeiculo.cor
-            }).returning('dados_veiculo_id')
+            })
+
+            const idDadosVeiculo = dadosVeiculoId[0]
+
+            const veiculoId = await trx('veiculo').insert({
+                modalidade: dadosVeiculo.modalidade,
+                fk_motorista_id: idMotorista,
+                fk_dados_veiculo_id: idDadosVeiculo
+            })
 
             return {
-                bancoId: bancoId[0],
-                enderecoId: enderecoId[0],
-                motoristaId: motoristaId[0]
+                bancoId: idBanco,
+                enderecoId: idEndereco,
+                motoristaId: idMotorista,
+                dadosVeiculoId: idDadosVeiculo,
+                veiculoId: veiculoId[0]
             }
         })
 
@@ -254,6 +281,7 @@ module.exports = {
     getSelectDriverByEmail,
     getSelectDriverByCpf,
     setInsertDriver,
+    setInsertMotoristaCompleto,
     setUpdateDriver,
     setDeleteDriver,
     getSelectLastID,

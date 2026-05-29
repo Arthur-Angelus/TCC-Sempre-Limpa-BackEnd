@@ -1,9 +1,10 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pelos endpoints do motorista
- * Data: 12/05/2026
+ * Data: 29/05/2026
  * Autor: Arthur Angelus
- * Versão: 2.0
- * implementando router para esqueci minha senha e resetar senha
+ * Versão: 3.0
+ * implementado função esqueci minha senha e resetar senha
+ * implementado função cadastro completo de motorista
  *******************************************************************************************/
 
 const express = require('express')
@@ -74,6 +75,17 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
     response.status(Motorista.status_code)
     response.json(Motorista)
 })
+router.post('/motoristacompleto', cors(), bodyParserJSON, async function (request, response) {
+    let dadosBody = request.body
+
+    let contentType = request.headers['content-type']
+
+    let result = await controllerMotorista.inserirMotoristaCompleto(dadosBody, contentType)
+
+    response.status(result.status_code)
+    response.json(result)
+})
+
 // UPDATE motorista
 router.put('/motorista/:id', cors(), bodyParserJSON, async function(request, response){
     let motorista_id = request.params.id

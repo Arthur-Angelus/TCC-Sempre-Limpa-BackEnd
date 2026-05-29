@@ -1,9 +1,10 @@
 /*******************************************************************************************
  * Objetivo: Arquivo responsável pela controller do Motorista
- * Data: 12/05/2026
+ * Data: 29/05/2026
  * Autor: Arthur Angelus
- * Versão: 2.0
+ * Versão: 3.0
  * implementado função esqueci minha senha e resetar senha
+ * implementado função cadastro completo de motorista
  *******************************************************************************************/
 
 const jwt = require('jsonwebtoken')
@@ -12,6 +13,10 @@ const bcrypt = require('bcryptjs')
 const emailService = require('../../services/email.js')
 const motoristaDAO = require('../../model/DAO/motorista/motorista.js')
 const DEFAULT_MESSAGES = require('../module/config_messages.js')
+
+const controllerDadosBancarios = require('./controller_dados_bancarios.js')
+const controllerEnderecoMotorista = require('./controller_endereco_motorista.js')
+const controllerDadosVeiculo = require('./controller_dados_veiculo.js')
 
 // GET ALL
 const listarMotoristas = async function () {
@@ -199,6 +204,112 @@ const inserirMotoristas = async function (Motorista, contentType) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
+
+const inserirMotoristaCompleto = async function (
+    Motorista,
+    contentType
+) {
+
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        // =========================
+        // VALIDAR CONTENT TYPE
+        // =========================
+        if (String(contentType).toUpperCase() != 'APPLICATION/JSON') {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " controller inserir Motorista Completo"
+            return MESSAGES.ERROR_CONTENT_TYPE
+        }
+
+        // =========================
+        // VALIDAR CAMPOS (MOTORISTA)
+        // =========================
+        let validarMotorista = await validarDadosMotorista(Motorista.motorista)
+
+        if (validarMotorista) {
+            return validarMotorista
+        }
+
+        // validar bancários
+        let validarBanco = await controllerDadosBancarios.validarDadosBancarios(Motorista.dadosBancarios)
+        if (validarBanco) return validarBanco
+
+        // validar endereço
+        let validarEndereco = await controllerEnderecoMotorista.validarDadosEnderecoMotorista(Motorista.endereco)
+        if (validarEndereco) return validarEndereco
+
+        // validar veículo
+        let validarVeiculo = await controllerDadosVeiculo.validarDadosVeiculo(Motorista.dadosVeiculo)
+        if (validarVeiculo) return validarVeiculo
+
+        // =========================
+        // HASH SENHA
+        // =========================
+        const senhaHash = await bcrypt.hash(Motorista.motorista.senha, 10)
+        Motorista.motorista.senha = senhaHash
+
+        // =========================
+        // CHAMA DAO COMPLETO
+        // =========================
+        let result = await motoristaDAO.setInsertMotoristaCompleto(
+            Motorista.motorista,
+            Motorista.dadosBancarios,
+            Motorista.endereco,
+            Motorista.dadosVeiculo,
+            Motorista.veiculo
+        )
+
+        if (!result) {
+            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " controller inserir Motorista Completo"
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+        // =========================
+        // RESPONSE
+        // =========================
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+
+        MESSAGES.DEFAULT_HEADER.items = {
+            motorista: {
+                id: result.motoristaId,
+                ...Motorista.motorista
+            },
+
+            dadosBancarios: {
+                id: result.bancoId,
+                ...Motorista.dadosBancarios
+            },
+
+            endereco: {
+                id: result.enderecoId,
+                ...Motorista.endereco
+            },
+
+            dadosVeiculo: {
+                id: result.dadosVeiculoId,
+                ...Motorista.dadosVeiculo
+            },
+
+            veiculo: {
+                id: result.veiculoId,
+                ...Motorista.veiculo
+            }
+        }
+
+        return MESSAGES.DEFAULT_HEADER
+
+    } catch (error) {
+
+        console.log(error)
+
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " controller inserir Motorista Completo"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
 // UPDATE
 const atualizarMotorista = async function (Motorista, id, contentType) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -318,10 +429,6 @@ const validarDadosMotorista = async function (Motorista) {
 
     } else if (Motorista.foto == '' || Motorista.foto == undefined || Motorista.foto == null || Motorista.foto.length > 255) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [foto incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.fk_dados_bancarios_id == null || isNaN(Motorista.fk_dados_bancarios_id) || Motorista.fk_dados_bancarios_id <= 0) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message = "[fk_dados_bancarios_id inválido]";
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
     } else {
@@ -600,6 +707,7 @@ module.exports = {
     buscarMotoristaEmail,
     buscarMotoristaCpf,
     inserirMotoristas,
+    inserirMotoristaCompleto,
     atualizarMotorista,
     excluirMotorista,
     loginMotoristaEmail,
