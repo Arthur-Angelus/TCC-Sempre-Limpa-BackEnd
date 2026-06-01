@@ -8,6 +8,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const path = require('path');
 
 const app = express()
 
@@ -20,6 +21,8 @@ app.use(bodyParserJSON)
 const PORT = process.env.PORT || 5000
 
 require('dotenv').config()
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((request,  response,  next) => {
     response.header('Access-Control-Allow-Origin',  '*')

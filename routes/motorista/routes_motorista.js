@@ -10,6 +10,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const upload = require('../../config/upload')
 
 const router = express.Router()
 
@@ -18,6 +19,34 @@ const bodyParserJSON = bodyParser.json()
 const controllerEnderecoMotorista = require('../../controller/motorista/controller_endereco_motorista')
 const controllerMotorista = require('../../controller/motorista/controller_motorista.js')
 const controllerDadosBancarios = require('../../controller/motorista/controller_dados_bancarios')
+
+// endpoint de upload
+router.post('/motorista/upload-foto', upload.single('foto'), async (req, res) => {
+
+    try {
+        console.log("FILE:", req.file);
+console.log("BODY:", req.body);
+        if (!req.file) {
+            return res.status(400).json({
+                status: false,
+                message: 'Nenhuma imagem enviada'
+            })
+        }
+
+        const urlImagem = `http://localhost:5000/uploads/${req.file.filename}`
+
+        return res.status(200).json({
+            status: true,
+            foto: urlImagem
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            status: false,
+            message: 'Erro no upload'
+        })
+    }
+})
 
 //endpoints para a rota de genero
 // GET ALL motorista
