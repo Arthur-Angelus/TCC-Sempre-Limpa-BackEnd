@@ -24,8 +24,14 @@ const controllerDadosBancarios = require('../../controller/motorista/controller_
 router.post('/motorista/upload-foto', upload.single('foto'), async (req, res) => {
 
     try {
-        console.log("FILE:", req.file);
-console.log("BODY:", req.body);
+        console.log("HEADERS:");
+        console.log(req.headers);
+
+        console.log("FILE:");
+        console.log(req.file);
+
+        console.log("BODY:");
+        console.log(req.body);
         if (!req.file) {
             return res.status(400).json({
                 status: false,
@@ -33,7 +39,9 @@ console.log("BODY:", req.body);
             })
         }
 
-        const urlImagem = `http://localhost:5000/uploads/${req.file.filename}`
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+        const urlImagem = `${baseUrl}/uploads/${req.file.filename}`;
 
         return res.status(200).json({
             status: true,
@@ -73,13 +81,13 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
 
     let dadosEndereco = dadosBody.endereco
     let dadosBancarios = dadosBody.dadosBancarios
-    let dadosMotorista = {...dadosBody}
+    let dadosMotorista = { ...dadosBody }
     delete dadosMotorista.endereco
     delete dadosMotorista.dadosBancarios
 
     let resultDadosBancarios = await controllerDadosBancarios.inserirDadosBancarios(dadosBancarios, contentType)
-    
-    if (resultDadosBancarios.status_code !== 201){
+
+    if (resultDadosBancarios.status_code !== 201) {
         response.status(resultDadosBancarios.status_code);
         return response.json(resultDadosBancarios);
     }
@@ -104,19 +112,31 @@ router.post('/motorista', cors(), bodyParserJSON, async function (request, respo
     response.status(Motorista.status_code)
     response.json(Motorista)
 })
-router.post('/motoristacompleto', cors(), bodyParserJSON, async function (request, response) {
-    let dadosBody = request.body
+router.post('/motoristacompleto', cors(), bodyParserJSON, async (req, res) => {
 
-    let contentType = request.headers['content-type']
+    try {
 
-    let result = await controllerMotorista.inserirMotoristaCompleto(dadosBody, contentType)
+        console.log("BODY COMPLETO:", req.body);
 
-    response.status(result.status_code)
-    response.json(result)
+        const result = await controllerMotorista.inserirMotoristaCompleto(
+            req.body,
+            req.headers['content-type']
+        )
+
+        return res.status(result.status_code || 500).json(result)
+
+    } catch (error) {
+
+        return res.status(500).json({
+            status: false,
+            status_code: 500,
+            message: 'Erro no endpoint'
+        })
+    }
 })
 
 // UPDATE motorista
-router.put('/motorista/:id', cors(), bodyParserJSON, async function(request, response){
+router.put('/motorista/:id', cors(), bodyParserJSON, async function (request, response) {
     let motorista_id = request.params.id
 
     let dadosBody = request.body
@@ -129,7 +149,7 @@ router.put('/motorista/:id', cors(), bodyParserJSON, async function(request, res
     response.json(motorista)
 })
 // DELETE motorista
-router.delete('/motorista/:id', cors(), async function(request, response){
+router.delete('/motorista/:id', cors(), async function (request, response) {
     let motorista_id = request.params.id
 
     let motorista = await controllerMotorista.excluirMotorista(motorista_id)
@@ -158,28 +178,28 @@ router.post('/logincpfmotorista', cors(), bodyParserJSON, async function (reques
     response.json(motorista)
 })
 // ESQUECI MINHA SENHA
-router.post('/esquecisenhamotorista', cors(), bodyParserJSON, async function(request, response){
-        let email = request.body.email
+router.post('/esquecisenhamotorista', cors(), bodyParserJSON, async function (request, response) {
+    let email = request.body.email
 
-        let result = await controllerMotorista.esqueciMinhaSenha(email)
+    let result = await controllerMotorista.esqueciMinhaSenha(email)
 
-        response.status(result.status_code)
-        response.json(result)
-    }
+    response.status(result.status_code)
+    response.json(result)
+}
 )
 // RESETAR SENHA
-router.post('/resetarsenhamotorista', cors(), bodyParserJSON, async function(request, response){
-        let token = request.body.token
-        let novaSenha = request.body.novaSenha
+router.post('/resetarsenhamotorista', cors(), bodyParserJSON, async function (request, response) {
+    let token = request.body.token
+    let novaSenha = request.body.novaSenha
 
-        let result = await controllerMotorista.resetarSenha(
-            token,
-            novaSenha
-        )
+    let result = await controllerMotorista.resetarSenha(
+        token,
+        novaSenha
+    )
 
-        response.status(result.status_code)
-        response.json(result)
-    }
+    response.status(result.status_code)
+    response.json(result)
+}
 )
 
 module.exports = router
