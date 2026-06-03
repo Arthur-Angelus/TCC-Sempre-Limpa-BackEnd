@@ -166,6 +166,42 @@ const loginMotoristaEmail = async (email, senha) => {
     }
 }
 
+const loginMotoristaCpf = async (cpf, senha) => {
+
+    try {
+
+        if (!cpf || !senha)
+            return MESSAGES.ERROR_REQUIRED_FIELDS
+
+        const motorista = await motoristaDAO.getSelectDriverByCpf(cpf)
+
+        if (!motorista)
+            return MESSAGES.ERROR_NOT_FOUND
+
+        const valid = await bcrypt.compare(senha, motorista.senha)
+
+        if (!valid)
+            return { status: false, status_code: 401, message: 'Senha inválida' }
+
+        const token = jwt.sign(
+            { motorista_id: motorista.motorista_id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        )
+
+        return {
+            status: true,
+            status_code: 200,
+            message: 'Login realizado com sucesso',
+            token,
+            motorista
+        }
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
 const esqueciMinhaSenha = async (email) => {
 
     try {
@@ -227,6 +263,7 @@ module.exports = {
     buscarMotoristaID,
     inserirMotoristaCompleto,
     loginMotoristaEmail,
+    loginMotoristaCpf,
     esqueciMinhaSenha,
     resetarSenha
 }
