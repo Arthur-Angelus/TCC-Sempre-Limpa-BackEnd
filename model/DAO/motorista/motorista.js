@@ -83,7 +83,6 @@ const setInsertMotoristaCompleto = async (motorista, banco, endereco, veiculo) =
                 veiculoId
             }
         })
-
     } catch (error) {
         console.log('ERRO MODEL:', error)
         return null

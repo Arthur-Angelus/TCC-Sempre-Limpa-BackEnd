@@ -64,6 +64,11 @@ const selecionarLavanderiaPorFiltro = async function (parametrosQuery){
     try {
         let filtros = {}
 
+        // 1. ADICIONADO: Agora a controller enxerga o que você digita na barra de busca!
+        if (parametrosQuery.nome != '' && parametrosQuery.nome != undefined) {
+            filtros.nome = parametrosQuery.nome
+        }
+
         if (parametrosQuery.cidade != '' && parametrosQuery.cidade != undefined) {
             filtros.cidade = parametrosQuery.cidade
         }
@@ -79,11 +84,9 @@ const selecionarLavanderiaPorFiltro = async function (parametrosQuery){
         if (parametrosQuery.preco_max_secagem != '' && parametrosQuery.preco_max_secagem != undefined && !isNaN(parametrosQuery.preco_max_secagem)) {
             filtros.preco_max_secagem = Number(parametrosQuery.preco_max_secagem)
         }
-        if (Object.keys(filtros).length === 0) {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Nenhum parâmetro de filtro foi selecionado]'
-            return MESSAGES.ERROR_REQUIRED_FIELDS 
-        }
+
         let lavanderia = await lavanderiaDAO.getSelectLaundryByFilterSelect(filtros)
+        
         if(lavanderia){
             if (lavanderia.length > 0) {
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
