@@ -16,7 +16,7 @@
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.2.10",
     "mysql2": "^3.22.3",
-    "nodemailer": "^8.0.7"
+    "nodemailer": "^8.0.10"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.5",

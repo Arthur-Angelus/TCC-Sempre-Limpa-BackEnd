@@ -33,18 +33,27 @@ const getSelectLaundryByFilterSelect = async function(filtros){
     try {
         let query = knex('vw_lavanderias_filtros').select('*')
 
+
+        if (filtros.nome) {
+            query.where('nome', 'like', `%${filtros.nome}%`)
+        }
+        
+
         if (filtros.cidade) {
             query.where('cidade', 'like', `%${filtros.cidade}%`)
         }
         if (filtros.bairro){
             query.where('bairro', 'like', `%${filtros.bairro}%`)
         }
+        
+    
         if (filtros.preco_max_lavagem) {
             query.where('preco_padrao_lavagem', '<=', filtros.preco_max_lavagem)
         }
         if (filtros.preco_max_secagem) {
             query.where('preco_padrao_secagem', '<=', filtros.preco_max_secagem)
         }
+        
         if (filtros.avaliacao_minima) {
             query.where('media_avaliacao', '>=', filtros.avaliacao_minima)
         }
@@ -53,6 +62,7 @@ const getSelectLaundryByFilterSelect = async function(filtros){
 
         return await query
     } catch (error) {
+        console.error("ERRO NO KNEX (getSelectLaundry):", error);
         return false
     }
 }

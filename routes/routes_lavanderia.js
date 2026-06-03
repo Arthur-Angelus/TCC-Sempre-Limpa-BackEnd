@@ -24,11 +24,18 @@ router.get('/lavanderia', cors(), async function(request, response){
 })
 
 router.get('/lavanderia/filtro', cors(), async function (request, response){
-    let dadosLavanderia = await controllerLavanderia.selecionarLavanderiaPorFiltro(request.query)
 
-    response.status(dadosLavanderia.status_code)
-    response.json(dadosLavanderia)
-})
+    const filtrosFormatados = {
+        nome: request.query.nome,
+        preco_max_lavagem: request.query.preco_max_lavagem ? Number(request.query.preco_max_lavagem) : undefined,
+        avaliacao_minima: request.query.avaliacao_minima ? Number(request.query.avaliacao_minima) : undefined
+    };
+
+    let dadosLavanderia = await controllerLavanderia.selecionarLavanderiaPorFiltro(filtrosFormatados);
+    
+    response.status(dadosLavanderia.status_code);
+    response.json(dadosLavanderia);
+});
 
 router.get('/lavanderia/:id', cors(), async function(request, response){
     let idLavanderia = request.params.id
