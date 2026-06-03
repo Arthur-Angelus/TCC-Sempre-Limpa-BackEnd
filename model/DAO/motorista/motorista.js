@@ -32,42 +32,60 @@ const setInsertMotoristaCompleto = async (motorista, banco, endereco, veiculo) =
     try {
         return await knex.transaction(async (trx) => {
 
-            const bancoId = await trx('dados_bancarios').insert(banco).returning('id')
-            const enderecoId = await trx('endereco_motorista').insert(endereco).returning('id')
+            const bancoIdRaw = await trx('dados_bancarios').insert(banco)
+            const enderecoIdRaw = await trx('endereco_motorista').insert(endereco)
 
-            const motoristaId = await trx('motorista')
-                .insert({
-                    ...motorista,
-                    fk_dados_bancarios_id: bancoId[0],
-                    fk_endereco_motorista_id: enderecoId[0]
-                })
-                .returning('motorista_id')
+            const bancoId = Array.isArray(bancoIdRaw) ? bancoIdRaw[0] : bancoIdRaw
+            const enderecoId = Array.isArray(enderecoIdRaw) ? enderecoIdRaw[0] : enderecoIdRaw
 
-                if (veiculo.modalidade !== 'bike' && !veiculo.dados) {
-                    throw new Error('Dados do veículo obrigatórios para essa modalidade')
-                }
+            // 🔥 REMOVE CAMPOS QUE NÃO EXISTEM NA TABELA
+            const { dadosBancarios, endereco: _, veiculo: __, ...motoristaLimpo } = motorista
 
-            const dadosVeiculoId = veiculo.dados
-                ? await trx('dados_veiculo').insert(veiculo.dados).returning('id')
-                : null
+            const motoristaIdRaw = await trx('motorista').insert({
+                ...motoristaLimpo,
+                fk_dados_bancarios_id: bancoId,
+                fk_endereco_motorista_id: enderecoId
+            })
 
-            const veiculoId = await trx('veiculo')
-                .insert({
-                    modalidade: veiculo.modalidade,
-                    fk_motorista_id: motoristaId[0],
-                    fk_dados_veiculo_id: dadosVeiculoId[0]
-                })
-                .returning('veiculo_id')
+            const motoristaId = Array.isArray(motoristaIdRaw)
+                ? motoristaIdRaw[0]
+                : motoristaIdRaw
+
+            if (veiculo.modalidade !== 'bike' && !veiculo.dados) {
+                throw new Error('Dados do veículo obrigatórios para essa modalidade')
+            }
+
+            let dadosVeiculoId = null
+
+            if (veiculo.dados) {
+                const dadosVeiculoRaw = await trx('dados_veiculo').insert(veiculo.dados)
+
+                dadosVeiculoId = Array.isArray(dadosVeiculoRaw)
+                    ? dadosVeiculoRaw[0]
+                    : dadosVeiculoRaw
+            }
+
+            const veiculoIdRaw = await trx('veiculo').insert({
+                modalidade: veiculo.modalidade,
+                fk_motorista_id: motoristaId,
+                fk_dados_veiculo_id: dadosVeiculoId
+            })
+
+            const veiculoId = Array.isArray(veiculoIdRaw)
+                ? veiculoIdRaw[0]
+                : veiculoIdRaw
 
             return {
-                motoristaId: motoristaId[0],
-                bancoId: bancoId[0],
-                enderecoId: enderecoId[0],
-                dadosVeiculoId: dadosVeiculoId[0],
-                veiculoId: veiculoId[0]
+                motoristaId,
+                bancoId,
+                enderecoId,
+                dadosVeiculoId,
+                veiculoId
             }
         })
+
     } catch (error) {
+        console.log('ERRO MODEL:', error)
         return null
     }
 }
