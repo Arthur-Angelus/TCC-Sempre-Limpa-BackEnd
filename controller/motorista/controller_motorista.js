@@ -1,479 +1,143 @@
-/*******************************************************************************************
- * Objetivo: Arquivo responsável pela controller do Motorista
- * Data: 29/05/2026
- * Autor: Arthur Angelus
- * Versão: 3.0
- * implementado função esqueci minha senha e resetar senha
- * implementado função cadastro completo de motorista
- *******************************************************************************************/
-
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
 const emailService = require('../../services/email.js')
 const motoristaDAO = require('../../model/DAO/motorista/motorista.js')
-const DEFAULT_MESSAGES = require('../module/config_messages.js')
+
+const MESSAGES = require('../module/config_messages.js')
 
 const controllerDadosBancarios = require('./controller_dados_bancarios.js')
 const controllerEnderecoMotorista = require('./controller_endereco_motorista.js')
 const controllerDadosVeiculo = require('./controller_dados_veiculo.js')
 
-// GET ALL
-const listarMotoristas = async function () {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+const listarMotoristas = async () => {
 
-    try {
-        let resultMotoristas = await motoristaDAO.getSelectAllDriver()
-
-        if (resultMotoristas) {
-            if (resultMotoristas.length > 0) {
-                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
-                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.Motoristas = resultMotoristas
-
-                return MESSAGES.DEFAULT_HEADER //200
-            } else {
-                MESSAGES.ERROR_NOT_FOUND.message += "controller buscar Motoristas"
-                return MESSAGES.ERROR_NOT_FOUND //404
-            }
-        } else {
-            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar Motoristas"
-            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-        }
-    } catch (error) {
-        //console.log error
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar Motoristas"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-// GET BY ID
-const buscarMotoristaID = async function (id) {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
-    try {
-        if (!isNaN(id) && id != '' && id != null && id > 0) {
-            let resultMotoristas = await motoristaDAO.getSelectDriverById(Number(id))
-
-            if (resultMotoristas) {
-                if (resultMotoristas.length > 0) {
-                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.Motorista = resultMotoristas
-
-                    return MESSAGES.DEFAULT_HEADER //200
-                } else {
-                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar Motorista id"
-                    return MESSAGES.ERROR_NOT_FOUND //404
-                }
-            } else {
-                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar Motorista id"
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-            }
-
-        } else {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID incorreto]'
-            return MESSAGES.ERROR_REQUIRED_FIELDS //400
-        }
-
-    } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar Motorista id"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-// GET BY EMAIL
-const buscarMotoristaEmail = async function (email, senha) {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
-    try {
-        if (email && senha && email != '' && senha != '') {
-            let resultMotoristas = await motoristaDAO.getSelectDriverByEmail(email, senha)
-
-            if (resultMotoristas) {
-                if (resultMotoristas.length > 0) {
-                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.Motorista = resultMotoristas
-
-                    return MESSAGES.DEFAULT_HEADER //200
-                } else {
-                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar Motorista email"
-                    return MESSAGES.ERROR_NOT_FOUND //404
-                }
-            } else {
-                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar Motorista email"
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-            }
-
-        } else {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Email incorreto]'
-            return MESSAGES.ERROR_REQUIRED_FIELDS //400
-        }
-
-    } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar Motorista email"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-// GET BY CPF
-const buscarMotoristaCpf = async function (cpf, senha) {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
-    try {
-        if (cpf && senha && cpf != '' && senha != '') {
-            let resultMotoristas = await motoristaDAO.getSelectDriverByCpf(cpf, senha)
-
-            if (resultMotoristas) {
-                if (resultMotoristas.length > 0) {
-                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCES_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCES_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.Motorista = resultMotoristas
-
-                    return MESSAGES.DEFAULT_HEADER //200
-                } else {
-                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar Motorista cpf"
-                    return MESSAGES.ERROR_NOT_FOUND //404
-                }
-            } else {
-                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar Motorista cpf"
-                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-            }
-
-        } else {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[CPF incorreto]'
-            return MESSAGES.ERROR_REQUIRED_FIELDS //400
-        }
-
-    } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar Motorista cpf"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-// INSERT
-const inserirMotoristas = async function (Motorista, contentType) {
-
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
 
     try {
 
-        if (String(contentType).toUpperCase() != 'APPLICATION/JSON') {
-            MESSAGES.ERROR_CONTENT_TYPE.message += "controller inserir Motorista"
-            return MESSAGES.ERROR_CONTENT_TYPE
-        }
+        const result = await motoristaDAO.getSelectAllDriver()
 
-        // validação
-        let validar = await validarDadosMotorista(Motorista)
-
-        if (validar) {
-            return validar
-        }
-
-        // 🔐 HASH DA SENHA (AQUI ESTÁ A MUDANÇA PRINCIPAL)
-        const senhaHash = await bcrypt.hash(Motorista.senha, 10)
-        Motorista.senha = senhaHash
-
-        // chama DAO
-        let resultMotoristas = await motoristaDAO.setInsertDriver(Motorista)
-
-        if (!resultMotoristas) {
-            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir Motorista"
+        if (!result)
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
-        }
 
-        let lastID = await motoristaDAO.getSelectLastID()
+        if (result.length === 0)
+            return MESSAGES.ERROR_NOT_FOUND
 
-        if (!lastID) {
-            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir Motorista"
-            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
-        }
+        MESSAGE.DEFAULT_HEADER.status = true
+        MESSAGE.DEFAULT_HEADER.status_code = 200
+        MESSAGE.DEFAULT_HEADER.message = 'Consulta realizada com sucesso'
+        MESSAGE.DEFAULT_HEADER.items = { motoristas: result }
 
-        Motorista.Motorista_id = lastID
-        delete Motorista.senha // não retorna senha no response
-
-        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-        MESSAGES.DEFAULT_HEADER.items = Motorista
-
-        return MESSAGES.DEFAULT_HEADER
+        return MESSAGE.DEFAULT_HEADER
 
     } catch (error) {
-
-        console.log(error)
-
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller inserir Motorista"
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
-const inserirMotoristaCompleto = async function (
-    Motorista,
-    contentType
-) {
+const buscarMotoristaID = async (id) => {
 
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
 
     try {
 
-        // =========================
-        // VALIDAR CONTENT TYPE
-        // =========================
-        if (String(contentType).toUpperCase() != 'APPLICATION/JSON') {
-            MESSAGES.ERROR_CONTENT_TYPE.message += " controller inserir Motorista Completo"
+        if (!id || isNaN(id))
+            return MESSAGES.ERROR_REQUIRED_FIELDS
+
+        const result = await motoristaDAO.getSelectDriverById(Number(id))
+
+        if (!result)
+            return MESSAGES.ERROR_NOT_FOUND
+
+        MESSAGE.DEFAULT_HEADER.status = true
+        MESSAGE.DEFAULT_HEADER.status_code = 200
+        MESSAGE.DEFAULT_HEADER.message = 'Consulta realizada com sucesso'
+        MESSAGE.DEFAULT_HEADER.items = { motorista: result }
+
+        return MESSAGE.DEFAULT_HEADER
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const validarDadosMotorista = (m) => {
+
+    if (!m.nome) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.email) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.cpf) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.telefone) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.data_nascimento) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.senha) return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    return false
+}
+
+const inserirMotoristaCompleto = async (body, contentType) => {
+
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
+
+    try {
+
+        if (String(contentType).toUpperCase() !== 'APPLICATION/JSON')
             return MESSAGES.ERROR_CONTENT_TYPE
-        }
 
-        // =========================
-        // VALIDAR CAMPOS (MOTORISTA)
-        // =========================
-        let validarMotorista = await validarDadosMotorista(Motorista.motorista)
+        const v = validarDadosMotorista(body)
+        if (v) return v
 
-        if (validarMotorista) {
-            return validarMotorista
-        }
+        const v2 = controllerDadosBancarios.validarDadosBancarios(body.dadosBancarios)
+        if (v2) return v2
 
-        // validar bancários
-        let validarBanco = await controllerDadosBancarios.validarDadosBancarios(Motorista.dadosBancarios)
-        if (validarBanco) return validarBanco
+        const v3 = controllerEnderecoMotorista.validarDadosEnderecoMotorista(body.endereco)
+        if (v3) return v3
 
-        // validar endereço
-        let validarEndereco = await controllerEnderecoMotorista.validarDadosEnderecoMotorista(Motorista.endereco)
-        if (validarEndereco) return validarEndereco
+        const v4 = controllerDadosVeiculo.validarDadosVeiculo(body.veiculo?.dados || body.veiculo)
+        if (v4) return v4
 
-        // validar veículo
-        let validarVeiculo = await controllerDadosVeiculo.validarDadosVeiculo(Motorista.dadosVeiculo)
-        if (validarVeiculo) return validarVeiculo
+        body.senha = await bcrypt.hash(body.senha, 10)
 
-        // =========================
-        // HASH SENHA
-        // =========================
-        const senhaHash = await bcrypt.hash(Motorista.motorista.senha, 10)
-        Motorista.motorista.senha = senhaHash
-
-        // =========================
-        // CHAMA DAO COMPLETO
-        // =========================
-        let result = await motoristaDAO.setInsertMotoristaCompleto(
-            Motorista.motorista,
-            Motorista.dadosBancarios,
-            Motorista.endereco,
-            Motorista.dadosVeiculo,
-            Motorista.veiculo
+        const result = await motoristaDAO.setInsertMotoristaCompleto(
+            body,
+            body.dadosBancarios,
+            body.endereco,
+            body.veiculo
         )
 
-        if (!result) {
-            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " controller inserir Motorista Completo"
+        if (!result)
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
-        }
 
-        // =========================
-        // RESPONSE
-        // =========================
-        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+        MESSAGE.DEFAULT_HEADER.status = true
+        MESSAGE.DEFAULT_HEADER.status_code = 201
+        MESSAGE.DEFAULT_HEADER.message = 'Motorista criado com sucesso'
+        MESSAGE.DEFAULT_HEADER.items = result
 
-        MESSAGES.DEFAULT_HEADER.items = {
-            motorista: {
-                id: result.motoristaId,
-                ...Motorista.motorista
-            },
-
-            dadosBancarios: {
-                id: result.bancoId,
-                ...Motorista.dadosBancarios
-            },
-
-            endereco: {
-                id: result.enderecoId,
-                ...Motorista.endereco
-            },
-
-            dadosVeiculo: {
-                id: result.dadosVeiculoId,
-                ...Motorista.dadosVeiculo
-            },
-
-            veiculo: {
-                id: result.veiculoId,
-                ...Motorista.veiculo
-            }
-        }
-
-        return MESSAGES.DEFAULT_HEADER
+        return MESSAGE.DEFAULT_HEADER
 
     } catch (error) {
-
-        console.log(error)
-
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " controller inserir Motorista Completo"
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
-// UPDATE
-const atualizarMotorista = async function (Motorista, id, contentType) {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
-    try {
-        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
-
-            let validar = await validarDadosMotorista(Motorista)
-
-            if (!validar) {
-
-                let validarID = await buscarMotoristaID(id)
-
-                if (validarID.status_code == 200) {
-
-                    let idMotorista = Number(id)
-
-                    let dados = Motorista
-                    delete dados.id
-
-                    let resultMotoristas = await motoristaDAO.setUpdateDriver(dados, idMotorista)
-
-                    if (resultMotoristas) {
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.Motorista = Motorista
-
-                        return MESSAGES.DEFAULT_HEADER //200
-                    } else {
-                        MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller atualizar Motorista"
-                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-                    }
-                } else {
-                    return validarID
-                }
-            } else {
-                return validar //400
-            }
-        } else {
-            MESSAGES.ERROR_CONTENT_TYPE.message += "controller atualizar Motorista"
-            return MESSAGES.ERROR_CONTENT_TYPE //415
-        }
-    } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller atualizar Motorista"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-// DELETE
-const excluirMotorista = async function (id) {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+const loginMotoristaEmail = async (email, senha) => {
 
     try {
 
-        if (!isNaN(id) && id != '' && id != null && id > 0) {
-
-            let validarID = await buscarMotoristaID(id)
-
-            if (validarID.status_code == 200) {
-
-                let resultMotoristas = await motoristaDAO.setDeleteDriver(Number(id))
-
-                if (resultMotoristas) {
-
-                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETED_ITEM.status
-                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETED_ITEM.status_code
-                    MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETED_ITEM.message
-                    MESSAGES.DEFAULT_HEADER.items.Motorista = resultMotoristas
-                    delete MESSAGES.DEFAULT_HEADER.items
-                    return MESSAGES.DEFAULT_HEADER //200
-
-                } else {
-                    MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller excluir Motorista"
-                    return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
-                }
-            } else {
-                MESSAGES.ERROR_NOT_FOUND.message += "controller excluir Motorista"
-                return MESSAGES.ERROR_NOT_FOUND //404
-            }
-        } else {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [ID incorreto]'
-            return MESSAGES.ERROR_REQUIRED_FIELDS //400
-        }
-
-    } catch (error) {
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller excluir Motorista"
-        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
-    }
-}
-// VALIDAR DADOS
-const validarDadosMotorista = async function (Motorista) {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
-    if (Motorista.nome == '' || Motorista.nome == undefined || Motorista.nome == null || Motorista.nome.length > 100) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Nome incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.data_nascimento == '' || Motorista.data_nascimento == undefined || Motorista.data_nascimento == null || Motorista.data_nascimento.length > 10) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Data nascimento incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.cpf == '' || Motorista.cpf == undefined || Motorista.cpf == null || Motorista.cpf.length > 11) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [CPF incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.telefone == '' || Motorista.telefone == undefined || Motorista.telefone == null || Motorista.telefone.length > 11) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Telefone incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.email == '' || Motorista.email == undefined || Motorista.email == null || Motorista.email.length > 100) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Email incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.cnh != null && Motorista.cnh.length > 11) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Cnh incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Motorista.foto == '' || Motorista.foto == undefined || Motorista.foto == null || Motorista.foto.length > 255) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [foto incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else {
-        return false
-    }
-}
-// LOGIN Motoristas BY EMAIL
-const loginMotoristaEmail = async function (email, senha) {
-
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
-
-    try {
-
-        if (!email || !senha) {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Email ou senha inválidos]'
+        if (!email || !senha)
             return MESSAGES.ERROR_REQUIRED_FIELDS
-        }
 
-        let Motorista = await motoristaDAO.getSelectDriverByEmail(email)
+        const motorista = await motoristaDAO.getSelectDriverByEmail(email)
 
-        if (!Motorista) {
-            return {
-                status: false,
-                status_code: 404,
-                message: 'Usuário não encontrado'
-            }
-        }
+        if (!motorista)
+            return MESSAGES.ERROR_NOT_FOUND
 
-        // 🔐 COMPARAÇÃO SEGURA
-        const senhaValida = await bcrypt.compare(senha, Motorista.senha)
+        const valid = await bcrypt.compare(senha, motorista.senha)
 
-        if (!senhaValida) {
-            return {
-                status: false,
-                status_code: 401,
-                message: 'Email ou senha incorretos'
-            }
-        }
+        if (!valid)
+            return { status: false, status_code: 401, message: 'Senha inválida' }
 
-        // 🎟️ gera token
         const token = jwt.sign(
-            {
-                Motorista_id: Motorista.Motorista_id,
-                email: Motorista.data_nascimento
-            },
+            { motorista_id: motorista.motorista_id },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         )
@@ -483,235 +147,75 @@ const loginMotoristaEmail = async function (email, senha) {
             status_code: 200,
             message: 'Login realizado com sucesso',
             token,
-            Motorista: {
-                Motorista_id: Motorista.Motorista_id,
-                nome: Motorista.nome,
-                email: Motorista.data_nascimento
-            }
+            motorista
         }
 
     } catch (error) {
-
-        console.log(error)
-
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login email'
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-// LOGIN Motoristas BY CPF
-const loginMotoristaCpf = async function (cpf, senha) {
 
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+const esqueciMinhaSenha = async (email) => {
 
     try {
 
-        if (!cpf || !senha) {
-            return MESSAGES.ERROR_REQUIRED_FIELDS
-        }
+        const motorista = await motoristaDAO.getSelectDriverByEmail(email)
 
-        let Motorista = await motoristaDAO.getSelectDriverByCpf(cpf)
-
-        if (!Motorista) {
-            return {
-                status: false,
-                status_code: 404,
-                message: 'Usuário não encontrado'
-            }
-        }
-
-        // 🔐 compara hash
-        const senhaValida = await bcrypt.compare(senha, Motorista.senha)
-
-        if (!senhaValida) {
-            return {
-                status: false,
-                status_code: 401,
-                message: 'CPF ou senha incorretos'
-            }
-        }
+        if (!motorista)
+            return MESSAGES.ERROR_NOT_FOUND
 
         const token = jwt.sign(
-            {
-                Motorista_id: Motorista.Motorista_id,
-                email: Motorista.cpf
-            },
+            { motorista_id: motorista.motorista_id },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '15m' }
+        )
+
+        await emailService.enviarEmail(
+            motorista.email,
+            'Recuperação de senha',
+            `<h2>${token}</h2>`
         )
 
         return {
             status: true,
             status_code: 200,
-            message: 'Login realizado com sucesso',
-            token,
-            Motorista: {
-                Motorista_id: Motorista.Motorista_id,
-                nome: Motorista.nome,
-                cpf: Motorista.cpf
-            }
+            message: 'Email enviado com sucesso'
         }
 
     } catch (error) {
-
-        console.log(error)
-
-        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += 'login cpf'
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
-// ESQUECI MINHA SENHA
-const esqueciMinhaSenha = async function (email) {
+
+const resetarSenha = async (token, novaSenha) => {
 
     try {
 
-        let Motorista = await motoristaDAO.getSelectDriverOnlyEmail(email)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        if (Motorista) {
+        const hash = await bcrypt.hash(novaSenha, 10)
 
-            if (Motorista.length > 0) {
+        const result = await motoristaDAO.updateSenhaMotorista(decoded.motorista_id, hash)
 
-                Motorista = Motorista[0]
+        if (!result)
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
 
-                // TOKEN JWT
-                const token = jwt.sign(
-
-                    {
-                        Motorista_id: Motorista.Motorista_id,
-                        email: Motorista.data_nascimento
-                    },
-
-                    process.env.JWT_SECRET,
-
-                    {
-                        expiresIn: '15m'
-                    }
-                )
-
-                // HTML EMAIL
-                const mensagem = `
-                    <h1>Recuperação de senha</h1>
-
-                    <p>Use o token abaixo para redefinir sua senha:</p>
-
-                    <h2>${token}</h2>
-
-                    <p>Esse token expira em 15 minutos.</p>
-                `
-
-                // ENVIAR EMAIL
-                const resultEmail = await emailService.enviarEmail(
-                    Motorista.data_nascimento,
-                    'Recuperação de senha',
-                    mensagem
-                )
-
-                if (resultEmail) {
-
-                    return {
-                        status: true,
-                        status_code: 200,
-                        message: 'Email enviado com sucesso'
-                    }
-
-                } else {
-
-                    return {
-                        status: false,
-                        status_code: 500,
-                        message: 'Erro ao enviar email'
-                    }
-                }
-
-            } else {
-
-                return {
-                    status: false,
-                    status_code: 404,
-                    message: 'Email não encontrado'
-                }
-            }
-
-        } else {
-
-            return {
-                status: false,
-                status_code: 500,
-                message: 'Erro interno no banco'
-            }
+        return {
+            status: true,
+            status_code: 200,
+            message: 'Senha atualizada com sucesso'
         }
 
     } catch (error) {
-
-        console.log(error)
-
-        return {
-            status: false,
-            status_code: 500,
-            message: 'Erro interno'
-        }
-    }
-}
-// RESETAR SENHA
-const resetarSenha = async function (token, novaSenha) {
-
-    try {
-
-        // VALIDAR TOKEN
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET
-        )
-
-        // HASH NOVA SENHA
-        const senhaHash = await bcrypt.hash(novaSenha, 10)
-
-        // UPDATE SENHA
-        const result = await motoristaDAO.updateSenhaMotorista(
-            decoded.Motorista_id,
-            senhaHash
-        )
-
-        if (result) {
-
-            return {
-                status: true,
-                status_code: 200,
-                message: 'Senha alterada com sucesso'
-            }
-
-        } else {
-
-            return {
-                status: false,
-                status_code: 500,
-                message: 'Erro ao atualizar senha'
-            }
-        }
-
-        
-    } catch (error) {
-
-        console.log(error)
-
-        return {
-            status: false,
-            status_code: 401,
-            message: 'Token inválido ou expirado'
-        }
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
 
 module.exports = {
     listarMotoristas,
     buscarMotoristaID,
-    buscarMotoristaEmail,
-    buscarMotoristaCpf,
-    inserirMotoristas,
     inserirMotoristaCompleto,
-    atualizarMotorista,
-    excluirMotorista,
     loginMotoristaEmail,
-    loginMotoristaCpf,
     esqueciMinhaSenha,
     resetarSenha
 }

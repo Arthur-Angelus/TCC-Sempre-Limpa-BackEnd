@@ -1,277 +1,84 @@
-/*******************************************************************************************
- * Objetivo: Arquivo responsável pelas requisições CRUD do motorista
- * Data: 29/05/2026
- * Autor: Arthur Angelus
- * Versão: 3.0
- * implementado função esqueci minha senha e resetar senha
- * implementado função cadastro completo de motorista
- *******************************************************************************************/
-
 const knex = require('../../../db')
 
-// SELECT ALL
-const getSelectAllDriver = async function () {
+const getSelectAllDriver = async () => {
     try {
-        const rows = await knex.select('*').from('motorista')
-        return rows.map(u => {
-            delete u.senha
-            return u
-        })
+        return await knex('motorista').select('*')
     } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// SELECT BY ID
-const getSelectDriverById = async function (motorista_id) {
-    try {
-        const rows = await knex('motorista')
-            .select('*')
-            .where({ motorista_id: motorista_id })
-
-        return rows.map(u => {
-            delete u.senha
-            return u
-        })
-    } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// SELECT BY EMAIL + SENHA
-const getSelectDriverByEmail = async function (email) {
-
-    try {
-
-        const result = await knex('motorista')
-            .select('*')
-            .where({ email: email })
-            .first()
-
-        return result
-
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
-
-// SELECT BY CPF + SENHA
-const getSelectDriverByCpf = async function (cpf) {
-
-    try {
-
-        const result = await knex('motorista')
-            .select('*')
-            .where({ cpf: cpf })
-            .first()
-
-        return result
-
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
-
-// INSERT
-const setInsertDriver = async function (motorista) {
-    try {
-        const result = await knex('motorista').insert({
-            nome: motorista.nome,
-            data_nascimento: motorista.data_nascimento,
-            cpf: motorista.cpf,
-            telefone: motorista.telefone,
-            email: motorista.email,
-            cnh: motorista.cnh,
-            foto: motorista.foto,
-            senha: motorista.senha,
-            fk_dados_bancarios_id: motorista.fk_dados_bancarios_id,
-            fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
-
-        })
-        return result
-
-    } catch (error) {
-        console.error("🔥 ERRO NO DAO INSERT:", error)
-        throw error
-    }
-}
-
-const setInsertMotoristaCompleto = async function (
-    motorista,
-    dadosBancarios,
-    enderecoMotorista,
-    dadosVeiculo
-) {
-    try {
-        return await knex.transaction(async (trx) => {
-
-            // 1. DADOS BANCÁRIOS
-            const bancoId = await trx('dados_bancarios').insert({
-                digito: dadosBancarios.digito,
-                agencia: dadosBancarios.agencia,
-                banco: dadosBancarios.banco,
-                tipo_conta: dadosBancarios.tipo_conta,
-                conta: dadosBancarios.conta
-            })
-
-            const idBanco = bancoId[0]
-
-            // 2. ENDEREÇO
-            const enderecoId = await trx('endereco_motorista').insert({
-                cep: enderecoMotorista.cep,
-                uf: enderecoMotorista.uf,
-                cidade: enderecoMotorista.cidade,
-                bairro: enderecoMotorista.bairro,
-                logradouro: enderecoMotorista.logradouro,
-                numero: enderecoMotorista.numero,
-                complemento: enderecoMotorista.complemento
-            })
-
-            const idEndereco = enderecoId[0]
-
-            // 3. MOTORISTA
-            const motoristaId = await trx('motorista').insert({
-                nome: motorista.nome,
-                data_nascimento: motorista.data_nascimento,
-                cpf: motorista.cpf,
-                telefone: motorista.telefone,
-                email: motorista.email,
-                cnh: motorista.cnh,
-                foto: motorista.foto,
-                senha: motorista.senha,
-                fk_dados_bancarios_id: idBanco,
-                fk_endereco_motorista_id: idEndereco
-            })
-
-            const idMotorista = motoristaId[0]
-
-            // 4. VEÍCULO (se existir depois)
-            const dadosVeiculoId = await trx('dados_veiculo').insert({
-                placa: dadosVeiculo.placa,
-                modelo: dadosVeiculo.modelo,
-                marca: dadosVeiculo.marca,
-                ano_modelo: dadosVeiculo.ano_modelo,
-                ano_fabricacao: dadosVeiculo.ano_fabricacao,
-                cor: dadosVeiculo.cor
-            })
-
-            const idDadosVeiculo = dadosVeiculoId[0]
-
-            const veiculoId = await trx('veiculo').insert({
-                modalidade: dadosVeiculo.modalidade,
-                fk_motorista_id: idMotorista,
-                fk_dados_veiculo_id: idDadosVeiculo
-            })
-
-            return {
-                bancoId: idBanco,
-                enderecoId: idEndereco,
-                motoristaId: idMotorista,
-                dadosVeiculoId: idDadosVeiculo,
-                veiculoId: veiculoId[0]
-            }
-        })
-
-    } catch (error) {
-        console.error("🔥 ERRO NO DAO INSERT COMPLETO:", error)
-        throw error
-    }
-}
-
-// UPDATE
-const setUpdateDriver = async function (motorista, motorista_id) {
-    try {
-        const result = await knex('motorista')
-            .where({ motorista_id: motorista_id })
-            .update({
-                nome: motorista.nome,
-                data_nascimento: motorista.data_nascimento,
-                cpf: motorista.cpf,
-                telefone: motorista.telefone,
-                email: motorista.email,
-                cnh: motorista.cnh,
-                foto: motorista.foto,
-                senha: motorista.senha,
-                fk_dados_bancarios_id: motorista.fk_dados_bancarios_id,
-                fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
-            })
-
-        return result
-
-    } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// DELETE
-const setDeleteDriver = async function (motorista_id) {
-    try {
-        const result = await knex('motorista')
-            .where({ motorista_id: motorista_id })
-            .del()
-
-        return result
-    } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// GET LAST ID
-const getSelectLastID = async function (motorista_id) {
-    try {
-        const result = await knex('motorista')
-            .select('motorista_id')
-            .orderBy('motorista_id', 'desc')
-            .first()
-
-        return result ? result.motorista_id : null
-    } catch (error) {
-        console.error(error)
         return null
     }
 }
 
-const getSelectDriverOnlyEmail = async function (email) {
-
+const getSelectDriverById = async (id) => {
     try {
-
-        const result = await knex('motorista')
-            .select('*')
-            .where({
-                email: email
-            })
-
-        return result
-
+        return await knex('motorista')
+            .where({ motorista_id: id })
+            .first()
     } catch (error) {
-
-        console.log(error)
-        return false
+        return null
     }
 }
 
-const updateSenhaMotorista = async function (motorista_id, senha) {
-
+const getSelectDriverByEmail = async (email) => {
     try {
-
-        const result = await knex('motorista')
-            .where({ motorista_id: motorista_id })
-            .update({
-                senha: senha
-            })
-
-        return result
-
+        return await knex('motorista')
+            .where({ email })
+            .first()
     } catch (error) {
+        return null
+    }
+}
 
-        console.log(error)
-        return false
+const setInsertMotoristaCompleto = async (motorista, banco, endereco, veiculo) => {
+    try {
+        return await knex.transaction(async (trx) => {
+
+            const bancoId = await trx('dados_bancarios').insert(banco).returning('id')
+            const enderecoId = await trx('endereco_motorista').insert(endereco).returning('id')
+
+            const motoristaId = await trx('motorista')
+                .insert({
+                    ...motorista,
+                    fk_dados_bancarios_id: bancoId[0],
+                    fk_endereco_motorista_id: enderecoId[0]
+                })
+                .returning('motorista_id')
+
+                if (veiculo.modalidade !== 'bike' && !veiculo.dados) {
+                    throw new Error('Dados do veículo obrigatórios para essa modalidade')
+                }
+
+            const dadosVeiculoId = veiculo.dados
+                ? await trx('dados_veiculo').insert(veiculo.dados).returning('id')
+                : null
+
+            const veiculoId = await trx('veiculo')
+                .insert({
+                    modalidade: veiculo.modalidade,
+                    fk_motorista_id: motoristaId[0],
+                    fk_dados_veiculo_id: dadosVeiculoId[0]
+                })
+                .returning('veiculo_id')
+
+            return {
+                motoristaId: motoristaId[0],
+                bancoId: bancoId[0],
+                enderecoId: enderecoId[0],
+                dadosVeiculoId: dadosVeiculoId[0],
+                veiculoId: veiculoId[0]
+            }
+        })
+    } catch (error) {
+        return null
+    }
+}
+
+const updateSenhaMotorista = async (id, senha) => {
+    try {
+        return await knex('motorista')
+            .where({ motorista_id: id })
+            .update({ senha })
+    } catch (error) {
+        return null
     }
 }
 
@@ -279,12 +86,6 @@ module.exports = {
     getSelectAllDriver,
     getSelectDriverById,
     getSelectDriverByEmail,
-    getSelectDriverByCpf,
-    setInsertDriver,
     setInsertMotoristaCompleto,
-    setUpdateDriver,
-    setDeleteDriver,
-    getSelectLastID,
-    getSelectDriverOnlyEmail,
     updateSenhaMotorista
 }
