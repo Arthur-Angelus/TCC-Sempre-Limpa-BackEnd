@@ -126,10 +126,10 @@ router.post('/resetarsenha', cors(), bodyParserJSON, async function(request, res
     }
 )
 // GET HOME USUÁRIO
-router.get('/homeusuario/:id', cors(), async function(request, response){
-    let usuario_id = request.params.id
+router.get('/home/:id', cors(), async function(request, response){
+    let usuarioId = request.params.id
 
-    let result = await controllerUsuario.buscarDadosHome(usuario_id)
+    let result = await controllerUsuario.buscarDadosHome(usuarioId)
 
     response.status(result.status_code)
     response.json(result)
