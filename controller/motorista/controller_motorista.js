@@ -62,7 +62,7 @@ const buscarMotoristaID = async (id) => {
     }
 }
 
-const validarDadosMotorista = (m) => {
+const validarDadosMotorista = async (m) => {
 
     if (!m.nome) return MESSAGES.ERROR_REQUIRED_FIELDS
     if (!m.email) return MESSAGES.ERROR_REQUIRED_FIELDS
@@ -80,22 +80,31 @@ const inserirMotoristaCompleto = async (body, contentType) => {
 
     try {
 
+        // console.log(body)
+        // console.log(contentType)
+
         if (String(contentType).toUpperCase() !== 'APPLICATION/JSON')
             return MESSAGES.ERROR_CONTENT_TYPE
 
-        const v = validarDadosMotorista(body)
-        if (v) return v
+        const validarMotorista =  await validarDadosMotorista(body)
+        if (validarMotorista) return validarMotorista
 
-        const v2 = controllerDadosBancarios.validarDadosBancarios(body.dadosBancarios)
-        if (v2) return v2
+        console.log('BODY:', body)
+        console.log('TYPE:', contentType)
+        console.log('VALIDADOR:', typeof validarDadosMotorista)
 
-        const v3 = controllerEnderecoMotorista.validarDadosEnderecoMotorista(body.endereco)
-        if (v3) return v3
+        const validarBanco = await controllerDadosBancarios.validarDadosBancarios(body.dadosBancarios)
+        if (validarBanco) return validarBanco
 
-        const v4 = controllerDadosVeiculo.validarDadosVeiculo(body.veiculo?.dados || body.veiculo)
-        if (v4) return v4
+        const validarEndereco = await controllerEnderecoMotorista.validarDadosEnderecoMotorista(body.endereco)
+        if (validarEndereco) return validarEndereco
+
+        const validarVeiculo = await controllerDadosVeiculo.validarDadosVeiculo(body.veiculo?.dados || body.veiculo)
+        if (validarVeiculo) return validarVeiculo
 
         body.senha = await bcrypt.hash(body.senha, 10)
+
+        
 
         const result = await motoristaDAO.setInsertMotoristaCompleto(
             body,
@@ -103,6 +112,8 @@ const inserirMotoristaCompleto = async (body, contentType) => {
             body.endereco,
             body.veiculo
         )
+
+
 
         if (!result)
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL

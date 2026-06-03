@@ -24,14 +24,7 @@ const controllerDadosBancarios = require('../../controller/motorista/controller_
 router.post('/motorista/upload-foto', upload.single('foto'), async (req, res) => {
 
     try {
-        console.log("HEADERS:");
-        console.log(req.headers);
-
-        console.log("FILE:");
-        console.log(req.file);
-
-        console.log("BODY:");
-        console.log(req.body);
+    
         if (!req.file) {
             return res.status(400).json({
                 status: false,
@@ -116,16 +109,24 @@ router.post('/motoristacompleto', cors(), bodyParserJSON, async (req, res) => {
 
     try {
 
-        console.log("BODY COMPLETO:", req.body);
-
         const result = await controllerMotorista.inserirMotoristaCompleto(
+            
             req.body,
-            req.headers['content-type']
+            req.headers['content-type'],
+            
         )
+
+        // console.log(result)
+        // console.log(req.body)
+        // console.log(req.headers)
+
+   
 
         return res.status(result.status_code || 500).json(result)
 
     } catch (error) {
+
+       
 
         return res.status(500).json({
             status: false,

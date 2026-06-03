@@ -96,6 +96,7 @@ const inserirDadosBancarios = async function (DadosBancarios, contentType) {
         }
 
         let lastID = await dados_bancariosDAO.getSelectLastID()
+    
 
         if (!lastID) {
             MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir DadosBancarios"
@@ -216,7 +217,7 @@ const excluirDadosBancarios = async function (id) {
 const validarDadosBancarios = async function (DadosBancarios) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (DadosBancarios.digito == '' || DadosBancarios.digito == undefined || DadosBancarios.digito == null || isNaN(DadosBancarios.digito) ||DadosBancarios.digito.length > 1) {
+    if (DadosBancarios.digito == '' || DadosBancarios.digito == undefined || DadosBancarios.digito == null ||DadosBancarios.digito.length > 1) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[digito incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
