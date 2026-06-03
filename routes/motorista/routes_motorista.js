@@ -203,4 +203,13 @@ router.post('/resetarsenhamotorista', cors(), bodyParserJSON, async function (re
 }
 )
 
+router.get('/motoristacompleto/:id', cors(), async function (request, response) {
+    let motorista_id = request.params.id
+
+    let motorista = await controllerMotorista.listarMotoristaCompleto(motorista_id)
+
+    response.status(motorista.status_code)
+    response.json(motorista)
+})
+
 module.exports = router

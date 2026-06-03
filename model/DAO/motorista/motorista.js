@@ -110,11 +110,23 @@ const updateSenhaMotorista = async (id, senha) => {
     }
 }
 
+const getMotoristaCompletoById = async (id) => {
+    try {
+        return await knex('vw_motorista_perfil_completo')
+            .where('motorista_id', id)
+            .first()
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
 module.exports = {
     getSelectAllDriver,
     getSelectDriverById,
     getSelectDriverByEmail,
     getSelectDriverByCpf,
     setInsertMotoristaCompleto,
-    updateSenhaMotorista
+    updateSenhaMotorista,
+    getMotoristaCompletoById
 }
