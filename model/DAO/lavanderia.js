@@ -33,6 +33,10 @@ const getSelectLaundryByFilterSelect = async function(filtros){
     try {
         let query = knex('vw_lavanderias_filtros').select('*')
 
+        if (filtros.apenas_favoritos && filtros.usuario_id) {
+            query.innerJoin('favoritos', 'vw_lavanderias_filtros.lavanderia_id', 'favoritos.fk_lavanderia_id')
+                 .where('favoritos.fk_usuario_id', filtros.usuario_id);
+        }
 
         if (filtros.nome) {
             query.where('nome', 'like', `%${filtros.nome}%`)
@@ -45,7 +49,6 @@ const getSelectLaundryByFilterSelect = async function(filtros){
         if (filtros.bairro){
             query.where('bairro', 'like', `%${filtros.bairro}%`)
         }
-        
     
         if (filtros.preco_max_lavagem) {
             query.where('preco_padrao_lavagem', '<=', filtros.preco_max_lavagem)
