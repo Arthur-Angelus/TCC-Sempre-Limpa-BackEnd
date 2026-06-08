@@ -25,6 +25,7 @@ const getSelectLaundryById = async function(id_lavanderia){
         .where('lavanderia_id', id_lavanderia)
         .first()
     } catch (error) {
+        
         return false
     }
 }
