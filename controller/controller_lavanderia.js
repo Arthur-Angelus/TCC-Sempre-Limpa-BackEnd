@@ -35,14 +35,23 @@ const selecionarLavanderiaPorId = async function (id_lavanderia){
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     try {
         if (!isNaN(id_lavanderia) && id_lavanderia != '' && id_lavanderia != null && id_lavanderia > 0){
+            
+            // Vai puxar da sua vw_lavanderia_endereco lá na Model
             let lavanderia = await lavanderiaDAO.getSelectLaundryById(Number(id_lavanderia))
+            
             if (lavanderia !== false){
                 if (lavanderia !== undefined){
-                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
-                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.lavanderia = lavanderia
-                
-                return MESSAGES.DEFAULT_HEADER
+                    
+                    // A SOLUÇÃO: Ignoramos o MESSAGES.DEFAULT_HEADER e montamos a resposta manualmente
+                    // O [lavanderia] garante que o React consiga ler a posição [0]
+                    return {
+                        status: true,
+                        status_code: 200,
+                        items: {
+                            lavanderia: [lavanderia] 
+                        }
+                    };
+                    
                 } else {
                     return MESSAGES.ERROR_NOT_FOUND
                 }
@@ -54,7 +63,6 @@ const selecionarLavanderiaPorId = async function (id_lavanderia){
             return MESSAGES.ERROR_REQUIRED_FIELDS
         }
     } catch (error) {
-        
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
