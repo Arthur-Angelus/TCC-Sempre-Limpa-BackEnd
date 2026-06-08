@@ -41,7 +41,7 @@ const getSelectPedidoByUserId = async function (usuario_id) {
     try {
         const rows = await knex('pedido')
             .select('*')
-            .where({ usuario_id: usuario_id })
+            .where({ fk_usuario_id: usuario_id })
 
         return rows.map(pedido => {
             return pedido
