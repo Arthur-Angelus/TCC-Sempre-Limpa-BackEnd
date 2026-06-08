@@ -62,13 +62,13 @@ const buscarMotoristaID = async (id) => {
     }
 }
 
-const listarMotoristaCompleto = async () => {
+const listarMotoristaCompleto = async (id) => {
 
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
 
     try {
 
-        const result = await motoristaDAO.getMotoristaCompletoById()
+        const result = await motoristaDAO.getMotoristaCompletoById(id)
 
         if (!result)
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL

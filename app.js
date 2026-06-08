@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 5000
 
 require('dotenv').config()
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 app.use((request,  response,  next) => {
     response.header('Access-Control-Allow-Origin',  '*')

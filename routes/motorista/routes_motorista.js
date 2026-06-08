@@ -34,7 +34,7 @@ router.post('/motorista/upload-foto', upload.single('foto'), async (req, res) =>
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-        const urlImagem = `${baseUrl}/uploads/${req.file.filename}`;
+        const urlImagem = `${baseUrl}/uploads/fotos/${req.file.filename}`;
 
         return res.status(200).json({
             status: true,
