@@ -62,6 +62,32 @@ const buscarMotoristaID = async (id) => {
     }
 }
 
+const listarMotoristaCompleto = async (id) => {
+
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
+
+    try {
+
+        const result = await motoristaDAO.getMotoristaCompletoById(id)
+
+        if (!result)
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+
+        if (result.length === 0)
+            return MESSAGES.ERROR_NOT_FOUND
+
+        MESSAGE.DEFAULT_HEADER.status = true
+        MESSAGE.DEFAULT_HEADER.status_code = 200
+        MESSAGE.DEFAULT_HEADER.message = 'Consulta realizada com sucesso'
+        MESSAGE.DEFAULT_HEADER.items = { motoristas: result }
+
+        return MESSAGE.DEFAULT_HEADER
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
 const validarDadosMotorista = async (m) => {
 
     if (!m.nome) return MESSAGES.ERROR_REQUIRED_FIELDS
@@ -80,18 +106,11 @@ const inserirMotoristaCompleto = async (body, contentType) => {
 
     try {
 
-        // console.log(body)
-        // console.log(contentType)
-
         if (String(contentType).toUpperCase() !== 'APPLICATION/JSON')
             return MESSAGES.ERROR_CONTENT_TYPE
 
         const validarMotorista =  await validarDadosMotorista(body)
         if (validarMotorista) return validarMotorista
-
-        console.log('BODY:', body)
-        console.log('TYPE:', contentType)
-        console.log('VALIDADOR:', typeof validarDadosMotorista)
 
         const validarBanco = await controllerDadosBancarios.validarDadosBancarios(body.dadosBancarios)
         if (validarBanco) return validarBanco
@@ -138,6 +157,42 @@ const loginMotoristaEmail = async (email, senha) => {
             return MESSAGES.ERROR_REQUIRED_FIELDS
 
         const motorista = await motoristaDAO.getSelectDriverByEmail(email)
+
+        if (!motorista)
+            return MESSAGES.ERROR_NOT_FOUND
+
+        const valid = await bcrypt.compare(senha, motorista.senha)
+
+        if (!valid)
+            return { status: false, status_code: 401, message: 'Senha inválida' }
+
+        const token = jwt.sign(
+            { motorista_id: motorista.motorista_id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        )
+
+        return {
+            status: true,
+            status_code: 200,
+            message: 'Login realizado com sucesso',
+            token,
+            motorista
+        }
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+const loginMotoristaCpf = async (cpf, senha) => {
+
+    try {
+
+        if (!cpf || !senha)
+            return MESSAGES.ERROR_REQUIRED_FIELDS
+
+        const motorista = await motoristaDAO.getSelectDriverByCpf(cpf)
 
         if (!motorista)
             return MESSAGES.ERROR_NOT_FOUND
@@ -227,6 +282,8 @@ module.exports = {
     buscarMotoristaID,
     inserirMotoristaCompleto,
     loginMotoristaEmail,
+    loginMotoristaCpf,
     esqueciMinhaSenha,
-    resetarSenha
+    resetarSenha,
+    listarMotoristaCompleto
 }

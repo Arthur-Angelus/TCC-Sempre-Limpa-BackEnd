@@ -28,6 +28,16 @@ const getSelectDriverByEmail = async (email) => {
     }
 }
 
+const getSelectDriverByCpf = async (cpf) => {
+    try {
+        return await knex('motorista')
+            .where({ cpf })
+            .first()
+    } catch (error) {
+        return null
+    }
+}
+
 const setInsertMotoristaCompleto = async (motorista, banco, endereco, veiculo) => {
     try {
         return await knex.transaction(async (trx) => {
@@ -99,10 +109,23 @@ const updateSenhaMotorista = async (id, senha) => {
     }
 }
 
+const getMotoristaCompletoById = async (id) => {
+    try {
+        return await knex('vw_motorista_perfil_completo')
+            .where('motorista_id', id)
+            .first()
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
 module.exports = {
     getSelectAllDriver,
     getSelectDriverById,
     getSelectDriverByEmail,
+    getSelectDriverByCpf,
     setInsertMotoristaCompleto,
-    updateSenhaMotorista
+    updateSenhaMotorista,
+    getMotoristaCompletoById
 }

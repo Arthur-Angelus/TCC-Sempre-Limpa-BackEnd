@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 // garante que a pasta exista
-const dir = path.join(__dirname, "../../uploads/fotos");
+const dir = path.resolve(process.cwd(), "uploads/fotos");
 
 if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });

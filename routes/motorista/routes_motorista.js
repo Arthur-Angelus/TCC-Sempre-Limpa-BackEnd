@@ -34,7 +34,7 @@ router.post('/motorista/upload-foto', upload.single('foto'), async (req, res) =>
 
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-        const urlImagem = `${baseUrl}/uploads/${req.file.filename}`;
+        const urlImagem = `${baseUrl}/uploads/fotos/${req.file.filename}`;
 
         return res.status(200).json({
             status: true,
@@ -202,5 +202,14 @@ router.post('/resetarsenhamotorista', cors(), bodyParserJSON, async function (re
     response.json(result)
 }
 )
+
+router.get('/motoristacompleto/:id', cors(), async function (request, response) {
+    let motorista_id = request.params.id
+
+    let motorista = await controllerMotorista.listarMotoristaCompleto(motorista_id)
+
+    response.status(motorista.status_code)
+    response.json(motorista)
+})
 
 module.exports = router
