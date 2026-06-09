@@ -38,7 +38,8 @@ const setInsertReceive = async function (cesto_roupa) {
         const result = await knex('cesto_roupa').insert({
             fk_cesto_id: cesto_roupa.fk_cesto_id,
             fk_roupa_id: cesto_roupa.fk_roupa_id,
-            quantidade: cesto_roupa.quantidade
+            quantidade: cesto_roupa.quantidade,
+            cor: cesto_roupa.cor
         })
         return result
     } catch (error) {
