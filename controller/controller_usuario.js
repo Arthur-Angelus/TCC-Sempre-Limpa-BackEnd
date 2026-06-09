@@ -205,7 +205,7 @@ const atualizarUsuario = async function (Usuario, id, contentType) {
 
     try {
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
-
+            
             let validar = await validarDadosUsuario(Usuario)
 
             if (!validar) {

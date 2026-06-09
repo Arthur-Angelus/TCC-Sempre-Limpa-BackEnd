@@ -61,6 +61,7 @@ router.post('/usuario', cors(), bodyParserJSON, async function (request, respons
 })
 // UPDATE USUARIOS
 router.put('/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
     let usuario_id = request.params.id
 
     let dadosBody = request.body
