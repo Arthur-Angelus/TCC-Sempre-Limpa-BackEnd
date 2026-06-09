@@ -105,6 +105,42 @@ const buscarPedidoUsuarioID = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+
+// GET BY USER ID
+const buscarPedidoMotoristaID = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+            let resultPedido = await pedidoDAO.getSelectPedidoByDriverId(Number(id))
+
+            if (resultPedido) {
+                if (resultPedido.length > 0) {
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.Pedido = resultPedido
+
+                    return MESSAGES.DEFAULT_HEADER //200
+                } else {
+                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar pedido motorista id"
+                    return MESSAGES.ERROR_NOT_FOUND //404
+                }
+            } else {
+                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar pedido motorista id"
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+            }
+
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID incorreto]'
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar pedido motorista id"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+
 // INSERT
 const inserirPedido = async function (Pedido, contentType) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -228,7 +264,7 @@ const excluirPedido = async function (id) {
                 return MESSAGES.ERROR_NOT_FOUND //404
             }
         } else {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += " DELETE -[ID incorreto]" 
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += " DELETE -[ID incorreto]"
             return MESSAGES.ERROR_REQUIRED_FIELDS //400
         }
 
@@ -241,52 +277,58 @@ const excluirPedido = async function (id) {
 const validarDadosPedido = async function (Pedido) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (Pedido.data == '' || Pedido.data == undefined || 
-        Pedido.data == null || typeof Pedido.data !== 'string') {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Data Invalida]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Pedido.taxa_entregador == '' || Pedido.taxa_entregador == undefined || 
-        Pedido.taxa_entregador == null || typeof Pedido.taxa_entregador !== 'number') {
+    if (Pedido.taxa_entrega == '' || Pedido.taxa_entrega == undefined ||
+        Pedido.taxa_entrega == null || typeof Pedido.taxa_entrega !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Taxa de Entregador Invalida]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (Pedido.tempo_estimado == '' || Pedido.tempo_estimado == undefined || 
+    } else if (Pedido.taxa_entregador == '' || Pedido.taxa_entregador == undefined ||
+        Pedido.taxa_entregador == null || typeof Pedido.taxa_entregador !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Taxa do entregador Invalida]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Pedido.taxa_app == '' || Pedido.taxa_app == undefined ||
+        Pedido.taxa_app == null || typeof Pedido.taxa_app !== 'number') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Taxa do app Invalida]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    } else if (Pedido.tempo_estimado == '' || Pedido.tempo_estimado == undefined ||
         Pedido.tempo_estimado == null || typeof Pedido.tempo_estimado !== 'string') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Tempo Estimado Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (Pedido.fk_status_id == '' || Pedido.fk_status_id == undefined || 
+    } else if (Pedido.fk_status_id == '' || Pedido.fk_status_id == undefined ||
         Pedido.fk_status_id == null || typeof Pedido.fk_status_id !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Status Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
     }
-    else if (Pedido.fk_lavanderia_id == '' || Pedido.fk_lavanderia_id == undefined || 
+    else if (Pedido.fk_lavanderia_id == '' || Pedido.fk_lavanderia_id == undefined ||
         Pedido.fk_lavanderia_id == null || typeof Pedido.fk_lavanderia_id !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID da Lavanderia Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
-    } 
-    else if (Pedido.fk_usuario_id == '' || Pedido.fk_usuario_id == undefined || 
+    }
+    else if (Pedido.fk_usuario_id == '' || Pedido.fk_usuario_id == undefined ||
         Pedido.fk_usuario_id == null || typeof Pedido.fk_usuario_id !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Usuario Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } 
-    else if (Pedido.fk_motorista_id == '' || Pedido.fk_motorista_id == undefined || 
+    }
+    else if (Pedido.fk_motorista_id == '' || Pedido.fk_motorista_id == undefined ||
         Pedido.fk_motorista_id == null || typeof Pedido.fk_motorista_id !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do motorista Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
-    }  
+    }
     else {
         return false
     }
 }
 
 module.exports = {
-  listarPedido,
-  buscarPedidoID,
-  buscarPedidoUsuarioID,
-  inserirPedido,
-  atualizarPedido,
-  excluirPedido
+    listarPedido,
+    buscarPedidoID,
+    buscarPedidoUsuarioID,
+    buscarPedidoMotoristaID,
+    inserirPedido,
+    atualizarPedido,
+    excluirPedido
 }
