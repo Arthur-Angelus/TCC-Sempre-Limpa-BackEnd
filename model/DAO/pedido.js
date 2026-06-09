@@ -51,14 +51,35 @@ const getSelectPedidoByUserId = async function (usuario_id) {
         return false
     }
 }
+
+// SELECT PEDIDO BY USER ID
+const getSelectPedidoByDriverId = async function (motorista_id) {
+    try {
+        const rows = await knex('pedido')
+            .select('*')
+            .where({ fk_motorista_id: motorista_id })
+
+        return rows.map(pedido => {
+            return pedido
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
+
 // INSERT PEDIDO
 const setInsertPedido = async function (pedido) {
     try {
         const result = await knex('pedido').insert({
             data: pedido.data,
-            valor_total: pedido.valor_total,
+            valor_total:
+                Number(pedido.taxa_entrega) +
+                Number(pedido.taxa_entregador) +
+                Number(pedido.taxa_app),
             taxa_entrega: pedido.taxa_entrega,
             taxa_entregador: pedido.taxa_entregador,
+            taxa_app: pedido.taxa_app,
             tempo_estimado: pedido.tempo_estimado,
             fk_status_id: pedido.fk_status_id,
             fk_lavanderia_id: pedido.fk_lavanderia_id,
@@ -91,7 +112,7 @@ const setUpdatePedido = async function (pedido, pedido_id) {
             })
         return result
     } catch (error) {
-        console.error("ERRO NO DAO UPDATE:",error)
+        console.error("ERRO NO DAO UPDATE:", error)
         return false
     }
 }
@@ -104,7 +125,7 @@ const setDeletePedido = async function (pedido_id) {
 
         return result
     } catch (error) {
-        console.error("ERRO NO DAO DELETE:",error)
+        console.error("ERRO NO DAO DELETE:", error)
         return false
     }
 }
@@ -126,9 +147,10 @@ module.exports = {
     getSelectAllPedido,
     getSelectPedidoById,
     getSelectPedidoByUserId,
+    getSelectPedidoByDriverId,
     setInsertPedido,
     setUpdatePedido,
     setDeletePedido,
     getSelectLastID
 }
-    
+
