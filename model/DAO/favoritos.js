@@ -12,7 +12,7 @@ const insertFavorito = async function(usuarioId, lavanderiaId) {
         return false;
     }
 }
-
+//Ajuste
 // Função para remover o favorito
 const deleteFavorito = async function(usuarioId, lavanderiaId) {
     try {
