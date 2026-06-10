@@ -88,4 +88,19 @@ router.delete('/pedido/:id', cors(), async function(request, response){
     response.json(pedido)
 })
 
+router.post('/pedido-completo', async (request, response) => {
+    
+    // Captura o tipo de conteúdo (application/json)
+    const contentType = request.headers['content-type'];
+    
+    // Captura o JSON enviado pelo Front-end ou pelo Insomnia
+    const dadosPedidoCompleto = request.body;
+
+    // Chama a função maestrina no Controller
+    const resultado = await controllerPedido.criarPedidoCompleto(dadosPedidoCompleto, contentType);
+
+    // Retorna para o cliente com o status code formatado nas suas MESSAGES
+    response.status(resultado.status_code).json(resultado);
+});
+
 module.exports = router
