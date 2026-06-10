@@ -222,11 +222,6 @@ const validarDadosVeiculo = async function (Veiculo) {
         return MESSAGES.ERROR_REQUIRED_FIELDS
     }
 
-    if (!Veiculo.dados || typeof Veiculo.dados !== 'object') {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [dados do veículo inválidos]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-    }
-
     return false
 }
 

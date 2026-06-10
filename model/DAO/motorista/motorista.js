@@ -99,6 +99,40 @@ const setInsertMotoristaCompleto = async (motorista, banco, endereco, veiculo) =
     }
 }
 
+// UPDATE
+const setUpdateDrivers = async function (motorista, motorista_id) {
+    try {
+        const result = await knex('motorista')
+            .where({ motorista_id: motorista_id })
+            .update({
+                nome: motorista.nome,
+                email: motorista.email,
+                telefone: motorista.telefone,
+                cnh: motorista.cnh,
+                data_nascimento: motorista.data_nascimento
+            })
+
+            return result 
+        } catch (error) {
+            console.error(error)
+            return false
+        }
+    }
+
+// DELETE
+const setDeleteDrivers = async function (motorista_id) {
+    try {
+        const result = await knex('motorista')
+            .where({ motorista_id: motorista_id })
+            .del()
+
+        return result
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
+
 const updateSenhaMotorista = async (id, senha) => {
     try {
         return await knex('motorista')
@@ -127,5 +161,7 @@ module.exports = {
     getSelectDriverByCpf,
     setInsertMotoristaCompleto,
     updateSenhaMotorista,
-    getMotoristaCompletoById
+    getMotoristaCompletoById,
+    setDeleteDrivers,
+    setUpdateDrivers
 }
