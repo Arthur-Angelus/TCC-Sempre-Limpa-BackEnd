@@ -94,7 +94,7 @@ const setInsertUsers = async function (usuario) {
             return u
         })
     } catch (error) {
-        console.error("🔥 ERRO NO DAO INSERT:", error)
+        console.error(" ERRO NO DAO INSERT:", error)
         throw error
     }
 }
@@ -191,6 +191,15 @@ const updateSenhaUsuario = async function(usuario_id, senha){
     }
 }
 
+// SELECT HOME USUÁRIO
+const selectHomeUsuario = async (usuario_id) => {
+    const dados = await knex('vw_home_usuario_pedidos')
+        .where('usuario_id', usuario_id)
+        .orderBy('data_pedido', 'desc')
+
+    return dados
+}
+
 module.exports = {
     getSelectAllUsers,
     getSelectUserById,
@@ -201,5 +210,6 @@ module.exports = {
     setDeleteUsers,
     getSelectLastID,
     getSelectUserOnlyEmail,
-    updateSenhaUsuario
+    updateSenhaUsuario,
+    selectHomeUsuario
 }
