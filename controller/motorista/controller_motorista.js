@@ -100,6 +100,16 @@ const validarDadosMotorista = async (m) => {
     return false
 }
 
+const validarDadosUpdateMotorista = async (m) => {
+
+    if (!m.nome) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.email) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.telefone) return MESSAGES.ERROR_REQUIRED_FIELDS
+    if (!m.data_nascimento) return MESSAGES.ERROR_REQUIRED_FIELDS
+
+    return false
+}
+
 const inserirMotoristaCompleto = async (body, contentType) => {
 
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
@@ -146,6 +156,96 @@ const inserirMotoristaCompleto = async (body, contentType) => {
 
     } catch (error) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+// UPDATE
+const atualizarMotorista = async function (Motorista, id, contentType) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
+
+    try {
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosUpdateMotorista(Motorista)
+
+            if (!validar) {
+
+                let validarID = await buscarMotoristaID(id)
+
+                if (validarID.status_code == 200) {
+
+                    let idMotorista = Number(id)
+
+                    let dados = Motorista
+                    delete dados.id
+
+                    let resultMotoristas = await motoristaDAO.setUpdateDrivers(dados, idMotorista)
+
+                    if (resultMotoristas) {
+                        MESSAGE.DEFAULT_HEADER.status = MESSAGE.SUCCESS_UPDATED_ITEM.status
+                        MESSAGE.DEFAULT_HEADER.status_code = MESSAGE.SUCCESS_UPDATED_ITEM.status_code
+                        MESSAGE.DEFAULT_HEADER.message = MESSAGE.SUCCESS_UPDATED_ITEM.message
+                        MESSAGE.DEFAULT_HEADER.items.Motorista = Motorista
+
+                        return MESSAGE.DEFAULT_HEADER //200
+                    } else {
+                        MESSAGE.ERROR_INTERNAL_SERVER_MODEL.message += "controller atualizar motorista"
+                        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
+                } else {
+                    return validarID
+                }
+            } else {
+                return validar //400
+            }
+        } else {
+            MESSAGE.ERROR_CONTENT_TYPE.message += "controller atualizar motorista"
+            return MESSAGE.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller atualizar motorista"
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+// DELETE
+const excluirMotorista = async function (id) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES))
+
+    try {
+
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+
+            let validarID = await buscarMotoristaID(id)
+
+            if (validarID.status_code == 200) {
+
+                let resultMotoristas = await motoristaDAO.setDeleteDrivers(Number(id))
+
+                if (resultMotoristas) {
+
+                    MESSAGE.DEFAULT_HEADER.status = MESSAGE.SUCCESS_DELETED_ITEM.status
+                    MESSAGE.DEFAULT_HEADER.status_code = MESSAGE.SUCCESS_DELETED_ITEM.status_code
+                    MESSAGE.DEFAULT_HEADER.message = MESSAGE.SUCCESS_DELETED_ITEM.message
+                    MESSAGE.DEFAULT_HEADER.items.Motorista = resultMotoristas
+                    delete MESSAGE.DEFAULT_HEADER.items
+                    return MESSAGE.DEFAULT_HEADER //200
+
+                } else {
+                    MESSAGE.ERROR_INTERNAL_SERVER_MODEL.message += "controller excluir motorista"
+                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL //500
+                }
+            } else {
+                MESSAGE.ERROR_NOT_FOUND.message += "controller excluir motorista"
+                return MESSAGE.ERROR_NOT_FOUND //404
+            }
+        } else {
+            MESSAGE.ERROR_REQUIRED_FIELDS.message += ' [ID incorreto]'
+            return MESSAGE.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller excluir motorista"
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
 
@@ -285,5 +385,7 @@ module.exports = {
     loginMotoristaCpf,
     esqueciMinhaSenha,
     resetarSenha,
-    listarMotoristaCompleto
+    listarMotoristaCompleto,
+    atualizarMotorista,
+    excluirMotorista
 }

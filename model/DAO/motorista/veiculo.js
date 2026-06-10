@@ -53,9 +53,7 @@ const setUpdateVehicle = async function (veiculo, veiculo_id) {
         const result = await knex('veiculo')
             .where({ veiculo_id: veiculo_id })
             .update({
-                modalidade: veiculo.modalidade,
-                fk_motorista_id: veiculo.fk_motorista_id,
-                fk_dados_veiculo: veiculo.fk_dados_veiculo
+                modalidade: veiculo.modalidade
             })
             return result
     } catch (error) {
