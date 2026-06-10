@@ -32,11 +32,12 @@ router.get('/lavanderia', cors(), async function(request, response){
 })
 
 router.get('/lavanderia/filtro', cors(), async function (request, response){
-    let dadosLavanderia = await controllerLavanderia.selecionarLavanderiaPorFiltro(request.query)
 
-    response.status(dadosLavanderia.status_code)
-    response.json(dadosLavanderia)
-})
+    let dadosLavanderia = await controllerLavanderia.selecionarLavanderiaPorFiltro(request.query);
+    
+    response.status(dadosLavanderia.status_code);
+    response.json(dadosLavanderia);
+});
 
 router.get('/lavanderia/:id', cors(), async function(request, response){
     let idLavanderia = request.params.id

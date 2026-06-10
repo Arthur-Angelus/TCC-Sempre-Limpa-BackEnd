@@ -81,7 +81,7 @@ const inserirDadosVeiculo = async function (DadosVeiculo, contentType) {
         }
 
         // validação
-        let validar = await validarDadosDadosVeiculo(DadosVeiculo)
+        let validar = await validarDadosVeiculo(DadosVeiculo)
 
         if (validar) {
             return validar
@@ -125,7 +125,7 @@ const atualizarDadosVeiculo = async function (DadosVeiculo, id, contentType) {
     try {
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
-            let validar = await validarDadosDadosVeiculo(DadosVeiculo)
+            let validar = await validarDadosVeiculo(DadosVeiculo)
 
             if (!validar) {
 
@@ -208,26 +208,26 @@ const excluirDadosVeiculo = async function (id) {
     }
 }
 
-const validarDadosDadosVeiculo = async function (DadosVeiculo) {
+const validarDadosVeiculo = async function (DadosVeiculo) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (DadosVeiculo.placa == '' || DadosVeiculo.placa == undefined || DadosVeiculo.placa == null ||DadosVeiculo.placa.length > 7) {
+    if (DadosVeiculo.placa && DadosVeiculo.placa.length > 7) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[placa incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (DadosVeiculo.modelo == '' || DadosVeiculo.modelo == undefined || DadosVeiculo.modelo == null || DadosVeiculo.modelo.length > 100) {
+    } else if (DadosVeiculo.modelo && DadosVeiculo.modelo.length > 100) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [modelo incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (DadosVeiculo.marca == '' || DadosVeiculo.marca == undefined || DadosVeiculo.marca == null || DadosVeiculo.marca.length > 100) {
+    } else if (DadosVeiculo.marca && DadosVeiculo.marca.length > 100) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [marca incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (DadosVeiculo.ano_modelo == '' || DadosVeiculo.ano_modelo == undefined || DadosVeiculo.ano_modelo == null || isNaN(DadosVeiculo.ano_modelo)) {
+    } else if (DadosVeiculo.ano_modelo && isNaN(DadosVeiculo.ano_modelo)) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [ano_modelo incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (DadosVeiculo.ano_fabricacao == null || DadosVeiculo.ano_fabricacao == '' || DadosVeiculo.ano_fabricacao == undefined || isNaN(DadosVeiculo.ano_fabricacao)) {
+    } else if (DadosVeiculo.ano_fabricacao && isNaN(DadosVeiculo.ano_fabricacao)) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message = "[ano_fabricacao inválido]";
         return MESSAGES.ERROR_REQUIRED_FIELDS;
 
@@ -245,5 +245,6 @@ module.exports = {
     buscarDadosVeiculoID,
     inserirDadosVeiculo,
     atualizarDadosVeiculo,
-    excluirDadosVeiculo
+    excluirDadosVeiculo,
+    validarDadosVeiculo
 }

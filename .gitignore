@@ -4,3 +4,4 @@ knexfile.js
 middleware
 .env
 teste.js
+uploads/

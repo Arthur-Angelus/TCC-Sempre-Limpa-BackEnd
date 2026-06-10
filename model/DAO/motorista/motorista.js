@@ -1,193 +1,122 @@
-/*******************************************************************************************
- * Objetivo: Arquivo responsável pelas requisições CRUD do motorista
- * Data: 22/05/2026
- * Autor: Arthur Angelus
- * Versão: 1.0
- *******************************************************************************************/
-
 const knex = require('../../../db')
 
-// SELECT ALL
-const getSelectAllDriver = async function () {
+const getSelectAllDriver = async () => {
     try {
-        const rows = await knex.select('*').from('motorista')
-        return rows.map(u => {
-            delete u.senha
-            return u
-        })
+        return await knex('motorista').select('*')
     } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// SELECT BY ID
-const getSelectDriverById = async function (motorista_id) {
-    try {
-        const rows = await knex('motorista')
-            .select('*')
-            .where({ motorista_id: motorista_id })
-
-        return rows.map(u => {
-            delete u.senha
-            return u
-        })
-    } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// SELECT BY EMAIL + SENHA
-const getSelectDriverByEmail = async function (email) {
-
-    try {
-
-        const result = await knex('motorista')
-            .select('*')
-            .where({ email: email })
-            .first()
-
-        return result
-
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
-
-// SELECT BY CPF + SENHA
-const getSelectDriverByCpf = async function (cpf) {
-
-    try {
-
-        const result = await knex('motorista')
-            .select('*')
-            .where({ cpf: cpf })
-            .first()
-
-        return result
-
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
-
-// INSERT
-const setInsertDriver = async function (motorista) {
-    try {
-        const result = await knex('motorista').insert({
-            nome: motorista.nome,
-            data_nascimento: motorista.data_nascimento,
-            cpf: motorista.cpf,
-            telefone: motorista.telefone,
-            email: motorista.email,
-            cnh: motorista.cnh,
-            foto: motorista.foto,
-            senha: motorista.senha,
-            fk_dados_bancarios_id: motorista.fk_dados_bancarios_id,
-            fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
-
-        })
-        return result
-        
-    } catch (error) {
-        console.error("🔥 ERRO NO DAO INSERT:", error)
-        throw error
-    }
-}
-
-// UPDATE
-const setUpdateDriver = async function (motorista, motorista_id) {
-    try {
-        const result = await knex('motorista')
-            .where({ motorista_id: motorista_id })
-            .update({
-                nome: motorista.nome,
-                data_nascimento: motorista.data_nascimento,
-                cpf: motorista.cpf,
-                telefone: motorista.telefone,
-                email: motorista.email,
-                cnh: motorista.cnh,
-                foto: motorista.foto,
-                senha: motorista.senha,
-                fk_dados_bancarios_id: motorista.fk_dados_bancarios_id,
-                fk_endereco_motorista_id: motorista.fk_endereco_motorista_id
-            })
-
-        return result
-
-    } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// DELETE
-const setDeleteDriver = async function (motorista_id) {
-    try {
-        const result = await knex('motorista')
-            .where({ motorista_id: motorista_id })
-            .del()
-
-        return result
-    } catch (error) {
-        console.error(error)
-        return false
-    }
-}
-
-// GET LAST ID
-const getSelectLastID = async function (motorista_id) {
-    try {
-        const result = await knex('motorista')
-            .select('motorista_id')
-            .orderBy('motorista_id', 'desc')
-            .first()
-
-        return result ? result.motorista_id : null
-    } catch (error) {
-        console.error(error)
         return null
     }
 }
 
-const getSelectDriverOnlyEmail = async function (email) {
-
+const getSelectDriverById = async (id) => {
     try {
-
-        const result = await knex('motorista')
-            .select('*')
-            .where({
-                email: email
-            })
-
-        return result
-
+        return await knex('motorista')
+            .where({ motorista_id: id })
+            .first()
     } catch (error) {
-
-        console.log(error)
-        return false
+        return null
     }
 }
 
-const updateSenhaMotorista = async function (motorista_id, senha) {
-
+const getSelectDriverByEmail = async (email) => {
     try {
+        return await knex('motorista')
+            .where({ email })
+            .first()
+    } catch (error) {
+        return null
+    }
+}
 
-        const result = await knex('motorista')
-            .where({ motorista_id: motorista_id })
-            .update({
-                senha: senha
+const getSelectDriverByCpf = async (cpf) => {
+    try {
+        return await knex('motorista')
+            .where({ cpf })
+            .first()
+    } catch (error) {
+        return null
+    }
+}
+
+const setInsertMotoristaCompleto = async (motorista, banco, endereco, veiculo) => {
+    try {
+        return await knex.transaction(async (trx) => {
+
+            const bancoIdRaw = await trx('dados_bancarios').insert(banco)
+            const enderecoIdRaw = await trx('endereco_motorista').insert(endereco)
+
+            const bancoId = Array.isArray(bancoIdRaw) ? bancoIdRaw[0] : bancoIdRaw
+            const enderecoId = Array.isArray(enderecoIdRaw) ? enderecoIdRaw[0] : enderecoIdRaw
+
+            // 🔥 REMOVE CAMPOS QUE NÃO EXISTEM NA TABELA
+            const { dadosBancarios, endereco: _, veiculo: __, ...motoristaLimpo } = motorista
+
+            const motoristaIdRaw = await trx('motorista').insert({
+                ...motoristaLimpo,
+                fk_dados_bancarios_id: bancoId,
+                fk_endereco_motorista_id: enderecoId
             })
 
-        return result
+            const motoristaId = Array.isArray(motoristaIdRaw)
+                ? motoristaIdRaw[0]
+                : motoristaIdRaw
 
+            if (veiculo.modalidade !== 'bike' && !veiculo.dados) {
+                throw new Error('Dados do veículo obrigatórios para essa modalidade')
+            }
+
+            let dadosVeiculoId = null
+
+            if (veiculo.dados) {
+                const dadosVeiculoRaw = await trx('dados_veiculo').insert(veiculo.dados)
+
+                dadosVeiculoId = Array.isArray(dadosVeiculoRaw)
+                    ? dadosVeiculoRaw[0]
+                    : dadosVeiculoRaw
+            }
+
+            const veiculoIdRaw = await trx('veiculo').insert({
+                modalidade: veiculo.modalidade,
+                fk_motorista_id: motoristaId,
+                fk_dados_veiculo_id: dadosVeiculoId
+            })
+
+            const veiculoId = Array.isArray(veiculoIdRaw)
+                ? veiculoIdRaw[0]
+                : veiculoIdRaw
+
+            return {
+                motoristaId,
+                bancoId,
+                enderecoId,
+                dadosVeiculoId,
+                veiculoId
+            }
+        })
     } catch (error) {
+        console.log('ERRO MODEL:', error)
+        return null
+    }
+}
 
+const updateSenhaMotorista = async (id, senha) => {
+    try {
+        return await knex('motorista')
+            .where({ motorista_id: id })
+            .update({ senha })
+    } catch (error) {
+        return null
+    }
+}
+
+const getMotoristaCompletoById = async (id) => {
+    try {
+        return await knex('vw_motorista_perfil_completo')
+            .where('motorista_id', id)
+            .first()
+    } catch (error) {
         console.log(error)
-        return false
+        return null
     }
 }
 
@@ -196,10 +125,7 @@ module.exports = {
     getSelectDriverById,
     getSelectDriverByEmail,
     getSelectDriverByCpf,
-    setInsertDriver,
-    setUpdateDriver,
-    setDeleteDriver,
-    getSelectLastID,
-    getSelectDriverOnlyEmail,
-    updateSenhaMotorista
+    setInsertMotoristaCompleto,
+    updateSenhaMotorista,
+    getMotoristaCompletoById
 }

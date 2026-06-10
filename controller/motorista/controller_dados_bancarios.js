@@ -81,7 +81,7 @@ const inserirDadosBancarios = async function (DadosBancarios, contentType) {
         }
 
         // validação
-        let validar = await validarDadosDadosBancarios(DadosBancarios)
+        let validar = await validarDadosBancarios(DadosBancarios)
 
         if (validar) {
             return validar
@@ -96,17 +96,23 @@ const inserirDadosBancarios = async function (DadosBancarios, contentType) {
         }
 
         let lastID = await dados_bancariosDAO.getSelectLastID()
+    
 
         if (!lastID) {
             MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller inserir DadosBancarios"
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
         }
-        DadosBancarios.DadosBancarios_id = lastID
+        DadosBancarios.dados_bancarios_id = lastID
 
         MESSAGES.DEFAULT_HEADER.banco = MESSAGES.SUCCESS_CREATED_ITEM.banco
         MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
         MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-        MESSAGES.DEFAULT_HEADER.items = DadosBancarios
+        MESSAGES.DEFAULT_HEADER.items = {
+            dadosBancarios: {
+                id: lastID,
+                ...DadosBancarios
+            }
+        }
 
         return MESSAGES.DEFAULT_HEADER
 
@@ -125,7 +131,7 @@ const atualizarDadosBancarios = async function (DadosBancarios, id, contentType)
     try {
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
-            let validar = await validarDadosDadosBancarios(DadosBancarios)
+            let validar = await validarDadosBancarios(DadosBancarios)
 
             if (!validar) {
 
@@ -208,10 +214,10 @@ const excluirDadosBancarios = async function (id) {
     }
 }
 
-const validarDadosDadosBancarios = async function (DadosBancarios) {
+const validarDadosBancarios = async function (DadosBancarios) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (DadosBancarios.digito == '' || DadosBancarios.digito == undefined || DadosBancarios.digito == null || isNaN(DadosBancarios.digito) ||DadosBancarios.digito.length > 1) {
+    if (DadosBancarios.digito == '' || DadosBancarios.digito == undefined || DadosBancarios.digito == null ||DadosBancarios.digito.length > 1) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[digito incorreto]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
@@ -241,5 +247,6 @@ module.exports = {
     buscarDadosBancariosID,
     inserirDadosBancarios,
     atualizarDadosBancarios,
-    excluirDadosBancarios
+    excluirDadosBancarios,
+    validarDadosBancarios
 }

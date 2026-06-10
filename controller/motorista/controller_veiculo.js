@@ -209,23 +209,25 @@ const excluirVeiculo = async function (id) {
 }
 
 const validarDadosVeiculo = async function (Veiculo) {
+
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (Veiculo.modalidade == '' || Veiculo.modalidade == undefined || Veiculo.modalidade == null || Veiculo.modalidade != 'bike' && Veiculo.modalidade != 'carro' && Veiculo.modalidade != 'motocicleta') {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [modalidade incorreto]'
-        return MESSAGES.ERROR_REQUIRED_FIELDS
+    const modalidadesValidas = ['bike', 'carro', 'motocicleta']
 
-    } else if (Veiculo.fk_motorista_id == null || isNaN(Veiculo.fk_motorista_id) || Veiculo.fk_motorista_id <= 0) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message = "[fk_motorista_id inválido]";
+    if (
+        !Veiculo.modalidade ||
+        !modalidadesValidas.includes(Veiculo.modalidade)
+    ) {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [modalidade inválida]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else if (Veiculo.fk_dados_veiculo_id == null || isNaN(Veiculo.fk_dados_veiculo_id) || Veiculo.fk_dados_veiculo_id <= 0) {
-        MESSAGES.ERROR_REQUIRED_FIELDS.message = "[fk_dados_veiculo_id inválido]";
-        return MESSAGES.ERROR_REQUIRED_FIELDS
-
-    } else {
-        return false
     }
+
+    if (!Veiculo.dados || typeof Veiculo.dados !== 'object') {
+        MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [dados do veículo inválidos]'
+        return MESSAGES.ERROR_REQUIRED_FIELDS
+    }
+
+    return false
 }
 
 module.exports = {
@@ -233,5 +235,6 @@ module.exports = {
     buscarVeiculoID,
     inserirVeiculo,
     atualizarVeiculo,
-    excluirVeiculo
+    excluirVeiculo,
+    validarDadosVeiculo
 }

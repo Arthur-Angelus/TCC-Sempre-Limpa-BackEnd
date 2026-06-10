@@ -43,6 +43,17 @@ router.get('/pedidousuario/:id', cors(), async function (request, response) {
     response.status(pedidoUsuario.status_code)
     response.json(pedidoUsuario)
 })
+
+// GET PEDIDO BY USER ID
+router.get('/pedidomotorista/:id', cors(), async function (request, response) {
+    let motorista_id = request.params.id
+
+    let pedidoMotorista = await controllerPedido.buscarPedidoMotoristaID(motorista_id)
+
+    response.status(pedidoMotorista.status_code)
+    response.json(pedidoMotorista)
+})
+
 // POST PEDIDO
 router.post('/pedido', cors(), bodyParserJSON, async function(request, response){
     let pedido_data = request.body

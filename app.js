@@ -8,6 +8,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const path = require('path');
 
 const app = express()
 
@@ -20,6 +21,8 @@ app.use(bodyParserJSON)
 const PORT = process.env.PORT || 5000
 
 require('dotenv').config()
+
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 app.use((request,  response,  next) => {
     response.header('Access-Control-Allow-Origin',  '*')
@@ -45,8 +48,10 @@ const pixRoutes = require('./routes/routes_pix.js')
 const roupaRoutes = require('./routes/routes_roupa.js')
 const statusRoutes = require('./routes/routes_status.js')
 const usuarioRoutes = require('./routes/routes_usuario.js')
+const favoritosRoutes = require('./routes/routes_favoritos.js')
 
 app.use('/v1/semprelimpa', usuarioRoutes)
+app.use('/v1/semprelimpa', favoritosRoutes)
 app.use('/v1/semprelimpa', enderecoRoutes)
 app.use('/v1/semprelimpa', enderecoLavanderiaRoutes)
 app.use('/v1/semprelimpa', statusRoutes)
@@ -62,6 +67,7 @@ app.use('/v1/semprelimpa', ordempagamentoRoutes)
 app.use('/v1/semprelimpa', pagamentoCartaoRoutes)
 app.use('/v1/semprelimpa', pedidoRoutes)
 app.use('/v1/semprelimpa', pixRoutes)
+
 
 //rotas motorista
 const dados_bancariosRoutes = require('./routes/motorista/routes_dados_bancarios.js')

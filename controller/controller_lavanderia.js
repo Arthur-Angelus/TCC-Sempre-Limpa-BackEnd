@@ -82,6 +82,11 @@ const selecionarLavanderiaPorFiltro = async function (parametrosQuery) {
     try {
         let filtros = {}
 
+        // 1. ADICIONADO: Agora a controller enxerga o que você digita na barra de busca!
+        if (parametrosQuery.nome != '' && parametrosQuery.nome != undefined) {
+            filtros.nome = parametrosQuery.nome
+        }
+
         if (parametrosQuery.cidade != '' && parametrosQuery.cidade != undefined) {
             filtros.cidade = parametrosQuery.cidade
         }
