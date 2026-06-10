@@ -37,7 +37,7 @@ const setInsertReceive = async function (cesto_roupa) {
     try {
         const result = await knex('cesto_roupa').insert({
             fk_cesto_id: cesto_roupa.fk_cesto_id,
-            fk_roupa_id: cesto_roupa.fk_roupa_id,
+            fk_roupas_id: cesto_roupa.fk_roupa_id, // CORREÇÃO 1: Adicionado o 's' para bater com o seu banco (fk_roupas_id)
             quantidade: cesto_roupa.quantidade,
             cor: cesto_roupa.cor
         })

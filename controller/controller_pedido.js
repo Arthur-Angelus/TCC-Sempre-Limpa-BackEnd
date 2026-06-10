@@ -7,6 +7,8 @@
  *******************************************************************************************/
 
 const pedidoDAO = require('../model/DAO/pedido.js')
+const cestoDAO = require('../model/DAO/cesto.js')
+const cestoRoupaDAO = require('../model/DAO/cesto_roupa.js')
 
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 // GET ALL
@@ -273,6 +275,144 @@ const excluirPedido = async function (id) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+
+
+// =======================================================
+// CONTROLLER: Função para o Checkout Completo
+// =======================================================
+const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+
+    try {
+        // Validação do Content-Type obrigatório
+        if (String(contentType).toUpperCase() !== 'APPLICATION/JSON') {
+            MESSAGES.ERROR_CONTENT_TYPE.message += " - Tipo de conteúdo não suportado. Use 'application/json'";
+            return MESSAGES.ERROR_CONTENT_TYPE; // 415
+        }
+
+        // 1. PASSO: Validação dos campos obrigatórios que vêm do Front-end
+        if (!dadosPedidoCompleto.usuario_id || !dadosPedidoCompleto.lavanderia_id || !dadosPedidoCompleto.cestos) {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += " - Dados obrigatórios ausentes (usuario_id, lavanderia_id ou array de cestos).";
+            return MESSAGES.ERROR_REQUIRED_FIELDS; // 400
+        }
+
+        // 2. PASSO: Executa a Stored Procedure para criar o Pedido e a Ordem de Pagamento no MySQL
+        let pedidoIdGerado = await pedidoDAO.executeProcedurePedidoCompleto(dadosPedidoCompleto);
+
+        if (!pedidoIdGerado) {
+            MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += " - Falha crítica ao executar a procedure sp_criar_pedido_completo no banco.";
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL; // 500
+        }
+
+        // 3. PASSO: Processamento dos Cestos e suas respectivas Roupas no MySQL (via Knex)
+        for (let cestoFront of dadosPedidoCompleto.cestos) {
+            
+            // Traduz a lógica textual do React para os ENUMs do Banco de Dados
+            let tipoLavagem = 'NORMAL';
+            if (cestoFront.circulo_ativo?.includes('lavagem_pesada') || cestoFront.ciclos_selecionados?.includes('lavagem_pesada')) {
+                tipoLavagem = 'PESADA'; 
+            }
+
+            let aplicaSecagem = cestoFront.ciclos_selecionados?.includes('secagem') ? 1 : 0;
+
+            let objetoCesto = {
+                peso_estimado: 0, // Campo padrão inicializado como zero para o MVP
+                secagem: aplicaSecagem,
+                tipo_lavagem: tipoLavagem,
+                fk_pedido_id: pedidoIdGerado
+            };
+
+            // Insere o Cesto e recupera o ID auto-incremental gerado
+            let resultCesto = await cestoDAO.setInsertCesto(objetoCesto);
+            let cestoId = resultCesto[0]; 
+
+            if (cestoId) {
+                // Varre as roupas contidas dentro deste cesto específico
+                for (let roupa of cestoFront.roupas) {
+                    
+                    let objetoCestoRoupa = {
+                        fk_cesto_id: cestoId,
+                        fk_roupa_id: roupa.fk_roupas_id, // Converte a nomenclatura plural do React para o singular do BD
+                        quantidade: roupa.quantidade,
+                        cor: roupa.cor
+                    };
+                    
+                    // Insere o registro na tabela relacional cesto_roupa
+                    await cestoRoupaDAO.setInsertReceive(objetoCestoRoupa); 
+                }
+            }
+        }
+
+        // 4. PASSO: Comunicação com o Gateway de Pagamentos (AbacatePay)
+        let dadosPagamento = null;
+        
+        try {
+            // Conversão obrigatória para centavos (R$ 45.00 -> 4500) para evitar quebras decimais na API de pagamento
+            let valorTotalPedido = dadosPedidoCompleto.valor_ciclos + dadosPedidoCompleto.taxa_entrega + 6.00; 
+            let valorEmCentavos = Math.round(valorTotalPedido * 100);
+
+            // Mapeia o método escolhido para as palavras-chave aceitas pela AbacatePay
+            let metodoAbacate = dadosPedidoCompleto.tipo_pagamento === 'CARTAO' ? 'CREDIT_CARD' : 'PIX';
+
+            // Requisição Http nativa para criar o link de checkout / PIX
+            const reqAbacate = await fetch('https://api.abacatepay.com/v1/billing/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.ABACATE_PAY_API_KEY}`
+                },
+                body: JSON.stringify({
+                    frequency: "ONE_TIME",
+                    methods: [metodoAbacate],
+                    products: [
+                        {
+                            externalId: String(pedidoIdGerado),
+                            name: `SempreLimpa - Pedido #${pedidoIdGerado}`,
+                            quantity: 1,
+                            price: valorEmCentavos
+                        }
+                    ],
+                    returnUrl: "http://localhost:5173/sucesso", // Rota do front de sucesso do cartão
+                    completionUrl: "http://localhost:5173/sucesso"
+                })
+            });
+
+            const resAbacate = await reqAbacate.json();
+
+            if (resAbacate.success) {
+                dadosPagamento = {
+                    url_checkout: resAbacate.data.url, 
+                    codigo_copia_cola: resAbacate.data.pix ? resAbacate.data.pix.qrcodeText : null, 
+                    url_imagem_qrcode: resAbacate.data.pix ? resAbacate.data.pix.qrcodeImage : null
+                };
+            } else {
+                console.error("⚠️ AbacatePay recusou a criação do checkout:", resAbacate.error);
+            }
+        } catch (err) {
+            console.error("🔥 Falha na comunicação de rede com a API AbacatePay:", err);
+            // O bloco catch isolado garante que se a API externa falhar, os dados salvos no banco não quebrem
+        }
+
+        // 5. PASSO: Montagem do cabeçalho estruturado de resposta para o cliente (Postman / React)
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status;
+        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code;
+        MESSAGES.DEFAULT_HEADER.message = "Pedido completo gerado com sucesso!";
+        MESSAGES.DEFAULT_HEADER.items = {
+            pedido_id: pedidoIdGerado,
+            pagamento: dadosPagamento // Retorna nulo se a API falhar ou os links de pagamento reais se der sucesso
+        };
+
+        return MESSAGES.DEFAULT_HEADER; // 201
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += " - Erro Crítico no Controller de Checkout Completo.";
+        console.error("🔥 CRITICAL ERROR IN CONTROLLER:", error);
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER; // 500
+    }
+};
+
+
+
 // Validação dos dados INPUT - INSERT E UPDATE
 const validarDadosPedido = async function (Pedido) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -330,5 +470,6 @@ module.exports = {
     buscarPedidoMotoristaID,
     inserirPedido,
     atualizarPedido,
-    excluirPedido
+    excluirPedido,
+    criarPedidoCompleto
 }

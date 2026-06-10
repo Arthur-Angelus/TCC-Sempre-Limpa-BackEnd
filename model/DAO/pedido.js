@@ -143,6 +143,43 @@ const getSelectLastID = async function (pedido_id) {
         return null
     }
 }
+
+// =======================================================
+// DAO: Chamada da Procedure de Pedido Completo
+// =======================================================
+const executeProcedurePedidoCompleto = async function (dados) {
+    try {
+        // Usamos trx (transaction) apenas para garantir que a leitura da 
+        // variável @novo_pedido_id ocorra na mesma rota de conexão física do banco
+        return await knex.transaction(async (trx) => {
+            
+            // 1. Executa a procedure injetando os valores e definindo a variável de saída
+            await trx.raw(
+                'CALL sp_criar_pedido_completo(?, ?, ?, ?, ?, ?, ?, @novo_pedido_id)',
+                [
+                    dados.usuario_id,
+                    dados.lavanderia_id,
+                    dados.valor_ciclos,
+                    dados.taxa_entrega,
+                    dados.tipo_pagamento, // 'PIX' ou 'CARTAO'
+                    dados.cartao_id || null, // Se for PIX, passa null
+                    dados.tipo_cartao || null // 'CREDITO', 'DEBITO' ou null
+                ]
+            );
+
+            // 2. Captura o valor da variável gerada
+            const result = await trx.raw('SELECT @novo_pedido_id AS pedido_id');
+            
+            // O Knex retorna um array duplo no .raw()
+            const idGerado = result[0][0].pedido_id;
+            
+            return idGerado;
+        });
+    } catch (error) {
+        console.error("ERRO NO DAO (PROCEDURE):", error);
+        throw error;
+    }
+}
 module.exports = {
     getSelectAllPedido,
     getSelectPedidoById,
@@ -151,6 +188,7 @@ module.exports = {
     setInsertPedido,
     setUpdatePedido,
     setDeletePedido,
-    getSelectLastID
+    getSelectLastID,
+    executeProcedurePedidoCompleto
 }
 
