@@ -16,8 +16,16 @@ const bodyParserJSON = bodyParser.json()
 
 const controllerLavanderia = require('../controller/controller_lavanderia.js')
 
+router.get('/lavanderia/media', cors(), async function(request, response){
+    let result = await controllerLavandeira.selecionarMediaLavanderias();
+
+    response.status(result.status_code);
+    response.json(result);
+});
+
 router.get('/lavanderia', cors(), async function(request, response){
     let lavanderia = await controllerLavanderia.selecionarTodasLavanderia()
+    console.log(lavanderia)
     
         response.status(lavanderia.status_code)
         response.json(lavanderia)

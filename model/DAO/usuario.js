@@ -34,7 +34,6 @@ const getSelectUserById = async function (usuario_id) {
             return u
         })
     } catch (error) {
-        console.error(error)
         return false
     }
 }
@@ -78,6 +77,7 @@ const getSelectUserByCpf = async function (cpf) {
 // INSERT
 const setInsertUsers = async function (usuario) {
     try {
+
         const result = await knex('usuario').insert({
             nome: usuario.nome,
             e_mail: usuario.e_mail,
@@ -88,6 +88,7 @@ const setInsertUsers = async function (usuario) {
             senha: usuario.senha,
             data_nascimento: usuario.data_nascimento
         })
+
         return result.map(u => {
             delete u.senha
             return u
@@ -101,8 +102,9 @@ const setInsertUsers = async function (usuario) {
 // UPDATE
 const setUpdateUsers = async function (usuario, usuario_id) {
     try {
+
         const result = await knex('usuario')
-            .where({ usuario_id: usuario_id })
+            .where({ usuario_id})
             .update({
                 nome: usuario.nome,
                 e_mail: usuario.e_mail,
@@ -114,10 +116,8 @@ const setUpdateUsers = async function (usuario, usuario_id) {
                 data_nascimento: usuario.data_nascimento
             })
 
-        return result.map(u => {
-            delete u.senha
-            return u
-        })
+        return result
+    
     } catch (error) {
         console.error(error)
         return false
