@@ -377,13 +377,13 @@ const resetarSenha = async (token, novaSenha) => {
     }
 }
 
-const validarStatusMotorista = async (status) => {
-    const statusValidos = ['ONLINE', 'OFFLINE', 'OCUPADO'];
+const validarStatusMotorista = async (status_motorista) => {
+    const statusValidos = ['DISPONIVEL', 'OFFLINE', 'OCUPADO'];
 
-    if (!status)
+    if (!status_motorista)
         return MESSAGES.ERROR_REQUIRED_FIELDS;
 
-    if (!statusValidos.includes(status))
+    if (!statusValidos.includes(status_motorista))
         return {
             status: false,
             status_code: 400,

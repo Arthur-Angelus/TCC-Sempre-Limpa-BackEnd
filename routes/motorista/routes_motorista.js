@@ -215,12 +215,12 @@ router.get('/motoristacompleto/:id', cors(), async function (request, response) 
 // UPDATE STATUS MOTORISTA
 router.patch('/motoristastatus/:id', cors(), bodyParserJSON, async function (request, response) {
     let motorista_id = request.params.id
-    let status = request.body.status
+    let status_motorista = request.body.status_motorista
     let contentType = request.headers['content-type']
 
     let result = await controllerMotorista.atualizarStatusMotorista(
         motorista_id,
-        status,
+        status_motorista,
         contentType
     )
 
