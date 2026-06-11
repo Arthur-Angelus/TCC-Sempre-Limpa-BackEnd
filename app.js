@@ -87,6 +87,11 @@ app.use('/v1/semprelimpa', avaliacao_motoristaRoutes)
 app.use('/v1/semprelimpa', enderecoMotoristaRoutes)
 app.use('/v1/semprelimpa', extratoRoutes)
 
+//rota localizacao
+const localizacaoRoutes = require('./routes/localizacao/routes_localizacao.js')
+
+app.use('/v1/semprelimpa', localizacaoRoutes)
+
 
 app.listen(PORT,  function () {
     console.log('API aguardando requisições....')
