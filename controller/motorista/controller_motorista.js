@@ -377,6 +377,65 @@ const resetarSenha = async (token, novaSenha) => {
     }
 }
 
+const validarStatusMotorista = async (status) => {
+    const statusValidos = ['ONLINE', 'OFFLINE', 'OCUPADO'];
+
+    if (!status)
+        return MESSAGES.ERROR_REQUIRED_FIELDS;
+
+    if (!statusValidos.includes(status))
+        return {
+            status: false,
+            status_code: 400,
+            message: 'Status inválido'
+        };
+
+    return false;
+};
+
+const atualizarStatusMotorista = async (motorista_id, status, contentType) => {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGES));
+
+    try {
+        if (String(contentType).toUpperCase() !== 'APPLICATION/JSON') {
+            return MESSAGES.ERROR_CONTENT_TYPE;
+        }
+
+        if (!motorista_id || isNaN(motorista_id)) {
+            return MESSAGES.ERROR_REQUIRED_FIELDS;
+        }
+
+        // valida status
+        const validar = await validarStatusMotorista(status);
+        if (validar) return validar;
+
+        // valida motorista existe
+        let validarID = await buscarMotoristaID(motorista_id);
+        if (validarID.status_code !== 200) {
+            return validarID;
+        }
+
+        const result = await motoristaDAO.setUpdateStatusMotorista(motorista_id, status);
+
+        if (!result) {
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL;
+        }
+
+        MESSAGE.DEFAULT_HEADER.status = true;
+        MESSAGE.DEFAULT_HEADER.status_code = 200;
+        MESSAGE.DEFAULT_HEADER.message = 'Status atualizado com sucesso';
+        MESSAGE.DEFAULT_HEADER.items = {
+            motorista_id: motorista_id,
+            status_motorista: status
+        };
+
+        return MESSAGE.DEFAULT_HEADER;
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
 module.exports = {
     listarMotoristas,
     buscarMotoristaID,
@@ -387,5 +446,6 @@ module.exports = {
     resetarSenha,
     listarMotoristaCompleto,
     atualizarMotorista,
-    excluirMotorista
+    excluirMotorista,
+    atualizarStatusMotorista
 }
