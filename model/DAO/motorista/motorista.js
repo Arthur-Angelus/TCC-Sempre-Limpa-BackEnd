@@ -154,6 +154,17 @@ const getMotoristaCompletoById = async (id) => {
     }
 }
 
+const setUpdateStatusMotorista = async (motorista_id, status) => {
+    try {
+        return await knex('motorista')
+            .where({ motorista_id: motorista_id })
+            .update({ status_motorista: status })
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
+
 module.exports = {
     getSelectAllDriver,
     getSelectDriverById,
@@ -163,5 +174,6 @@ module.exports = {
     updateSenhaMotorista,
     getMotoristaCompletoById,
     setDeleteDrivers,
-    setUpdateDrivers
+    setUpdateDrivers,
+    setUpdateStatusMotorista
 }
