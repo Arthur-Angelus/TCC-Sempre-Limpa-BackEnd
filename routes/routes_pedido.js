@@ -103,4 +103,14 @@ router.post('/pedido-completo', async (request, response) => {
     response.status(resultado.status_code).json(resultado);
 });
 
+// GET DETALHES PEDIDO BY ID
+router.get('/pedidodetalhes/:id', cors(), async function (request, response) {
+    let pedido_id = request.params.id
+
+    let pedidoDetalhes = await controllerPedido.buscarDetalhesPedidoID(pedido_id)
+
+    response.status(pedidoDetalhes.status_code)
+    response.json(pedidoDetalhes)
+})
+
 module.exports = router
