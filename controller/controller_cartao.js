@@ -68,7 +68,7 @@ const inserirCartao = async (dadosCartaoFront) => {
 
         // 5. Aciona o banco de dados passando os dados seguros
         // Certifique-se de que o nome da função na DAO é o correto (inserirCartao ou setinsertCard)
-        let result = await cartaoDAO.inserirCartao(cartaoParaSalvar); 
+        let result = await cartaoDAO.setinsertCard(cartaoParaSalvar); 
 
         if (result) {
             MESSAGES.DEFAULT_HEADER.status = true;
