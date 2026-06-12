@@ -437,8 +437,8 @@ const validarDadosPedido = async function (Pedido) {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Tempo Estimado Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
-    } else if (Pedido.fk_status_id == '' || Pedido.fk_status_id == undefined ||
-        Pedido.fk_status_id == null || typeof Pedido.fk_status_id !== 'number') {
+    } else if (Pedido.fk_status_pedido_id == '' || Pedido.fk_status_pedido_id == undefined ||
+        Pedido.fk_status_pedido_id == null || typeof Pedido.fk_status_pedido_id !== 'number') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID do Status Invalido]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
     }

@@ -26,9 +26,9 @@ router.get('/status', cors(), async function (request, response) {
 })
 // GET STATUS BY ID
 router.get('/status/:id', cors(), async function (request, response) {
-    let status_id = request.params.id
+    let status_pedido_id = request.params.id
 
-    let Status = await controllerStatus.buscarStatusID(status_id)
+    let Status = await controllerStatus.buscarStatusID(status_pedido_id)
 
     response.status(Status.status_code)
     response.json(Status)
@@ -46,22 +46,22 @@ router.post('/status', cors(), bodyParserJSON, async function(request, response)
 })
 // PUT STATUS
 router.put('/Status/:id', cors(), bodyParserJSON, async function(request, response){
-    let status_id = request.params.id
+    let status_pedido_id = request.params.id
 
     let dadosBody = request.body
 
     let contentType = request.headers['content-type']
 
-    let Status = await controllerStatus.atualizarStatus(dadosBody, status_id, contentType)
+    let Status = await controllerStatus.atualizarStatus(dadosBody, status_pedido_id, contentType)
 
     response.status(Status.status_code)
     response.json(Status)
 })
 // DELETE STATUS
 router.delete('/Status/:id', cors(), async function(request, response){
-    let status_id = request.params.id
+    let status_pedido_id = request.params.id
 
-    let Status = await controllerStatus.excluirStatus(status_id)
+    let Status = await controllerStatus.excluirStatus(status_pedido_id)
 
     response.status(Status.status_code)
     response.json(Status)

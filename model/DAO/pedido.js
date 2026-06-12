@@ -56,17 +56,34 @@ const getSelectPedidoByUserId = async function (usuario_id) {
 const getSelectPedidoByDriverId = async function (motorista_id) {
     try {
         const rows = await knex('pedido')
-            .select('*')
-            .where({ fk_motorista_id: motorista_id })
+            .select(
+                'pedido.*',
+                'status_pedido.progresso as status'
+            )
+            .join('status_pedido', 'status_pedido.status_pedido_id', 'pedido.fk_status_pedido_id')
+            .where({ fk_motorista_id: motorista_id });
 
-        return rows.map(pedido => {
-            return pedido
-        })
+        return rows;
     } catch (error) {
-        console.error(error)
-        return false
+        console.error(error);
+        return false;
     }
-}
+};
+
+const setUpdatePedidoStatus = async function (pedido_id, status_pedido_id) {
+    try {
+        const result = await knex('pedido')
+            .where({ pedido_id })
+            .update({
+                fk_status_pedido_id: status_pedido_id
+            });
+
+        return result;
+    } catch (error) {
+        console.error("ERRO UPDATE STATUS PEDIDO:", error);
+        return false;
+    }
+};
 
 // INSERT PEDIDO
 const setInsertPedido = async function (pedido) {
@@ -81,7 +98,7 @@ const setInsertPedido = async function (pedido) {
             taxa_entregador: pedido.taxa_entregador,
             taxa_app: pedido.taxa_app,
             tempo_estimado: pedido.tempo_estimado,
-            fk_status_id: pedido.fk_status_id,
+            fk_status__pedido_id: pedido.fk_status_pedido_id,
             fk_lavanderia_id: pedido.fk_lavanderia_id,
             fk_usuario_id: pedido.fk_usuario_id,
             fk_motorista_id: pedido.fk_motorista_id
@@ -105,7 +122,7 @@ const setUpdatePedido = async function (pedido, pedido_id) {
                 taxa_entrega: pedido.taxa_entrega,
                 taxa_entregador: pedido.taxa_entregador,
                 tempo_estimado: pedido.tempo_estimado,
-                fk_status_id: pedido.fk_status_id,
+                fk_status_pedido_id: pedido.fk_status_pedido_id,
                 fk_lavanderia_id: pedido.fk_lavanderia_id,
                 fk_usuario_id: pedido.fk_usuario_id,
                 fk_motorista_id: pedido.fk_motorista_id
@@ -189,6 +206,7 @@ module.exports = {
     setUpdatePedido,
     setDeletePedido,
     getSelectLastID,
-    executeProcedurePedidoCompleto
+    executeProcedurePedidoCompleto,
+    setUpdatePedidoStatus
 }
 

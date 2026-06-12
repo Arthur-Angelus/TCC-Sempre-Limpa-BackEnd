@@ -211,9 +211,9 @@ const excluirStatus = async function (id) {
 const validarDadosStatus = async function (Status) {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (Status.descricao == '' || Status.descricao == undefined || 
-        Status.descricao == null || Status.descricao.length > 50 ||
-        typeof Status.descricao !== 'string') {
+    if (Status.progresso == '' || Status.progresso == undefined || 
+        Status.progresso == null || Status.progresso.length > 50 ||
+        typeof Status.progresso !== 'string') {
         MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Descrição Invalida]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
 
