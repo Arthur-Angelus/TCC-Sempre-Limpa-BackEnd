@@ -9,7 +9,7 @@
 const pedidoDAO = require('../model/DAO/pedido.js')
 const cestoDAO = require('../model/DAO/cesto.js')
 const cestoRoupaDAO = require('../model/DAO/cesto_roupa.js')
-const knex = require('../../db')
+const knex = require('../db')
 
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 // GET ALL
