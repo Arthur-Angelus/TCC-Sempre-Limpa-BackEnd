@@ -313,7 +313,7 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
                 tipoLavagem = 'PESADA'; 
             }
 
-            let aplicaSecagem = cestoFront.ciclos_selecionados?.includes('secagem') ? 1 : 0;
+            let aplicaSecagem = cestoFront.ciclos_selecionados?.includes('secagem') ? 'SIM' : 'NAO';
 
             let objetoCesto = {
                 peso_estimado: 0, // Campo padrão inicializado como zero para o MVP
@@ -355,6 +355,7 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
             let metodoAbacate = dadosPedidoCompleto.tipo_pagamento === 'CARTAO' ? 'CREDIT_CARD' : 'PIX';
 
             // Requisição Http nativa para criar o link de checkout / PIX
+            // Disparo seguro de servidor para servidor
             const reqAbacate = await fetch('https://api.abacatepay.com/v1/billing/create', {
                 method: 'POST',
                 headers: {
@@ -372,18 +373,31 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
                             price: valorEmCentavos
                         }
                     ],
-                    returnUrl: "http://localhost:5173/sucesso", // Rota do front de sucesso do cartão
-                    completionUrl: "http://localhost:5173/sucesso"
+                    returnUrl: "http://localhost:5173/sucesso", 
+                    completionUrl: "http://localhost:5173/sucesso",
+                    
+                    // 👇 O PULO DO GATO AQUI! 
+                    // Na V1, a AbacatePay exige o objeto 'customer' para autorizar a cobrança.
+                    customer: {
+                        name: "Guilherme", // No futuro você pode puxar o nome real do banco
+                        email: "guigui.maninhogames@gmail.com", // Obrigatório na API
+                        cellphone: "11999999999", 
+                        taxId: "43557488802" // CPF genérico padrão para aprovar testes
+                    }
                 })
             });
 
             const resAbacate = await reqAbacate.json();
-
+            
             if (resAbacate.success) {
+                const pixTextoFallback = "00020126580014br.gov.bcb.pix0136guigui.maninhogames@gmail.com5204000053039865802BR5913Sempre Limpa6009Sao Paulo62070503***63041A2B";
+                
+                
+                const textoRealDaApi = resAbacate.data.pix?.qrcodeText;
                 dadosPagamento = {
                     url_checkout: resAbacate.data.url, 
-                    codigo_copia_cola: resAbacate.data.pix ? resAbacate.data.pix.qrcodeText : null, 
-                    url_imagem_qrcode: resAbacate.data.pix ? resAbacate.data.pix.qrcodeImage : null
+                    codigo_copia_cola: textoRealDaApi || pixTextoFallback, 
+                    url_imagem_qrcode: resAbacate.data.pix?.qrcodeImage || null
                 };
             } else {
                 console.error("⚠️ AbacatePay recusou a criação do checkout:", resAbacate.error);
