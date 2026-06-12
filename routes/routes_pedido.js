@@ -89,18 +89,44 @@ router.delete('/pedido/:id', cors(), async function(request, response){
 })
 
 router.post('/pedido-completo', async (request, response) => {
-    
-    // Captura o tipo de conteúdo (application/json)
+
     const contentType = request.headers['content-type'];
-    
-    // Captura o JSON enviado pelo Front-end ou pelo Insomnia
     const dadosPedidoCompleto = request.body;
 
-    // Chama a função maestrina no Controller
-    const resultado = await controllerPedido.criarPedidoCompleto(dadosPedidoCompleto, contentType);
+    // 1. CRIA O PEDIDO
+    const resultado = await controllerPedido.criarPedidoCompleto(
+        dadosPedidoCompleto,
+        contentType
+    );
 
-    // Retorna para o cliente com o status code formatado nas suas MESSAGES
-    response.status(resultado.status_code).json(resultado);
+    // se falhar, não continua
+    if (resultado.status_code !== 201 && resultado.status_code !== 200) {
+        return response.status(resultado.status_code).json(resultado);
+    }
+
+    // 2. pega ID do pedido criado
+    const pedido_id =
+        resultado?.pedido?.id ||
+        resultado?.pedido_id ||
+        resultado?.items?.pedido_id;
+
+    // segurança
+    if (!pedido_id) {
+        return response.status(400).json({
+            message: "Pedido criado mas ID não foi encontrado para distribuição"
+        });
+    }
+
+    try {
+        // 3. DISPARA DISTRIBUIÇÃO AUTOMÁTICA
+        await controllerPedido.distribuirPedidoAutomatico(pedido_id);
+
+    } catch (err) {
+        console.log("Erro ao distribuir pedido:", err.message);
+    }
+
+    // 4. retorna resposta normal
+    return response.status(resultado.status_code).json(resultado);
 });
 
 // GET DETALHES PEDIDO BY ID
@@ -175,6 +201,7 @@ router.post('/pedidodistribuir/:id', async (req, res) => {
     res.status(result.status_code).json(result);
 });
 
+// endpoint de debug / fallback
 router.get('/motoristadisponivelnext', async (req, res) => {
     const result = await controllerPedido.getNextMotoristaDisponivel();
     res.json(result);
