@@ -10,9 +10,9 @@ const knex = require('../../db')
 // SELECT ALL
 const getSelectAllStatus = async function () {
     try {
-        const rows = await knex.select('*').from('status')
-        return rows.map(status => {
-            return status
+        const rows = await knex.select('*').from('status_pedido')
+        return rows.map(status_pedido => {
+            return status_pedido
         })
     } catch (error) {
         console.error(error)
@@ -20,11 +20,11 @@ const getSelectAllStatus = async function () {
     }
 }
 // SELECT STATUS BY ID
-const getSelectStatusById = async function (status_id) {
+const getSelectStatusById = async function (status_pedido_id) {
     try {
-        const rows = await knex('status')
+        const rows = await knex('status_pedido')
             .select('*')
-            .where({ status_id: status_id })
+            .where({ status_pedido_id: status_pedido_id })
 
         return rows.map(s => {
             return s
@@ -35,13 +35,13 @@ const getSelectStatusById = async function (status_id) {
     }
 }
 // INSERT STATUS
-const setInsertStatus = async function (status) {
+const setInsertStatus = async function (status_pedido) {
     try {
-        const result = await knex('status').insert({
-            descricao: status.descricao
+        const result = await knex('status_pedido').insert({
+            progresso: status_pedido.progresso
         })
-        return result.map(status => {
-            return status
+        return result.map(status_pedido => {
+            return status_pedido
         })
     } catch (error) {
         console.error("ERRO NO DAO INSERT:", error)
@@ -49,12 +49,12 @@ const setInsertStatus = async function (status) {
     }
 }
 // UPDATE STATUS
-const setUpdateStatus = async function (status, status_id) {
+const setUpdateStatus = async function (status_pedido, status_pedido_id) {
     try {
-        const result = await knex('status')
-            .where({ status_id: status_id })
+        const result = await knex('status_pedido')
+            .where({ status_pedido_id: status_pedido_id })
             .update({
-                descricao: status.descricao
+                progresso: status_pedido.progresso
             })
         return result
     } catch (error) {
@@ -63,10 +63,10 @@ const setUpdateStatus = async function (status, status_id) {
     }
 }
 // DELETE
-const setDeleteStatus = async function (status_id) {
+const setDeleteStatus = async function (status_pedido_id) {
     try {
-        const result = await knex('status')
-            .where({ status_id: status_id })
+        const result = await knex('status_pedido')
+            .where({ status_pedido_id: status_pedido_id })
             .del()
 
         return result
@@ -76,14 +76,14 @@ const setDeleteStatus = async function (status_id) {
     }
 }
 // GET LAST ID
-const getSelectLastID = async function (status_id) {
+const getSelectLastID = async function (status_pedido_id) {
     try {
-        const result = await knex('status')
-            .select('status_id')
-            .orderBy('status_id', 'desc')
+        const result = await knex('status_pedido')
+            .select('status_pedido_id')
+            .orderBy('status_pedido_id', 'desc')
             .first()
 
-        return result ? result.status_id : null
+        return result ? result.status_pedido_id : null
     } catch (error) {
         console.error(error)
         return null

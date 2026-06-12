@@ -29,7 +29,7 @@ router.get('/localizacao/:id', async (req, res) => {
 })
 
 // UPDATE
-router.put('/localizacao/:id', async (req, res) => {
+router.patch('/localizacao/:id', async (req, res) => {
     const result = await controller.atualizarLocalizacao(req.params.id, req.body)
     res.status(result.status_code).json(result)
 })
