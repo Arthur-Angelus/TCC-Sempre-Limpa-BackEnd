@@ -351,8 +351,9 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
             let valorTotalPedido = dadosPedidoCompleto.valor_ciclos + dadosPedidoCompleto.taxa_entrega + 6.00; 
             let valorEmCentavos = Math.round(valorTotalPedido * 100);
 
-            // Mapeia o método escolhido para as palavras-chave aceitas pela AbacatePay
-            let metodoAbacate = dadosPedidoCompleto.tipo_pagamento === 'CARTAO' ? 'CREDIT_CARD' : 'PIX';
+            // Converte a palavra do front para maiúsculo e garante que seja 'CARD' (Padrão AbacatePay)
+            let tipoPagamentoRecebido = String(dadosPedidoCompleto.tipo_pagamento).toUpperCase();
+            let metodoAbacate = tipoPagamentoRecebido === 'CARTAO' ? 'CARD' : 'PIX';
 
             // Requisição Http nativa para criar o link de checkout / PIX
             // Disparo seguro de servidor para servidor
