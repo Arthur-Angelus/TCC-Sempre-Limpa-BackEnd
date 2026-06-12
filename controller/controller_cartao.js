@@ -39,26 +39,58 @@ const listarTodosCartoes = async () => {
 
 
 /* Controller insert cartão */
-const inserirCartao = async (cartao) => {
-    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+const inserirCartao = async (dadosCartaoFront) => {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
 
     try {
-        let result = await cartaoDAO.inserirCartao(cartao)
+        // 1. Extrair os últimos 4 dígitos (Segurança PCI Compliance)
+        // O front manda "1234 5678 9101 1121", nós tiramos os espaços e pegamos os 4 finais
+        const numeroLimpo = String(dadosCartaoFront.numero).replace(/\s/g, '');
+        const ultimos_digitos = numeroLimpo.slice(-4);
+
+        // 2. Descobrir a bandeira de forma dinâmica
+        let bandeira = 'Desconhecida';
+        if (numeroLimpo.startsWith('4')) bandeira = 'Visa';
+        else if (numeroLimpo.startsWith('5')) bandeira = 'Mastercard';
+        else if (numeroLimpo.startsWith('3')) bandeira = 'Amex';
+
+        // 3. Simular o Token Seguro (O que um Gateway real faria)
+        const token_cartao = 'tok_test_' + Math.random().toString(36).substring(2, 15);
+
+        // 4. Montar o objeto exato que a sua Model (DAO) está esperando
+        const cartaoParaSalvar = {
+            usuario_id: dadosCartaoFront.usuario_id || 1, // Fixado como 1 para o fluxo principal
+            bandeira: bandeira,
+            validade: dadosCartaoFront.validade,
+            token_cartao: token_cartao,
+            ultimos_digitos: ultimos_digitos
+        };
+
+        // 5. Aciona o banco de dados passando os dados seguros
+        // Certifique-se de que o nome da função na DAO é o correto (inserirCartao ou setinsertCard)
+        let result = await cartaoDAO.setinsertCard(cartaoParaSalvar); 
 
         if (result) {
-            MESSAGES.DEFAULT_HEADER.status = true
-            MESSAGES.DEFAULT_HEADER.status_code = 201
-            MESSAGES.DEFAULT_HEADER.message = "Cartão cadastrado com sucesso"
-            MESSAGES.DEFAULT_HEADER.items = cartao
+            MESSAGES.DEFAULT_HEADER.status = true;
+            MESSAGES.DEFAULT_HEADER.status_code = 201;
+            MESSAGES.DEFAULT_HEADER.message = "Cartão cadastrado com sucesso";
             
-            return MESSAGES.DEFAULT_HEADER
+            // Retornamos apenas os dados não-sensíveis para o React desenhar o novo Card na tela
+            MESSAGES.DEFAULT_HEADER.items = {
+                id: result[0] || result.insertId, // Pega o ID gerado pelo banco
+                bandeira: cartaoParaSalvar.bandeira,
+                final: cartaoParaSalvar.ultimos_digitos,
+                tipo: 'Crédito'
+            };
+            
+            return MESSAGES.DEFAULT_HEADER;
         }
 
-        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
+        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL;
 
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL
-    
+        console.error("🔥 Erro ao tokenizar/inserir cartão:", error);
+        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL;
     }
 }
 

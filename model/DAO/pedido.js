@@ -197,6 +197,23 @@ const executeProcedurePedidoCompleto = async function (dados) {
         throw error;
     }
 }
+
+// Buscar detalhes do pedido pelo id do pedido
+const getSelectDetalhesPedidoByPedidoId = async function (pedido_id) {
+    try {
+        const rows = await knex('vw_detalhes_pedido')
+            .select('*')
+            .where({ pedido_id: pedido_id })
+
+        return rows.map(pedido => {
+            return pedido
+        })
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
+
 module.exports = {
     getSelectAllPedido,
     getSelectPedidoById,
@@ -207,6 +224,7 @@ module.exports = {
     setDeletePedido,
     getSelectLastID,
     executeProcedurePedidoCompleto,
-    setUpdatePedidoStatus
+    setUpdatePedidoStatus,
+    getSelectDetalhesPedidoByPedidoId
 }
 

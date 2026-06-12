@@ -102,10 +102,7 @@ const selecionarLavanderiaPorFiltro = async function (parametrosQuery) {
         if (parametrosQuery.preco_max_secagem != '' && parametrosQuery.preco_max_secagem != undefined && !isNaN(parametrosQuery.preco_max_secagem)) {
             filtros.preco_max_secagem = Number(parametrosQuery.preco_max_secagem)
         }
-        if (Object.keys(filtros).length === 0) {
-            MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [Nenhum parâmetro de filtro foi selecionado]'
-            return MESSAGES.ERROR_REQUIRED_FIELDS
-        }
+        
         let lavanderia = await lavanderiaDAO.getSelectLaundryByFilterSelect(filtros)
         if (lavanderia) {
             if (lavanderia.length > 0) {

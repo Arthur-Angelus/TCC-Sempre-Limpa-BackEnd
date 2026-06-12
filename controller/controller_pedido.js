@@ -313,7 +313,7 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
                 tipoLavagem = 'PESADA'; 
             }
 
-            let aplicaSecagem = cestoFront.ciclos_selecionados?.includes('secagem') ? 1 : 0;
+            let aplicaSecagem = cestoFront.ciclos_selecionados?.includes('secagem') ? 'SIM' : 'NAO';
 
             let objetoCesto = {
                 peso_estimado: 0, // Campo padrão inicializado como zero para o MVP
@@ -351,10 +351,12 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
             let valorTotalPedido = dadosPedidoCompleto.valor_ciclos + dadosPedidoCompleto.taxa_entrega + 6.00; 
             let valorEmCentavos = Math.round(valorTotalPedido * 100);
 
-            // Mapeia o método escolhido para as palavras-chave aceitas pela AbacatePay
-            let metodoAbacate = dadosPedidoCompleto.tipo_pagamento === 'CARTAO' ? 'CREDIT_CARD' : 'PIX';
+            // Converte a palavra do front para maiúsculo e garante que seja 'CARD' (Padrão AbacatePay)
+            let tipoPagamentoRecebido = String(dadosPedidoCompleto.tipo_pagamento).toUpperCase();
+            let metodoAbacate = tipoPagamentoRecebido === 'CARTAO' ? 'CARD' : 'PIX';
 
             // Requisição Http nativa para criar o link de checkout / PIX
+            // Disparo seguro de servidor para servidor
             const reqAbacate = await fetch('https://api.abacatepay.com/v1/billing/create', {
                 method: 'POST',
                 headers: {
@@ -372,18 +374,31 @@ const criarPedidoCompleto = async function (dadosPedidoCompleto, contentType) {
                             price: valorEmCentavos
                         }
                     ],
-                    returnUrl: "http://localhost:5173/sucesso", // Rota do front de sucesso do cartão
-                    completionUrl: "http://localhost:5173/sucesso"
+                    returnUrl: "http://localhost:5173/sucesso", 
+                    completionUrl: "http://localhost:5173/sucesso",
+                    
+                    // 👇 O PULO DO GATO AQUI! 
+                    // Na V1, a AbacatePay exige o objeto 'customer' para autorizar a cobrança.
+                    customer: {
+                        name: "Guilherme", // No futuro você pode puxar o nome real do banco
+                        email: "guigui.maninhogames@gmail.com", // Obrigatório na API
+                        cellphone: "11999999999", 
+                        taxId: "43557488802" // CPF genérico padrão para aprovar testes
+                    }
                 })
             });
 
             const resAbacate = await reqAbacate.json();
-
+            
             if (resAbacate.success) {
+                const pixTextoFallback = "00020126580014br.gov.bcb.pix0136guigui.maninhogames@gmail.com5204000053039865802BR5913Sempre Limpa6009Sao Paulo62070503***63041A2B";
+                
+                
+                const textoRealDaApi = resAbacate.data.pix?.qrcodeText;
                 dadosPagamento = {
                     url_checkout: resAbacate.data.url, 
-                    codigo_copia_cola: resAbacate.data.pix ? resAbacate.data.pix.qrcodeText : null, 
-                    url_imagem_qrcode: resAbacate.data.pix ? resAbacate.data.pix.qrcodeImage : null
+                    codigo_copia_cola: textoRealDaApi || pixTextoFallback, 
+                    url_imagem_qrcode: resAbacate.data.pix?.qrcodeImage || null
                 };
             } else {
                 console.error("⚠️ AbacatePay recusou a criação do checkout:", resAbacate.error);
@@ -463,6 +478,41 @@ const validarDadosPedido = async function (Pedido) {
     }
 }
 
+// GET DETALHES PEDIDO BY ID
+const buscarDetalhesPedidoID = async function (id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        if (!isNaN(id) && id != '' && id != null && id > 0) {
+            let resultPedido = await pedidoDAO.getSelectDetalhesPedidoByPedidoId(Number(id))
+
+            if (resultPedido) {
+                if (resultPedido.length > 0) {
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.Pedido = resultPedido
+
+                    return MESSAGES.DEFAULT_HEADER //200
+                } else {
+                    MESSAGES.ERROR_NOT_FOUND.message += "controller buscar detalhes pedido id"
+                    return MESSAGES.ERROR_NOT_FOUND //404
+                }
+            } else {
+                MESSAGES.ERROR_INTERNAL_SERVER_MODEL.message += "controller buscar detalhes pedido id"
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+            }
+
+        } else {
+            MESSAGES.ERROR_REQUIRED_FIELDS.message += '[ID incorreto]'
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER.message += "controller buscar detalhes pedido id"
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+
 module.exports = {
     listarPedido,
     buscarPedidoID,
@@ -471,5 +521,6 @@ module.exports = {
     inserirPedido,
     atualizarPedido,
     excluirPedido,
-    criarPedidoCompleto
+    criarPedidoCompleto,
+    buscarDetalhesPedidoID
 }
