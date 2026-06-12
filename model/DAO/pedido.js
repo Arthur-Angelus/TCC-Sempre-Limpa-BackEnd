@@ -39,16 +39,17 @@ const getSelectPedidoById = async function (pedido_id) {
 // SELECT PEDIDO BY USER ID
 const getSelectPedidoByUserId = async function (usuario_id) {
     try {
-        const rows = await knex('pedido')
+        // Apontando para a View em vez da tabela crua
+        const rows = await knex('vw_home_usuario_pedidos')
             .select('*')
-            .where({ fk_usuario_id: usuario_id })
+            .where({ usuario_id: usuario_id }); // Ajustado para bater com a coluna da View
 
         return rows.map(pedido => {
-            return pedido
-        })
+            return pedido;
+        });
     } catch (error) {
-        console.error(error)
-        return false
+        console.error(error);
+        return false;
     }
 }
 
