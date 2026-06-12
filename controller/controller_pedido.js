@@ -9,6 +9,7 @@
 const pedidoDAO = require('../model/DAO/pedido.js')
 const cestoDAO = require('../model/DAO/cesto.js')
 const cestoRoupaDAO = require('../model/DAO/cesto_roupa.js')
+const knex = require('../../db')
 
 const DEFAULT_MESSAGES = require('./module/config_messages.js')
 // GET ALL
@@ -513,6 +514,118 @@ const buscarDetalhesPedidoID = async function (id) {
     }
 }
 
+const listarPedidosDisponiveis = async function () {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+
+    try {
+        let result = await pedidoDAO.getPedidosDisponiveis();
+
+        if (result && result.length > 0) {
+            MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status;
+            MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code;
+            MESSAGES.DEFAULT_HEADER.items.Pedido = result;
+            return MESSAGES.DEFAULT_HEADER;
+        }
+
+        return MESSAGES.ERROR_NOT_FOUND;
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
+const aceitarPedidoMotorista = async function (pedido_id, motorista_id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+
+    try {
+        // status ATRIBUIDO (você precisa do ID dele)
+        const STATUS_ATRIBUIDO = 2;
+
+        let result = await pedidoDAO.setAceitarPedido(
+            pedido_id,
+            motorista_id,
+            STATUS_ATRIBUIDO
+        );
+
+        if (!result) {
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL;
+        }
+
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status;
+        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code;
+        MESSAGES.DEFAULT_HEADER.message = "Pedido aceito com sucesso";
+
+        return MESSAGES.DEFAULT_HEADER;
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
+const alterarStatusPedidoMotorista = async function (pedido_id, status_pedido_id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+
+    try {
+        let result = await pedidoDAO.setUpdatePedidoStatusMotorista(
+            pedido_id,
+            status_pedido_id
+        );
+
+        if (!result) {
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL;
+        }
+
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status;
+        MESSAGES.DEFAULT_HEADER.message = "Status atualizado";
+
+        return MESSAGES.DEFAULT_HEADER;
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
+const distribuirPedidoAutomatico = async function (pedido_id) {
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+
+    try {
+        const motorista = await pedidoDAO.getNextMotoristaDisponivel();
+
+        if (!motorista) {
+            return MESSAGES.ERROR_NOT_FOUND;
+        }
+
+        const STATUS_ATRIBUIDO = 2;
+
+        const atualizado = await pedidoDAO.setAceitarPedido(
+            pedido_id,
+            motorista.motorista_id,
+            STATUS_ATRIBUIDO
+        );
+
+        if (!atualizado) {
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL;
+        }
+
+        await knex('motorista')
+            .where({ motorista_id: motorista.motorista_id })
+            .update({ status_motorista: 'OCUPADO' });
+
+        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status;
+        MESSAGES.DEFAULT_HEADER.message = "Pedido distribuído automaticamente";
+
+        MESSAGES.DEFAULT_HEADER.items = {
+            pedido_id,
+            motorista_id: motorista.motorista_id
+        };
+
+        return MESSAGES.DEFAULT_HEADER;
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
 module.exports = {
     listarPedido,
     buscarPedidoID,
@@ -522,5 +635,9 @@ module.exports = {
     atualizarPedido,
     excluirPedido,
     criarPedidoCompleto,
-    buscarDetalhesPedidoID
+    buscarDetalhesPedidoID,
+    listarPedidosDisponiveis,
+    aceitarPedidoMotorista,
+    alterarStatusPedidoMotorista,
+    distribuirPedidoAutomatico
 }

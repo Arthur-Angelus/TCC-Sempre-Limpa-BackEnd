@@ -98,7 +98,7 @@ const setInsertPedido = async function (pedido) {
             taxa_entregador: pedido.taxa_entregador,
             taxa_app: pedido.taxa_app,
             tempo_estimado: pedido.tempo_estimado,
-            fk_status__pedido_id: pedido.fk_status_pedido_id,
+            fk_status_pedido_id: pedido.fk_status_pedido_id,
             fk_lavanderia_id: pedido.fk_lavanderia_id,
             fk_usuario_id: pedido.fk_usuario_id,
             fk_motorista_id: pedido.fk_motorista_id
@@ -214,6 +214,83 @@ const getSelectDetalhesPedidoByPedidoId = async function (pedido_id) {
     }
 }
 
+const getPedidosDisponiveis = async function () {
+    try {
+        const rows = await knex('pedido')
+            .select('*')
+            .where({
+                fk_motorista_id: null,
+            })
+            .andWhere('fk_status_pedido_id', 1); // SOLICITADO
+
+        return rows;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+const setAceitarPedido = async function (pedido_id, motorista_id, status_pedido_id) {
+    try {
+        const result = await knex('pedido')
+            .where({
+                pedido_id,
+                fk_motorista_id: null // trava concorrência simples
+            })
+            .update({
+                fk_motorista_id: motorista_id,
+                fk_status_pedido_id: status_pedido_id // ATRIBUIDO
+            });
+
+        return result;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+const setUpdatePedidoStatusMotorista = async function (pedido_id, status_pedido_id) {
+    try {
+        return await knex('pedido')
+            .where({ pedido_id })
+            .update({
+                fk_status_pedido_id: status_pedido_id
+            });
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+const getNextMotoristaDisponivel = async function () {
+    try {
+        return await knex('motorista')
+            .where({ status_motorista: 'DISPONIVEL' })
+            .orderBy('ultima_atividade', 'asc')
+            .first();
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+const recusarPedidoMotorista = async function (pedido_id, motorista_id) {
+
+    try {
+        // libera motorista
+        await knex('motorista')
+            .where({ motorista_id })
+            .update({ status_motorista: 'DISPONIVEL' });
+
+        // tenta redistribuir
+        return await distribuirPedidoAutomatico(pedido_id);
+
+    } catch (error) {
+        console.error(error)
+        return false;
+    }
+};
+
 module.exports = {
     getSelectAllPedido,
     getSelectPedidoById,
@@ -225,6 +302,11 @@ module.exports = {
     getSelectLastID,
     executeProcedurePedidoCompleto,
     setUpdatePedidoStatus,
-    getSelectDetalhesPedidoByPedidoId
+    getSelectDetalhesPedidoByPedidoId,
+    getPedidosDisponiveis,
+    setAceitarPedido,
+    setUpdatePedidoStatusMotorista,
+    getNextMotoristaDisponivel,
+    recusarPedidoMotorista
 }
 
